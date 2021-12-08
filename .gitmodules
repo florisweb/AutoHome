@@ -1,0 +1,3 @@
+[submodule "projects/elektroLumen"]
+	path = projects/elektroLumen
+	url = https://github.com/florisweb/elektroLumen.git
