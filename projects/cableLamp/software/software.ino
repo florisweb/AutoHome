@@ -18,7 +18,7 @@ const int buttonPin     = 33;
 bool prevButtonState = false;
 
 
-char executeLightProgramTime[] = "13:30";
+String executeLightProgramTime = "13:30";
 unsigned int curLightProgram[64] = {1, 800, 2, 800, 1, 700, 2, 700, 1, 600, 2, 600, 1, 500, 2, 500, 1, 400, 2, 400, 1, 300, 2, 300, 1, 200, 2, 200, 1, 100, 2, 100, 1, 800, 2, 800, 1, 700, 2, 700, 1, 600, 2, 600, 1, 500, 2, 500, 1, 400, 2, 400, 1, 300, 2, 300, 1, 200, 2, 200, 1, 100, 2, 0};
 int curLightProgramIndex = -1;
 unsigned int waitUntilMillis = 0;
@@ -88,13 +88,13 @@ void loop() {
   // Time detector/program starter
   if (millis() % 50000 == 0)
   {
-    Serial.println("test if it's time");
+    Serial.println("Test if it's time");
     struct tm timeinfo;
     if (getLocalTime(&timeinfo))
     {
-      char timeString[3];
-      strftime(timeString, 6, "%H:%M", &timeinfo);
-      if (strcmp(timeString, executeLightProgramTime) == 0) curLightProgramIndex = 0;
+      char timeChar[3];
+      strftime(timeChar, 6, "%H:%M", &timeinfo);
+      if (String(timeChar) == executeLightProgramTime) curLightProgramIndex = 0;
     }
   }
 
@@ -196,6 +196,14 @@ void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length) {
           //          curLightProgram = {1, 500, 2, 500, 1, 500, 2, 500};
           curLightProgramIndex = 0;
 
+          break;
+        case 4:
+          //          char* Time = doc["data"].as<char>();
+          executeLightProgramTime = doc["data"].as<String>();
+          //          executeLightProgramTime = Time;
+          setLampState(!lampOn);
+          delay(500);
+          setLampState(!lampOn);
           break;
       }
 
