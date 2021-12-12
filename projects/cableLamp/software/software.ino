@@ -19,7 +19,7 @@ bool prevButtonState = false;
 
 
 String executeLightProgramTime = "13:30";
-unsigned int curLightProgram[64] = {1, 800, 2, 800, 1, 700, 2, 700, 1, 600, 2, 600, 1, 500, 2, 500, 1, 400, 2, 400, 1, 300, 2, 300, 1, 200, 2, 200, 1, 100, 2, 100, 1, 800, 2, 800, 1, 700, 2, 700, 1, 600, 2, 600, 1, 500, 2, 500, 1, 400, 2, 400, 1, 300, 2, 300, 1, 200, 2, 200, 1, 100, 2, 0};
+unsigned int curLightProgram[64] = {3, 800, 3, 800, 3, 700, 3, 700, 3, 600, 3, 600, 3, 500, 3, 500, 3, 400, 3, 400, 3, 300, 3, 300, 3, 200, 3, 200, 3, 100, 3, 100, 3, 200, 3, 200, 3, 300, 3, 300, 3, 400, 3, 400, 3, 500, 3, 500, 3, 600, 3, 600, 3, 700, 3, 700, 3, 800, 3, 800};
 int curLightProgramIndex = -1;
 unsigned int waitUntilMillis = 0;
 
@@ -86,7 +86,7 @@ void loop() {
 
 
   // Time detector/program starter
-  if (millis() % 50000 == 0)
+  if (millis() % 10000 == 0 && curLightProgramIndex == -1)
   {
     Serial.println("Test if it's time");
     struct tm timeinfo;
