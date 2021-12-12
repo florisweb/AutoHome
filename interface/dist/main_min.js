@@ -1,22 +1,38 @@
 var Socket;
 
 function init() {
-  Socket = new WebSocket('ws://localhost:8080/');
+  let domain = window.location.origin;
+  if (domain != 'localhost') domain = domain.split('://')[1];
+  Socket = new WebSocket('ws://' + domain + ':8080/');
 
   Socket.onmessage = function (event) {
     console.log(event.data);
   };
+
+  Socket.onopen = function () {
+    Socket.send(JSON.stringify({
+      id: "InterfaceClient"
+    }));
+  };
 }
 
-document.getElementById('BTN_1').addEventListener('click', button_1_pressed);
-
-function button_1_pressed() {
+document.getElementById('BTN_1').addEventListener('click', () => {
   Socket.send(JSON.stringify({
-    type: 1,
+    type: "setLampStatus",
     data: true
   }));
-}
-
+});
+document.getElementById('BTN_2').addEventListener('click', () => {
+  Socket.send(JSON.stringify({
+    type: "setLampStatus",
+    data: false
+  }));
+});
+document.getElementById('BTN_3').addEventListener('click', () => {
+  Socket.send(JSON.stringify({
+    type: "runLightProgram"
+  }));
+});
 init();
 const App = new function () {
   this.name = 'hey';

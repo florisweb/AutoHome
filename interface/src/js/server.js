@@ -1,10 +1,12 @@
 var Socket; 
 function init() { 
-	Socket = new WebSocket('ws://localhost:8080/'); 
+	let domain = window.location.origin;
+	if (domain != 'localhost') domain = domain.split('://')[1];
+	Socket = new WebSocket('ws://' + domain + ':8080/'); 
 	Socket.onmessage = function(event) { 
 		console.log(event.data);
 	};
-	Socket.onOpen = () => {
+	Socket.onopen = function() {
 		// Authenticate as interfaceClient
 		Socket.send(JSON.stringify({id: "InterfaceClient"}));
 	}
