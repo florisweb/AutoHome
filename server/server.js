@@ -1,35 +1,26 @@
 
-let CableLampConst = require('./cableLamp.js').constructor;
-let CableLamp = new CableLampConst();
-
-console.log(CableLamp);
-
 const WebSocketServer = require('ws');
-
 const PORT = 8080;
 
 
- 
-
-// Creating a new websocket server
-// const wss = new WebSocketServer.Server({ port: PORT });
-const wss = new WebSocketServer.WebSocketServer({ port: PORT });
-
-console.log("The WebSocket server is running on port " + PORT);
-
-
-
-
+const CableLamp = new (require('./cableLamp.js').constructor)();
 const Services = [
     CableLamp    
 ];
+
+
+
+
+ 
+const wss = new WebSocketServer.WebSocketServer({ port: PORT });
+console.log("The WebSocket server is running on port " + PORT);
+
+
 
 const ServiceManager = new function() {
     this.findService = function(_id) {
         return Services.find((s) => s.id == _id);
     }
-
-
 }
 
 
