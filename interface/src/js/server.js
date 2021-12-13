@@ -5,6 +5,7 @@ function init() {
 	Socket = new WebSocket('ws://' + domain + ':8080/'); 
 	Socket.onmessage = function(event) { 
 		console.log(event.data);
+		message.innerHTML = event.data;
 	};
 	Socket.onopen = function() {
 		// Authenticate as interfaceClient
@@ -12,9 +13,9 @@ function init() {
 	}
 }
 
-document.getElementById('BTN_1').addEventListener('click', () => {Socket.send(JSON.stringify({type: "setLampStatus", data: true}));});
-document.getElementById('BTN_2').addEventListener('click', () => {Socket.send(JSON.stringify({type: "setLampStatus", data: false}));});
-document.getElementById('BTN_3').addEventListener('click', () => {Socket.send(JSON.stringify({type: "runLightProgram"}));});
+document.getElementById('BTN_1').addEventListener('click', () => {Socket.send(JSON.stringify({serviceId: "CableLamp", type: "setLampStatus", data: true}));});
+document.getElementById('BTN_2').addEventListener('click', () => {Socket.send(JSON.stringify({serviceId: "CableLamp", type: "setLampStatus", data: false}));});
+document.getElementById('BTN_3').addEventListener('click', () => {Socket.send(JSON.stringify({serviceId: "CableLamp", type: "runLightProgram"}));});
 
 
 init();

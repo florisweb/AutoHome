@@ -7,6 +7,7 @@ function init() {
 
   Socket.onmessage = function (event) {
     console.log(event.data);
+    message.innerHTML = event.data;
   };
 
   Socket.onopen = function () {
@@ -18,18 +19,21 @@ function init() {
 
 document.getElementById('BTN_1').addEventListener('click', () => {
   Socket.send(JSON.stringify({
+    serviceId: "CableLamp",
     type: "setLampStatus",
     data: true
   }));
 });
 document.getElementById('BTN_2').addEventListener('click', () => {
   Socket.send(JSON.stringify({
+    serviceId: "CableLamp",
     type: "setLampStatus",
     data: false
   }));
 });
 document.getElementById('BTN_3').addEventListener('click', () => {
   Socket.send(JSON.stringify({
+    serviceId: "CableLamp",
     type: "runLightProgram"
   }));
 });

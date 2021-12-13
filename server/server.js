@@ -43,8 +43,6 @@ function Client(_conn) {
     const Conn = _conn;
     Conn.on("message", buffer => {
         if (This.isInterfaceClient) return;
-        
-        console.log('client request', This.id, This.isInterfaceClient);
         let data;
         try {
             data = JSON.parse(buffer);
@@ -76,9 +74,9 @@ function Client(_conn) {
     });
 
     Conn.on("close", () => {
-        console.log("the client has connected");
-        clients = clients.filter(s => s !== Conn);
+        clients = clients.filter(s => s.id !== This.id);
         if (This.service) This.service.client = false;
+        console.log('[Client disconnected] Total: ' + clients.length);
     });
 
     Conn.onerror = function () {
@@ -99,9 +97,9 @@ function InterfaceClient(_conn) {
     this.isInterfaceClient = true;
     console.log('Upgraded client ' + this.id + ' to InterfaceClient');
 
-    this.subscriptions = [
-        CableLamp.subscribe({onEvent: handleCableLampEvent}),
-    ];
+    this.subscriptions = new SubscriptionList([
+        CableLamp.subscribe({onEvent: handleCableLampEvent})
+    ]);
 
     function handleCableLampEvent(_event) {
         Conn.send(JSON.stringify(_event));
@@ -114,24 +112,27 @@ function InterfaceClient(_conn) {
         try {
             message = JSON.parse(buffer);
         } catch (e) {return Conn.send(JSON.stringify({error: "Invalid request"}))};
+
         console.log('interfaceclient request', This.id, message);
 
-        switch (message.type) 
-        {
-            case "setLampStatus": 
-                console.log('setLampStatus',  CableLamp.setLampStatus(message.data));
-            break;
-            case "runLightProgram": 
-                console.log('runLightProgram', CableLamp.runLightProgram());
-            break;
-            case "setTimerStart": 
-                console.log('setTimerStart', CableLamp.setTimerStart(message.data));
-            break;
-        }
+        let subscription = This.subscriptions.get(message.serviceId);
+        if (!subscription) return Conn.send(JSON.stringify({error: "Subscription not found"}));
 
+        console.log(
+            "Subsciber of service " + subscription.service.id + ".handleRequest()", 
+            message, 
+            subscription.handleRequest(message)
+        );
     });
 }
 
+
+function SubscriptionList(_list = []) {
+    _list.get = (_id) => {
+        return _list.find((sub) => {return sub.service.id == _id});
+    }
+    return _list;
+}
 
 
 
