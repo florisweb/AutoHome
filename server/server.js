@@ -1,11 +1,11 @@
-const ServiceLib = require(__dirname + '/services/serviceLib.js');
-const ServiceManager = require(__dirname + '/services/serviceManager.js').ServiceManager;
+import { SubscriptionList } from './services/serviceLib.js';
+import ServiceManager from './services/serviceManager.js';
 
 
 
-const WebSocketServer = require('ws');
+import { WebSocketServer } from 'ws';
 const PORT = 8080; 
-const wss = new WebSocketServer.WebSocketServer({ port: PORT });
+const wss = new WebSocketServer({ port: PORT });
 console.log("The WebSocket server is running on port " + PORT);
 
 let clients = [];
@@ -89,7 +89,7 @@ function InterfaceClient(_conn) {
     this.isInterfaceClient = true;
     console.log('Upgraded client ' + this.id + ' to InterfaceClient');
 
-    this.subscriptions = new ServiceLib.SubscriptionList([
+    this.subscriptions = new SubscriptionList([
         ServiceManager.getService('CableLamp').subscribe({onEvent: handleCableLampEvent}),
         ServiceManager.getService('MovementTracker').subscribe({onEvent: handleMovementEvent})
     ]);

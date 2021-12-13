@@ -1,19 +1,20 @@
-const ServiceLib = require('./serviceLib.js');
-const CableLamp = require('./cableLamp.js').service;
 
-function Subscriber() {
-    ServiceLib.Subscriber.call(this, ...arguments);
+import { Subscriber, Service, SubscriptionList } from './serviceLib.js';
+import CableLamp from './cableLamp.js';
+
+function CustomSubscriber() {
+    Subscriber.call(this, ...arguments);
     this.handleRequest = function(_message) {}
 }
 
-exports.service = new function() {
+export default new function() {
     const This = this;
-    ServiceLib.Service.call(this, {
+    Service.call(this, {
         id: 'MovementTracker',
-        SubscriberTemplate: Subscriber
+        SubscriberTemplate: CustomSubscriber
     });
     
-    this.subscriptions = new ServiceLib.SubscriptionList([
+    this.subscriptions = new SubscriptionList([
         CableLamp.subscribe({onEvent: handleCableLampEvent})
     ]);
 

@@ -1,5 +1,5 @@
 
 
-exports.errors = {
+export default {
     NotConnectedService: 'E_NotConnectedService'
 }

@@ -1,8 +1,8 @@
-const ServiceConfig = require('./serviceConfig.js').config;
-const Errors = require('../errors.js').errors;
+import ServiceConfig from './serviceConfig.js';
+import Errors from '../errors.js';
 
 
-function Service({id, SubscriberTemplate = Subscriber}) {
+export function Service({id, SubscriberTemplate = Subscriber}) {
     console.log('[Service] Loaded ' + id);
     this.subscribers    = [];
     this.id             = id;
@@ -28,7 +28,7 @@ function Service({id, SubscriberTemplate = Subscriber}) {
 
 
 
-function DeviceService({id}) {
+export function DeviceService({id}) {
     Service.call(this, ...arguments);
 
     this.onMessage = (_event) => {console.log('Service doesn\'t have onMessage set', this.id);}
@@ -39,25 +39,17 @@ function DeviceService({id}) {
 }
 
 
-function SubscriptionList(_list = []) {
+export function SubscriptionList(_list = []) {
     _list.get = (_id) => {
         return _list.find((sub) => {return sub.service.id == _id});
     }
     return _list;
 }
 
-function Subscriber({onEvent}) {
+export function Subscriber({onEvent}) {
     this.service = false;
     this.onEvent = onEvent;
 
     this.handleRequest = () => {console.log('Subscriber doesn\'t have the handleRequest-function set')}
 }
-
-
-exports.Service             = Service;
-exports.DeviceService       = DeviceService;
-exports.Subscriber          = Subscriber;
-exports.SubscriptionList    = SubscriptionList;
-
-
 

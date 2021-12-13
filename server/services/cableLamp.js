@@ -1,15 +1,8 @@
-const ServiceLib = require('./serviceLib.js');
-/*
-    Messages:
-    type:
-        lampSatus -> data: lampOn
 
+import { Subscriber, DeviceService } from './serviceLib.js';
 
-
-*/
-
-function Subscriber() {
-    ServiceLib.Subscriber.call(this, ...arguments);
+function CustomSubscriber() {
+    Subscriber.call(this, ...arguments);
 
     this.handleRequest = function(_message) {
         switch (_message.type) 
@@ -32,11 +25,10 @@ function Subscriber() {
     }
 }
 
-
-exports.service = new function() {
-    ServiceLib.DeviceService.call(this, {
+export default new function() {
+    DeviceService.call(this, {
         id: 'CableLamp',
-        SubscriberTemplate: Subscriber
+        SubscriberTemplate: CustomSubscriber
     });
 
     this.onMessage = function(_message) {
