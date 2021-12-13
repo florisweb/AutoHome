@@ -67,9 +67,10 @@ void setup() {
   digitalWrite(lampEnablePin, LOW);
 
   Serial.begin(115200);
-  Serial.setDebugOutput(true);
-  Serial.println("Waking up...");
+  //  Serial.setDebugOutput(true);
 
+  delay(1000);
+  Serial.println("Waking up...");
 
   ConnectionManager.setup(ssid, password, deviceId, deviceKey, &onMessage);
 
@@ -80,12 +81,11 @@ void loop() {
   ConnectionManager.loop();
 
   buttonState = digitalRead(buttonPin);
-  if (prevButtonState != buttonState && buttonState)
+  if (prevButtonState != buttonState && buttonState) 
   {
-    Serial.println("click");
     setLampState(!lampOn);
+    ConnectionManager.send("{\"type\": \"buttonPressed\"}");
   }
-
   prevButtonState = buttonState;
 
 
@@ -151,17 +151,20 @@ void loop() {
 
 
 void setLampState(bool turnLampOn) {
+  String statusMessage = "{\"type\": \"lampStatus\", \"data\":";
   if (turnLampOn)
   {
-    Serial.println("Lamp on");
     lampOn = true;
     digitalWrite(LED_BUILTIN, HIGH);
     digitalWrite(lampEnablePin, HIGH);
+    statusMessage += "true";
   } else {
-    Serial.println("Lamp off");
     lampOn = false;
     digitalWrite(LED_BUILTIN, LOW);
     digitalWrite(lampEnablePin, LOW);
+    statusMessage += "false";
   }
-  //  update_webpage();
+
+  statusMessage += "}";
+  ConnectionManager.send(statusMessage);
 }
