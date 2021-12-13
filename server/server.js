@@ -3,10 +3,16 @@ const WebSocketServer = require('ws');
 const PORT = 8080;
 
 
-const CableLamp = new (require('./cableLamp.js').constructor)();
+const Service = require('./service.js');
+
+
+const MovementTracker = require('./movementTracker.js').service;
+const CableLamp = require('./cableLamp.js').service;
 const Services = [
     CableLamp,
+    MovementTracker
 ];
+
 
 
 
@@ -97,15 +103,19 @@ function InterfaceClient(_conn) {
     this.isInterfaceClient = true;
     console.log('Upgraded client ' + this.id + ' to InterfaceClient');
 
-    this.subscriptions = new SubscriptionList([
-        CableLamp.subscribe({onEvent: handleCableLampEvent})
+    this.subscriptions = new Service.SubscriptionList([
+        CableLamp.subscribe({onEvent: handleCableLampEvent}),
+        MovementTracker.subscribe({onEvent: handleMovementEvent})
     ]);
 
     function handleCableLampEvent(_event) {
+        _event.serviceId = CableLamp.id;
         Conn.send(JSON.stringify(_event));
     }
-
-
+    function handleMovementEvent(_event) {
+        _event.serviceId = MovementTracker.id;
+        Conn.send(JSON.stringify(_event));
+    }
 
     Conn.on("message", buffer => {
         let message;
@@ -126,13 +136,6 @@ function InterfaceClient(_conn) {
     });
 }
 
-
-function SubscriptionList(_list = []) {
-    _list.get = (_id) => {
-        return _list.find((sub) => {return sub.service.id == _id});
-    }
-    return _list;
-}
 
 
 

@@ -3,6 +3,7 @@ const Errors = require('./errors.js').errors;
 
 
 function Service({id, SubscriberTemplate = Subscriber}) {
+    console.log('[Service] Loaded ' + id);
     this.subscribers    = [];
     this.id             = id;
     this.key            = ServiceKeys[id];
@@ -13,7 +14,6 @@ function Service({id, SubscriberTemplate = Subscriber}) {
         return this.key == _key;
     }
 
-    this.onMessage = (_event) => {console.log('Service doesn\'t have onMessage set', this.id);}
     this.pushEvent = function(_event) {
         for (let subscriber of this.subscribers) subscriber.onEvent(_event);
     }
@@ -30,12 +30,20 @@ function Service({id, SubscriberTemplate = Subscriber}) {
 function DeviceService({id}) {
     Service.call(this, ...arguments);
 
+    this.onMessage = (_event) => {console.log('Service doesn\'t have onMessage set', this.id);}
     this.send = function(_data) {
         if (!this.client) return Errors.NotConnectedService;
         this.client.send(JSON.stringify(_data));
     }
 }
 
+
+function SubscriptionList(_list = []) {
+    _list.get = (_id) => {
+        return _list.find((sub) => {return sub.service.id == _id});
+    }
+    return _list;
+}
 
 function Subscriber({onEvent}) {
     this.service = false;
@@ -45,10 +53,10 @@ function Subscriber({onEvent}) {
 }
 
 
-exports.Service         = Service;
-exports.DeviceService   = DeviceService;
-exports.Subscriber      = Subscriber;
-
+exports.Service             = Service;
+exports.DeviceService       = DeviceService;
+exports.Subscriber          = Subscriber;
+exports.SubscriptionList    = SubscriptionList;
 
 
 

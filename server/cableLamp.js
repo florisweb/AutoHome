@@ -33,7 +33,7 @@ function Subscriber() {
 }
 
 
-exports.constructor = function() {
+exports.service = new function() {
     Service.DeviceService.call(this, {
         id: 'CableLamp',
         SubscriberTemplate: Subscriber
@@ -41,10 +41,7 @@ exports.constructor = function() {
 
     this.onMessage = function(_message) {
         console.log(this.id + " received: ", _message);
-        switch (_message.type)
-        {
-            case "lampStatus": this.pushEvent(_message); break;
-        }
+        this.pushEvent(_message);
     }
 }
 

@@ -6,8 +6,20 @@ function init() {
   Socket = new WebSocket('ws://' + domain + ':8080/');
 
   Socket.onmessage = function (event) {
-    console.log(event.data);
-    message.innerHTML = event.data;
+    let message = JSON.parse(event.data);
+    console.log(message);
+    if (message.type != 'status' && message.type != 'lampStatus') return;
+
+    switch (message.serviceId) {
+      case "CableLamp":
+        lampStatus.innerHTML = message.data ? 'lamp on' : 'lamp off';
+        break;
+
+      case "MovementTracker":
+        atHomeStatus.innerHTML = message.isAtHome ? 'is home' : 'is not home';
+        inRoomStatus.innerHTML = message.isInRoom ? 'is in room' : 'is not in room';
+        break;
+    }
   };
 
   Socket.onopen = function () {
