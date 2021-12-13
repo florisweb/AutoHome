@@ -1,36 +1,12 @@
+const ServiceLib = require(__dirname + '/services/serviceLib.js');
+const ServiceManager = require(__dirname + '/services/serviceManager.js').ServiceManager;
+
+
 
 const WebSocketServer = require('ws');
-const PORT = 8080;
-
-
-const Service = require('./service.js');
-
-
-const MovementTracker = require('./movementTracker.js').service;
-const CableLamp = require('./cableLamp.js').service;
-const Services = [
-    CableLamp,
-    MovementTracker
-];
-
-
-
-
-
- 
+const PORT = 8080; 
 const wss = new WebSocketServer.WebSocketServer({ port: PORT });
 console.log("The WebSocket server is running on port " + PORT);
-
-
-
-const ServiceManager = new function() {
-    this.findService = function(_id) {
-        return Services.find((s) => s.id == _id);
-    }
-}
-
-
-
 
 let clients = [];
 wss.on("connection", _conn => {
@@ -38,6 +14,13 @@ wss.on("connection", _conn => {
     clients.push(client);
     console.log('[Client connected] Total: ' + clients.length);
 });
+
+
+
+
+
+
+
 
 
 function Client(_conn) {
@@ -49,6 +32,7 @@ function Client(_conn) {
     const Conn = _conn;
     Conn.on("message", buffer => {
         if (This.isInterfaceClient) return;
+        
         let data;
         try {
             data = JSON.parse(buffer);
@@ -63,7 +47,7 @@ function Client(_conn) {
                 return;
             }
 
-            let service = ServiceManager.findService(data.id);
+            let service = ServiceManager.getService(data.id);
             if (!service) return Conn.send(JSON.stringify({error: "Service not found"}));
             let allowed = service.authenticate(data.key);
             if (!allowed) return Conn.send(JSON.stringify({error: "Invalid Key"}));
@@ -97,23 +81,25 @@ function Client(_conn) {
 
 
 
+
+
 function InterfaceClient(_conn) {
     const This = this;
     const Conn = _conn;
     this.isInterfaceClient = true;
     console.log('Upgraded client ' + this.id + ' to InterfaceClient');
 
-    this.subscriptions = new Service.SubscriptionList([
-        CableLamp.subscribe({onEvent: handleCableLampEvent}),
-        MovementTracker.subscribe({onEvent: handleMovementEvent})
+    this.subscriptions = new ServiceLib.SubscriptionList([
+        ServiceManager.getService('CableLamp').subscribe({onEvent: handleCableLampEvent}),
+        ServiceManager.getService('MovementTracker').subscribe({onEvent: handleMovementEvent})
     ]);
 
     function handleCableLampEvent(_event) {
-        _event.serviceId = CableLamp.id;
+        _event.serviceId = 'CableLamp';
         Conn.send(JSON.stringify(_event));
     }
     function handleMovementEvent(_event) {
-        _event.serviceId = MovementTracker.id;
+        _event.serviceId = 'MovementTracker';
         Conn.send(JSON.stringify(_event));
     }
 

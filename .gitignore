@@ -2,5 +2,5 @@
 **/node_modules/*
 **/package-lock.json
 **/dist/*
-server/serviceKeyManager.js
+server/services/serviceConfig.js
 
