@@ -103,7 +103,7 @@ void connectionManager::setup(const char* _ssid, const char* _password, const St
     delay(100);
   }
 
-  webSocket.begin("192.168.178.92", 8080, "/");
+  webSocket.begin(serverIP, serverPort, "/");
   webSocket.onEvent(webSocketEvent);
   webSocket.setReconnectInterval(5000); // try every 5000 again if connection has failed
 }

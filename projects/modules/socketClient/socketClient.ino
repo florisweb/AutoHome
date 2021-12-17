@@ -16,7 +16,7 @@ bool buttonState = false;
 bool prevButtonState = false;
 
 
-String executeLightProgramTime = "08:00";
+String executeLightProgramTime = "";
 unsigned int curLightProgram[64] = {3, 800, 3, 800, 3, 700, 3, 700, 3, 600, 3, 600, 3, 500, 3, 500, 3, 400, 3, 400, 3, 300, 3, 300, 3, 200, 3, 200, 3, 100, 3, 100, 3, 200, 3, 200, 3, 300, 3, 300, 3, 400, 3, 400, 3, 500, 3, 500, 3, 600, 3, 600, 3, 700, 3, 700, 3, 800, 3, 800, 1, 0};
 int curLightProgramIndex = -1;
 unsigned int waitUntilMillis = 0;

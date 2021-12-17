@@ -11,6 +11,11 @@ class connectionManager
     void send(String _string);
     bool isConnected();
     bool isAuthenticated();
+  private:
+    String serverIP = "192.168.178.94"; //192.168.178.92
+    int serverPort = 8081;
+
 };
+
 
 #endif
