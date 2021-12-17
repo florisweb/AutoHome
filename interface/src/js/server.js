@@ -1,8 +1,6 @@
 var Socket; 
 function init() { 
-	// let domain = window.location.origin;
-	// if (domain != 'localhost') domain = domain.split('://')[1];
-	// Socket = new WebSocket('ws://' + domain + ':8080/'); 
+	// Socket = new WebSocket('ws://localhost:8081/'); 
 	Socket = new WebSocket('ws://thuiswolk.local:8081/'); 
 	Socket.onmessage = function(event) { 
 		let message = JSON.parse(event.data);
@@ -20,7 +18,7 @@ function init() {
 	};
 	Socket.onopen = function() {
 		// Authenticate as interfaceClient
-		Socket.send(JSON.stringify({id: "InterfaceClient"}));
+		Socket.send(JSON.stringify({id: "InterfaceClient", key: localStorage.userKey}));
 	}
 }
 

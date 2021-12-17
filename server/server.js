@@ -1,3 +1,5 @@
+
+import WebServer from './webServer.js';
 import { SubscriptionList } from './services/serviceLib.js';
 import ServiceManager from './services/serviceManager.js';
 
@@ -38,30 +40,34 @@ function Client(_conn) {
             data = JSON.parse(buffer);
         } catch (e) {return Conn.send(JSON.stringify({error: "Invalid request"}))};
 
-        if (!This.authenticated)
+        if (This.authenticated) return This.service.onMessage(data);
+
+        if (!data.id) return Conn.send(JSON.stringify({error: "Parameters missing"}));
+        if (data.id == "InterfaceClient")
         {
-            if (!data.id) return Conn.send(JSON.stringify({error: "Parameters missing"}));
-            if (data.id == "InterfaceClient")
+            if (!authenticateInterfaceClient(data.key))
             {
-                InterfaceClient.call(This, Conn);  
+                console.log('[Invalid key] InterfaceClient ' + This.id + " tried to connect with an invalid key.");
+                Conn.send(JSON.stringify({"error": "Invalid Key"}));
+                Conn.close();
                 return;
             }
 
-            let service = ServiceManager.getService(data.id);
-            if (!service) return Conn.send(JSON.stringify({error: "Service not found"}));
-            let allowed = service.authenticate(data.key);
-            if (!allowed) return Conn.send(JSON.stringify({error: "Invalid Key"}));
-            This.authenticated = true;
-            This.service = service;
-            This.service.client = This;
-            Conn.send(JSON.stringify({type: "auth", data: true}));
-            console.log('Bound Client ' + This.id + ' to service ' + This.service.id);
-
+            InterfaceClient.call(This, Conn);  
             return;
         }
 
-        This.service.onMessage(data);
+        let service = ServiceManager.getService(data.id);
+        if (!service) return Conn.send(JSON.stringify({error: "Service not found"}));
+        let allowed = service.authenticate(data.key);
+        if (!allowed) return Conn.send(JSON.stringify({error: "Invalid Key"}));
+        This.authenticated = true;
+        This.service = service;
+        This.service.client = This;
+        Conn.send(JSON.stringify({type: "auth", data: true}));
+        console.log('Bound Client ' + This.id + ' to service ' + This.service.id);
     });
+
 
     Conn.on("close", () => {
         clients = clients.filter(s => s.id !== This.id);
@@ -122,7 +128,9 @@ function InterfaceClient(_conn) {
     });
 }
 
-
+function authenticateInterfaceClient(_key) {
+    return Math.random() > .5; // TODO actual authentication
+}
 
 
 

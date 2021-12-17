@@ -22,7 +22,8 @@ function init() {
 
   Socket.onopen = function () {
     Socket.send(JSON.stringify({
-      id: "InterfaceClient"
+      id: "InterfaceClient",
+      key: localStorage.userKey
     }));
   };
 }
