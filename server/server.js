@@ -1,4 +1,4 @@
-
+import Config from './config.js';
 import WebServer from './webServer.js';
 import { SubscriptionList } from './services/serviceLib.js';
 import ServiceManager from './services/serviceManager.js';
@@ -128,8 +128,14 @@ function InterfaceClient(_conn) {
     });
 }
 
-function authenticateInterfaceClient(_key) {
-    return Math.random() > .5; // TODO actual authentication
+function authenticateInterfaceClient(_encryptedString) {
+    try {
+        // Decrypt string
+        let data = JSON.parse(_encryptedString);
+        return Config.interface.auth.allowedUserIds.includes(data.userId);
+    } catch (e) {
+        return false;
+    }
 }
 
 

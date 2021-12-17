@@ -3,4 +3,5 @@
 **/package-lock.json
 **/dist/*
 server/services/serviceConfig.js
+server/config.js
 
