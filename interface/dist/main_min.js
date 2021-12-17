@@ -1,7 +1,7 @@
 var Socket;
 
 function init() {
-  Socket = new WebSocket('ws://thuiswolk.local:8081/');
+  Socket = new WebSocket('ws://' + window.location.hostname + ':8081/');
 
   Socket.onmessage = function (event) {
     let message = JSON.parse(event.data);

@@ -5,10 +5,12 @@
   "dependencies": {
     "crypto": "^1.0.1",
     "crypto-js": "^4.1.1",
+    "express": "^4.17.2",
     "fritzapi": "^0.12.0",
     "fs": "^0.0.1-security",
     "https": "^1.0.0",
     "node-fetch": "^3.1.0",
+    "url": "^0.11.0",
     "ws": "^8.3.0"
   },
   "type": "module",
