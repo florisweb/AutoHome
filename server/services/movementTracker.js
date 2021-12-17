@@ -1,7 +1,6 @@
 
 import { Subscriber, Service, SubscriptionList } from './serviceLib.js';
-import CableLamp from './cableLamp.js';
-import RouterManager from './routerManager.js';
+import ServiceManager from './serviceManager.js';
 
 function CustomSubscriber() {
     Subscriber.call(this, ...arguments);
@@ -14,11 +13,14 @@ export default new function() {
         id: 'MovementTracker',
         SubscriberTemplate: CustomSubscriber
     });
-    
-    this.subscriptions = new SubscriptionList([
-        CableLamp.subscribe({onEvent: handleCableLampEvent}),
-        RouterManager.subscribe({onEvent: handleRouterEvent})
-    ]);
+        
+    this.subscriptions = [];
+    this.setup = function() {
+        this.subscriptions = new SubscriptionList([
+            ServiceManager.getService('CableLamp').subscribe({onEvent: handleCableLampEvent}),
+            ServiceManager.getService('RouterManager').subscribe({onEvent: handleRouterEvent})
+        ]);
+    }
 
     this.isInRoom = false;
     this.isAtHome = false;
@@ -38,7 +40,6 @@ export default new function() {
         });
     }
     function handleRouterEvent(_event) {
-        console.log('routerevent', _event);
     }
 }
 

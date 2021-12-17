@@ -45,7 +45,7 @@ export function InterfaceClient(_conn) {
         if (!subscription) return Conn.send(JSON.stringify({error: "Subscription not found"}));
 
         console.log(
-            "Subsciber of service " + subscription.service.id + ".handleRequest()", 
+            "Subscriber of service " + subscription.service.id + ".handleRequest()", 
             message, 
             subscription.handleRequest(message)
         );

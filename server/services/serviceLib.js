@@ -10,6 +10,7 @@ export function Service({id, SubscriberTemplate = Subscriber}) {
     this.config         = ServiceConfig.services[id];
     this.client         = false;
     
+    this.setup = () => {};
     this.authenticate = (_key) => {
         if (!this.key) return true;
         return this.key == _key;

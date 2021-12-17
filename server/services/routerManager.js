@@ -25,7 +25,6 @@ export default new function() {
         console.log('[!] Server.people.setup(): SID retrieved:', sid);    
         syncLoop();
     }
-    this.setup();
 
     async function syncLoop() {
         await This.update();
@@ -75,9 +74,6 @@ export default new function() {
     }
    
 }
-
-
-
 
 
 
