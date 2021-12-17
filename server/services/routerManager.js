@@ -17,16 +17,21 @@ export default new function() {
         id: 'RouterManager',
         SubscriberTemplate: CustomSubscriber
     });
-    this.list = this.config.peopleData;
+    this.devices = this.config.devices;
 
     let sid = false;
     this.setup = async function() {
         sid = await fritz.getSessionID(this.config.credentials.username, this.config.credentials.password); 
-        console.log('[!] Server.people.setup(): SID retrieved:', sid);
-        await this.updatePeople();
-        console.log('mensjes', this.list);
+        console.log('[!] Server.people.setup(): SID retrieved:', sid);    
+        syncLoop();
     }
     this.setup();
+
+    async function syncLoop() {
+        await This.update();
+        setTimeout(syncLoop, This.config.updateTimeout);
+    }
+
 
     async function fetchNetworkData() {
         let response = await fetch('http://fritz.box/net/network.lua?sid=' + sid + '&updatecheck=&no_check=&no_sidrenew=&updating=&timeout=&useajax=1&xhr=1&t1625490333641=nocache');
@@ -35,9 +40,9 @@ export default new function() {
         try {
             data = JSON.parse(result);
         } catch (e) {
-            Logger.log('[!] Error while parsing text from fetchNetworkData:', e);
+            console.log('[!] Error while parsing text from fetchNetworkData:', e);
 
-            Logger.log('Getting new sid...');
+            console.log('Getting new sid...');
             await People.setup();
             return new Promise(async function (resolve, error) {
               await wait(1000);
@@ -47,32 +52,26 @@ export default new function() {
         return data.topology.devices;
     }
     
-    this.updatePeople = async function() {
-        console.log('[!] Send API Request');
+    this.update = async function() {
         let data = await fetchNetworkData();
-        console.log('peopledata', data);
-        for (let person of this.list)
+        for (let device of this.devices)
         {
-          person.atHome = false;
-          for (let device of person.devices)
-          {
-            let uids = [];
-            if (typeof device.UID == 'object')
-            {
-              uids = device.UID;
-            } else uids = [device.UID];
+            let wasOnline = device.online;
             device.online = false;
-            
-            for (let uid of uids) 
+            for (let uid of device.UID) 
             {
               if (!Object.keys(data).includes(uid)) continue;
               device.online = true;
+              device.name = data[uid].nameinfo.name;
               break;
             }
-            if (device.online) person.atHome = true;
-          }
+            if (wasOnline == device.online) continue;
+            console.log("[RouterManager] Device " + (device.online ? "connected" : "disconnected"), device);
+            this.pushEvent({
+                type: device.online ? "deviceConnected" : "deviceDisconnected",
+                data: device,
+            });
         }
-        console.log('- Recieved API response');
     }
    
 }

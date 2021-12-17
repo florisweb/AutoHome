@@ -1,9 +1,7 @@
 var Socket;
 
 function init() {
-  let domain = window.location.origin;
-  if (domain != 'localhost') domain = domain.split('://')[1];
-  Socket = new WebSocket('ws://' + domain + ':8080/');
+  Socket = new WebSocket('ws://thuiswolk.local:8081/');
 
   Socket.onmessage = function (event) {
     let message = JSON.parse(event.data);

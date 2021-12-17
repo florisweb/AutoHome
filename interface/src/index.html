@@ -5,8 +5,41 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="main_min.css">
 		<title>AutoHome</title>
+
+
+		<style>
+			.signInWithFloriswebButton {
+				padding:  10px 10px;
+				height: 20px;
+
+				
+				border:  1px solid #ddd;
+				border-radius: 5px;
+				background: #fff;
+
+
+				text-decoration: none;
+				line-height: 20px;
+				font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+				color: #777;
+				font-size: 12px;
+			}
+		</style>
 	</head>
 	<body>
+
+		<a href='https://user.florisweb.dev/login?APIKey=TESTSERVICE' class='signInWithFloriswebButton'>
+			Sign in with Florisweb >
+		</a>
+		<script>
+			(() => {
+				let str = window.location.search.split("?data=")[1];
+				if (!str) return;
+				let data = JSON.parse(decodeURI(str));
+				console.log(data);
+			})();
+		</script>
+
 		<div id="lampStatus">lamp off</div>
 		<div id="atHomeStatus">not at home</div>
 		<div id="inRoomStatus">not in room</div>

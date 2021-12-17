@@ -4,7 +4,7 @@ import ServiceManager from './services/serviceManager.js';
 
 
 import { WebSocketServer } from 'ws';
-const PORT = 8080; 
+const PORT = 8081;
 const wss = new WebSocketServer({ port: PORT });
 console.log("The WebSocket server is running on port " + PORT);
 

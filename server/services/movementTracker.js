@@ -1,6 +1,7 @@
 
 import { Subscriber, Service, SubscriptionList } from './serviceLib.js';
 import CableLamp from './cableLamp.js';
+import RouterManager from './routerManager.js';
 
 function CustomSubscriber() {
     Subscriber.call(this, ...arguments);
@@ -15,7 +16,8 @@ export default new function() {
     });
     
     this.subscriptions = new SubscriptionList([
-        CableLamp.subscribe({onEvent: handleCableLampEvent})
+        CableLamp.subscribe({onEvent: handleCableLampEvent}),
+        RouterManager.subscribe({onEvent: handleRouterEvent})
     ]);
 
     this.isInRoom = false;
@@ -34,6 +36,9 @@ export default new function() {
             isInRoom: This.isInRoom,
             isAtHome: This.isAtHome,
         });
+    }
+    function handleRouterEvent(_event) {
+        console.log('routerevent', _event);
     }
 }
 
