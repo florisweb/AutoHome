@@ -16,7 +16,6 @@ Express.get('/*', handleRequest);
 Express.post('/*', handleRequest);
 
 function handleRequest(req, res) {
-    if (req._parsedUrl.pathname == '/onLogin') return handleLoginRedirect(req, res);;
     if (req.url == '/stop') 
     {
         Logger.log('=== Stopping server ===');
@@ -29,9 +28,6 @@ function handleRequest(req, res) {
     return handleStaticResources(req, res);
 }
 
-function handleLoginRedirect(req, res) {
-    res.send("<script>localStorage.userKey = '" + req.query.data + "'; window.location.replace('./')</script>");
-}
 
 function handleStaticResources (req, res) {
     let path = new URL('../interface/dist/' + req.url, import.meta.url).pathname;

@@ -1,3 +1,24 @@
+const Auth = new function () {
+  const keyIvSplitter = "&iv=";
+
+  this.getKey = function () {
+    if (localStorage.userKey) return localStorage.userKey;
+
+    try {
+      let string = window.location.search.split("?data=")[1];
+      let data = string.split("&iv=")[0];
+      let iv = string.split("&iv=")[1];
+      localStorage.userKey = data + keyIvSplitter + iv;
+      return localStorage.userKey;
+    } catch (e) {
+      return false;
+    }
+  };
+
+  this.clearKey = function () {
+    localStorage.userKey = '';
+  };
+}();
 var Socket;
 
 function init() {
@@ -6,6 +27,7 @@ function init() {
   Socket.onmessage = function (event) {
     let message = JSON.parse(event.data);
     console.log(message);
+    if (message.error == "Invalid Key") return Auth.clearKey();
     if (message.type != 'status' && message.type != 'lampStatus') return;
 
     switch (message.serviceId) {
@@ -23,7 +45,7 @@ function init() {
   Socket.onopen = function () {
     Socket.send(JSON.stringify({
       id: "InterfaceClient",
-      key: localStorage.userKey
+      key: Auth.getKey()
     }));
   };
 }

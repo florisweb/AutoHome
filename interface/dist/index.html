@@ -31,14 +31,6 @@
 		<a href='https://user.florisweb.dev/login?APIKey=TESTSERVICE' class='signInWithFloriswebButton'>
 			Sign in with Florisweb >
 		</a>
-		<script>
-			(() => {
-				let str = window.location.search.split("?data=")[1];
-				if (!str) return;
-				let data = JSON.parse(decodeURI(str));
-				console.log(data);
-			})();
-		</script>
 
 		<div id="lampStatus">lamp off</div>
 		<div id="atHomeStatus">not at home</div>

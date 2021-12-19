@@ -1,17 +1,46 @@
+import * as crypto from "crypto";
 import Config from './config.js';
 import ServiceManager from './services/serviceManager.js';
 import { SubscriptionList } from './services/serviceLib.js';
 
-
-export function authenticateInterfaceClient(_encryptedString) {
+const encryptionMethod = 'AES-256-CBC';
+const keyIvSplitter = "&iv=";
+export function authenticateInterfaceClient(_key) {
     try {
         // Decrypt string
-        let data = JSON.parse(_encryptedString);
+        let encryptedString = _key.split(keyIvSplitter)[0];
+        let iv              = _key.split(keyIvSplitter)[1];
+        let decryptedString = decrypt(encryptedString, encryptionMethod, Config.interface.auth.signInWithFloriswebKey, iv);
+        if (!decryptedString) return false;
+
+        let data = JSON.parse(decryptedString);
         return Config.interface.auth.allowedUserIds.includes(data.userId);
     } catch (e) {
+        console.log("error", e);
         return false;
     }
 }
+
+var encrypt = function (plain_text, encryptionMethod, secret, iv) {
+    var encryptor = crypto.createCipheriv(encryptionMethod, secret, iv);
+    return encryptor.update(plain_text, 'utf8', 'base64') + encryptor.final('base64');
+};
+
+var decrypt = function (encryptedMessage, encryptionMethod, secret, iv) {
+    var decryptor = crypto.createDecipheriv(encryptionMethod, secret, iv);
+    return decryptor.update(encryptedMessage, 'base64', 'utf8') + decryptor.final('utf8');
+};
+
+
+
+
+
+
+
+
+
+
+
 
 export function InterfaceClient(_conn) {
     const This = this;

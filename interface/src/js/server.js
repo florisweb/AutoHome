@@ -5,6 +5,8 @@ function init() {
 		let message = JSON.parse(event.data);
 		console.log(message);
 
+		if (message.error == "Invalid Key") return Auth.clearKey();
+
 		if (message.type != 'status' && message.type != 'lampStatus') return;
 		switch (message.serviceId)
 		{
@@ -17,7 +19,7 @@ function init() {
 	};
 	Socket.onopen = function() {
 		// Authenticate as interfaceClient
-		Socket.send(JSON.stringify({id: "InterfaceClient", key: localStorage.userKey}));
+		Socket.send(JSON.stringify({id: "InterfaceClient", key: Auth.getKey()}));
 	}
 }
 
