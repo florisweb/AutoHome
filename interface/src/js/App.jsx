@@ -1,17 +1,13 @@
 
-
+let MainContent;
 const App = new function() {
-	this.name = 'hey';
-	this.render = function() {
-		let test = 'hey';
-		let element = <div className='test' ref={(e) => {test = e}}>{App.name}</div>;
-		document.body.append(element);
-		console.log(test);
+	this.setup = function() {
+		MainContent = new _MainContent();
+
 	}
+	
 }
-
-
-App.render();
+App.setup();
 
 
 function createElement(tagName, attrs = {}, ...children) {
@@ -20,6 +16,6 @@ function createElement(tagName, attrs = {}, ...children) {
     if (Array.isArray(child)) elem.append(...child)
     else elem.append(child)
   }
-	if (attrs.ref) attrs.ref(elem);
+	if (attrs && attrs.ref) attrs.ref(elem);
   return elem
 }

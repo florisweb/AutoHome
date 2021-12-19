@@ -1,0 +1,41 @@
+:root {
+  --componentWidth: 25%;
+  --componentHeight: 100px;
+}
+
+.Component.panel {
+  position: relative;
+  /* flex: 1; */
+  float: left;
+
+  padding: 20px;
+  width: calc(var(--componentWidth) - 10px * 2);
+  height: calc(var(--componentHeight) - 10px * 2);
+  margin: 10px;
+  
+  border-radius: 5px;
+
+  box-shadow: 5px 5px 10px 10px rgba(0, 0, 0, .02);
+  background: #fff;
+  border: 1px solid #e7e7e7;
+  box-sizing: border-box;
+}
+.Component.panel.whiteSpace {
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+.Component.panel.variable .text.name {
+  margin-right: 5px;
+}
+.Component.panel.variable .text.value {
+  color: #333;
+}
+
+
+.Component.panel.lineGraph {
+  padding: 0px;
+
+  background-color: #fff;
+}

@@ -2,6 +2,7 @@
 **/node_modules/*
 **/package-lock.json
 **/dist/*
+interface/dist/*
 server/services/serviceConfig.js
 server/config.js
 
