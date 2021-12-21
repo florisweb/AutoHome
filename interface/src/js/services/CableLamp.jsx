@@ -3,12 +3,11 @@
 const CableLampPanel = new function() {
 	const This = this;
 	Panel.call(this, {
-		width: 2,
-		height: 2,
+		customClass: "CableLamp",
 		onRender: render
 	});
 	function render() {
-		let lampStatus = <div class='text'>lamp off</div>;
+		let lampStatus = <div className='text'>lamp off</div>;
 		let toggleButton = <div className='button bDefault text'>Toggle</div>;
 		toggleButton.onclick = () => {CableLamp.toggleLight()}
 		This.html = {
@@ -17,8 +16,11 @@ const CableLampPanel = new function() {
 		};
 		This.setLampStatus(CableLamp.lampOn);
 		return [
+			<div className='text panelTitle'>Cable Lamp</div>,
 			lampStatus,
-			toggleButton,
+			<div className='bottomBar'>
+				{toggleButton}
+			</div>
 		];
 	}
 
@@ -30,7 +32,7 @@ const CableLampPanel = new function() {
 }
 
 const CableLamp = new function() {
-	Service.call(this, {serviceId: 'CableLamp'});
+	Service.call(this, {serviceId: 'CableLamp', name: 'Cable Lamp'});
 	this.state = {
 		lampOn: false
 	};

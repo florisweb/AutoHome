@@ -25,8 +25,11 @@ function MainContent_page({index, pageRenderer, onOpen}) {
 						<div className='pageHeader'>
 							<div className='text titleHolder'>Title</div>
 						</div>
-						<div className='pageContent'> 
+						<div className='pageContent'>
 							{pageRenderer()}
+							<a href='https://user.florisweb.dev/login?APIKey=TESTSERVICE' className='signInWithFloriswebButton'>
+								Sign in with Florisweb >
+							</a>
 						</div>
 					</div>;
 		return HTML.page;

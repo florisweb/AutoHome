@@ -1,14 +1,12 @@
 
-function Panel({width, height, onRender}) {
+function Panel({onRender, customClass = ""}) {
 	this.html = {};
 
 	this.render = function() {
-		let html = <div class='Panel'>
+		let html = <div className={'Panel ' + customClass}>
 			{onRender()}
 		</div>;
 
-		html.style.width = 'calc(' + width + ' * var(--componentWidth) - 10px * 2)';
-    	html.style.height = 'calc(' + height + ' * var(--componentHeight) - 10px * 2)';
 		this.html.self = html;
 		return html;
 	}
