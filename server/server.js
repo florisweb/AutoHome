@@ -45,12 +45,13 @@ function Client(_conn) {
             if (!authenticateInterfaceClient(data.key))
             {
                 console.log('[Invalid key] InterfaceClient ' + This.id + " tried to connect with an invalid key.");
-                Conn.send(JSON.stringify({"error": "Invalid Key"}));
+                Conn.send(JSON.stringify({"type": "auth", "status": false, "error": "Invalid Key"}));
                 Conn.close();
                 return;
             }
 
             InterfaceClient.call(This, Conn);  
+            Conn.send(JSON.stringify({"type": "auth", "status": true}));
             return;
         }
 

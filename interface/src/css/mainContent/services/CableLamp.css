@@ -1,7 +1,7 @@
 
 
 
-.Component.panel.CableLamp {
+.Panel.CableLamp {
 	width: calc(var(--componentWidth) - 10px * 2);
   	height: calc(var(--componentHeight) * 3 - 10px * 2);
 }

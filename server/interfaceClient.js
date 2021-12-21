@@ -15,10 +15,7 @@ export function authenticateInterfaceClient(_key) {
 
         let data = JSON.parse(decryptedString);
         return Config.interface.auth.allowedUserIds.includes(data.userId);
-    } catch (e) {
-        console.log("error", e);
-        return false;
-    }
+    } catch (e) {return false;}
 }
 
 var encrypt = function (plain_text, encryptionMethod, secret, iv) {

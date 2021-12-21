@@ -26,14 +26,20 @@ function CustomSubscriber() {
 }
 
 export default new function() {
+    const This = this;
     DeviceService.call(this, {
         id: 'CableLamp',
-        SubscriberTemplate: CustomSubscriber
+        SubscriberTemplate: CustomSubscriber,
+        onMessage: onMessage
     });
 
-    this.onMessage = function(_message) {
-        console.log(this.id + " received: ", _message);
-        this.pushEvent(_message);
+    function onMessage(_message) {
+        switch (_message.type)
+        {
+            case "lampStatus": This.curState.lampOn = _message.data; break;
+        }
+        console.log(This.id + " received: ", _message);
+        This.pushEvent(_message);
     }
 }
 

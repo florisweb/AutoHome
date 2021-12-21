@@ -23,16 +23,21 @@ export function Service({id, SubscriberTemplate = Subscriber}) {
         let sub = new SubscriberTemplate(_subscriber);
         sub.service = this;
         this.subscribers.push(sub);
+        if (this.curState) sub.onEvent({type: "curState", data: this.curState});
         return sub;
     }
 }
 
 
 
-export function DeviceService({id}) {
+export function DeviceService({id, onMessage}) {
     Service.call(this, ...arguments);
-
-    this.onMessage = (_event) => {console.log('Service doesn\'t have onMessage set', this.id);}
+    this.curState = {};
+    this.onMessage = (_event) => {
+        try {
+            onMessage(_event);
+        } catch (e) {console.log(e)};
+    }
     this.send = function(_data) {
         if (!this.client) return Errors.NotConnectedService;
         this.client.send(JSON.stringify(_data));

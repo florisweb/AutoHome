@@ -2,7 +2,7 @@
 cd "$(dirname "$0")"
 echo - Building JavaScript
 
-cat src/js/services/* src/js/mainContent.jsx src/js/auth.js src/js/server.js src/js/App.jsx > dist/main_min.jsx
+cat src/js/extraFunctions.js src/js/auth.js src/js/server.js src/js/service.jsx src/js/panel.jsx src/js/services/* src/js/mainContent.jsx src/js/App.jsx > dist/main_min.jsx
 npx babel dist/main_min.jsx -d dist
 rm dist/main_min.jsx
 
@@ -10,7 +10,7 @@ rm dist/main_min.jsx
 cd "$(dirname "$0")"
 echo - Building CSS
 
-cat src/css/component.css src/css/main.css src/css/mainContent/components.css src/css/mainContent/page.css src/css/mainContent/mainContent.css src/css/mainContent/services/* > dist/main_min.css
+cat src/css/component.css src/css/main.css src/css/mainContent/panel.css src/css/mainContent/page.css src/css/mainContent/mainContent.css src/css/mainContent/services/* > dist/main_min.css
 
 cp -r src/images dist
 cp src/index.html dist/index.html

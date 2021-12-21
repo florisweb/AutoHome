@@ -3,7 +3,7 @@
   --componentHeight: 100px;
 }
 
-.Component.panel {
+.Panel {
   position: relative;
   /* flex: 1; */
   float: left;
@@ -19,23 +19,9 @@
   background: #fff;
   border: 1px solid #e7e7e7;
   box-sizing: border-box;
+  border:  1px solid red;
 }
-.Component.panel.whiteSpace {
+.Panel.whiteSpace {
   opacity: 0;
   pointer-events: none;
-}
-
-
-.Component.panel.variable .text.name {
-  margin-right: 5px;
-}
-.Component.panel.variable .text.value {
-  color: #333;
-}
-
-
-.Component.panel.lineGraph {
-  padding: 0px;
-
-  background-color: #fff;
 }
