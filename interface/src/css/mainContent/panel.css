@@ -26,8 +26,17 @@
     pointer-events: none;
 }
 
+.Panel .panelIcon {
+    float:  left;
+    width:  40px;
+    height: 40px;
+    margin-right: 5px;
+    margin-bottom: 10px;
+}
+
 .Panel .text.panelTitle {
-    width:  100%;
+    float:  left;
+    width:  calc(100% - 40px - 5px);
     height: 30px;
 
 

@@ -10,12 +10,16 @@ const CableLampPanel = new function() {
 		let lampStatus = <div className='text'>lamp off</div>;
 		let toggleButton = <div className='button bDefault text'>Toggle</div>;
 		toggleButton.onclick = () => {CableLamp.toggleLight()}
+
+		let lightBolbIcon = <img className='panelIcon' src='images/lightBolbOn.png'></img>;
 		This.html = {
 			toggleButton: toggleButton, 
-			lampStatus: lampStatus
+			lampStatus: lampStatus,
+			lightBolbIcon: lightBolbIcon,
 		};
 		This.setLampStatus(CableLamp.lampOn);
 		return [
+			lightBolbIcon,
 			<div className='text panelTitle'>Cable Lamp</div>,
 			lampStatus,
 			<div className='bottomBar'>
@@ -25,8 +29,9 @@ const CableLampPanel = new function() {
 	}
 
 	this.setLampStatus = (_lampOn) => {
-		if (!This.html.lampStatus) return console.log('doesn\'t exist yet');
-		setTextToElement(This.html.lampStatus, _lampOn ? "Lamp On" : "Lamp Off");
+		if (!this.html.lampStatus) return console.log('doesn\'t exist yet');
+		setTextToElement(this.html.lampStatus, _lampOn ? "Lamp On" : "Lamp Off");
+		this.html.lightBolbIcon.setAttribute('src', "images/lightBolb" + (_lampOn ? "On" : "Off") + ".png");
 	}
 
 }
