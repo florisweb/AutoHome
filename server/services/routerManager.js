@@ -22,7 +22,7 @@ export default new function() {
     let sid = false;
     this.setup = async function() {
         sid = await fritz.getSessionID(this.config.credentials.username, this.config.credentials.password); 
-        console.log('[!] Server.people.setup(): SID retrieved:', sid);    
+        console.log('[RouterManager] setup(): SID retrieved:', sid);    
         syncLoop();
     }
 
@@ -39,7 +39,7 @@ export default new function() {
         try {
             data = JSON.parse(result);
         } catch (e) {
-            console.log('[!] Error while parsing text from fetchNetworkData:', e);
+            console.log('[RouterManager] Error while parsing text from fetchNetworkData:', e);
 
             console.log('Getting new sid...');
             await People.setup();
@@ -65,7 +65,7 @@ export default new function() {
               break;
             }
             if (wasOnline == device.online) continue;
-            console.log("[RouterManager] Device " + (device.online ? "connected" : "disconnected"), device);
+            console.log("[RouterManager] Device " + (device.online ? "connected" : "disconnected"), device.name);
             this.pushEvent({
                 type: device.online ? "deviceConnected" : "deviceDisconnected",
                 data: device,

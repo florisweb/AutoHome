@@ -8,7 +8,18 @@ export function Service({id, SubscriberTemplate = Subscriber}) {
     this.id             = id;
     this.key            = ServiceConfig.services[id].key;
     this.config         = ServiceConfig.services[id];
+    
     this.client         = false;
+    this.curState = {};
+    this.setDevicesClient = (_deviceClient) => {
+        this.client = _deviceClient;
+        console.log("onlineStatusUpdate", !!this.client);
+        this.pushEvent({
+            type: "onlineStatusUpdate",
+            data: !!this.client
+        });
+        this.curState.deviceOnline = !!this.client;
+    }
     
     this.setup = () => {};
     this.authenticate = (_key) => {
@@ -23,8 +34,14 @@ export function Service({id, SubscriberTemplate = Subscriber}) {
         let sub = new SubscriberTemplate(_subscriber);
         sub.service = this;
         this.subscribers.push(sub);
-        if (this.curState) sub.onEvent({type: "curState", data: this.curState});
+        this.pushCurState(sub);
         return sub;
+    }
+
+    this.pushCurState = function(_sub) {
+        let event = {type: "curState", data: this.curState};
+        if (!_sub) return this.pushEvent(event);
+        _sub.onEvent(event);
     }
 }
 
@@ -32,7 +49,6 @@ export function Service({id, SubscriberTemplate = Subscriber}) {
 
 export function DeviceService({id, onMessage}) {
     Service.call(this, ...arguments);
-    this.curState = {};
     this.onMessage = (_event) => {
         try {
             onMessage(_event);

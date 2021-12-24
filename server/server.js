@@ -17,11 +17,6 @@ wss.on("connection", _conn => {
 
 
 
-
-
-
-
-
 function Client(_conn) {
     const This = this;
     this.authenticated = false;
@@ -61,26 +56,33 @@ function Client(_conn) {
         if (!allowed) return Conn.send(JSON.stringify({error: "Invalid Key"}));
         This.authenticated = true;
         This.service = service;
-        This.service.client = This;
+        service.setDevicesClient(This);
         Conn.send(JSON.stringify({type: "auth", data: true}));
         console.log('Bound Client ' + This.id + ' to service ' + This.service.id);
     });
 
 
     Conn.on("close", () => {
+        console.log("Start disconnect");
         clients = clients.filter(s => s.id !== This.id);
-        if (This.service) This.service.client = false;
+        if (This.service) This.service.setDevicesClient(false);
         console.log('[Client disconnected] Total: ' + clients.length);
     });
 
-    Conn.onerror = function () {
-        console.log("Some Error occurred")
-    }
+    Conn.on("error", () => {
+        console.log("Some Error occurred");
+    });
+    Conn.on("timeout", () => {
+        console.log("timeout");
+    });
+    Conn.on("end", () => {
+        console.log("end");
+    });
 
 
     this.send = (_string) => {
         Conn.send(_string);
-    }   
+    }
 }
 
 

@@ -36,7 +36,7 @@
 
 .Panel .text.panelTitle {
     float:  left;
-    width:  calc(100% - 40px - 5px);
+    width:  calc(100% - 40px - 5px - 10px);
     height: 30px;
 
 
@@ -45,6 +45,21 @@
     text-align: left;
     font-weight: lighter;
     color:  #666;
+}
+
+.Panel .onlineIndicator {
+    position: relative;
+    float:  left;
+    width:  8px;
+    height: 8px;
+    margin:  11px 1px;
+    border-radius: 100%;
+    
+    background: #888;
+}
+
+.Panel .onlineIndicator.online {
+    background: #0f0;
 }
 
 .Panel .bottomBar {

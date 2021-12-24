@@ -6,21 +6,25 @@ const CableLampPanel = new function() {
 		customClass: "CableLamp",
 		onRender: render
 	});
+	let renderOnlineIndicator = this.renderOnlineIndicator;
 	function render() {
 		let lampStatus = <div className='text'>lamp off</div>;
 		let toggleButton = <div className='button bDefault text'>Toggle</div>;
 		toggleButton.onclick = () => {CableLamp.toggleLight()}
 
 		let lightBolbIcon = <img className='panelIcon' src='images/lightBolbOn.png'></img>;
-		This.html = {
-			toggleButton: toggleButton, 
-			lampStatus: lampStatus,
-			lightBolbIcon: lightBolbIcon,
-		};
+		This.html["toggleButton"] = toggleButton;
+		This.html["lampStatus"] = lampStatus;
+		This.html["lightBolbIcon"] = lightBolbIcon;
+
 		This.setLampStatus(CableLamp.lampOn);
+		let onlineIndicator = This.renderOnlineIndicator();
+		This.setOnlineState(CableLamp.state.deviceOnline);
+
 		return [
 			lightBolbIcon,
 			<div className='text panelTitle'>Cable Lamp</div>,
+			onlineIndicator,
 			lampStatus,
 			<div className='bottomBar'>
 				{toggleButton}
@@ -45,10 +49,14 @@ const CableLamp = new function() {
 	this.onEvent = (_event) => {
 		switch (_event.type)
 		{
+			case "onlineStatusUpdate": 
+				this.state.deviceOnline = _event.data;
+				CableLampPanel.setOnlineState(this.state.deviceOnline);
+			break;
 			case "curState": 
 				this.state = _event.data;
-				console.log(this.state.lampOn);
 				CableLampPanel.setLampStatus(this.state.lampOn);
+				CableLampPanel.setOnlineState(this.state.deviceOnline);
 			break;
 			case "lampStatus": 
 				this.state.lampOn = _event.data;

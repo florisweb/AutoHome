@@ -47,7 +47,7 @@ export function InterfaceClient(_conn) {
 
     this.subscriptions = new SubscriptionList([
         ServiceManager.getService('CableLamp').subscribe({onEvent: handleCableLampEvent}),
-        ServiceManager.getService('MovementTracker').subscribe({onEvent: handleMovementEvent})
+        // ServiceManager.getService('MovementTracker').subscribe({onEvent: handleMovementEvent})
     ]);
 
     function handleCableLampEvent(_event) {
