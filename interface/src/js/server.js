@@ -7,8 +7,10 @@ const Server = new function() {
 	this.registerServiceListener = (_service) => {this.serviceListeners.push(_service)}
 
 	let Socket;
-	this.setup = function() {
+	this.setup = () => {return this.connect()}
+	this.connect = function() {
 		Socket = new WebSocket('ws://' + window.location.hostname + ':8081/'); 
+		window.s = Socket;
 		// Socket = new WebSocket('ws://thuiswolk.local:8081/'); 
 		Socket.onmessage = function(_event) { 
 			let message = JSON.parse(_event.data); 
@@ -27,6 +29,13 @@ const Server = new function() {
 		Socket.onopen = function() {
 			// Authenticate as interfaceClient
 			Socket.send(JSON.stringify({id: "InterfaceClient", key: Auth.getKey()}));
+		}
+		
+		Socket.onclose = function() {
+			console.log('closed, reconnecting...');
+			setTimeout(() => {
+				Server.connect();
+			}, 1000);
 		}
 	}
 

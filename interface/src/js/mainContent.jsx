@@ -58,7 +58,8 @@ function MainContent_homePage() {
 
 	function render() {
 		return <div>
-			{CableLampPanel.render()}
+			{CableLampPanel.render()},
+			{ELumenPanel.render()},
 		</div>;
 	}
 

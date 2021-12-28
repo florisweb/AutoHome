@@ -21,6 +21,11 @@ function CustomSubscriber() {
                     type: 3,
                     data: _message.data
                 });
+            case "setLightProgram": 
+                return this.service.send({
+                    type: 4,
+                    data: _message.data
+                });
         }
     }
 }

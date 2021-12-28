@@ -14,6 +14,14 @@ wss.on("connection", _conn => {
     console.log('[Client connected] Total: ' + clients.length);
 });
 
+// Remove disconnected clients
+const interval = setInterval(function () {
+  wss.clients.forEach(function (conn) {
+    if (conn.isAlive === false) return conn.terminate();
+    conn.isAlive = false;
+    conn.ping();
+  });
+}, 30000);
 
 
 
@@ -24,6 +32,11 @@ function Client(_conn) {
     this.id = newId();
 
     const Conn = _conn;
+    Conn.isAlive = true;
+    Conn.on('pong', () => {Conn.isAlive = true});
+
+
+
     Conn.on("message", buffer => {
         if (This.isInterfaceClient) return;
         

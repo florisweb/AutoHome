@@ -1,0 +1,7 @@
+
+
+
+.Panel.ELumen {
+	width: calc(var(--componentWidth) - 10px * 2);
+  	height: calc(var(--componentHeight) * 2 - 10px * 2);
+}
