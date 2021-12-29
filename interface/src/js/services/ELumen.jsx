@@ -54,10 +54,6 @@ const ELumen = new function() {
 		}
 	}
 
-	// document.getElementById('BTN_1').addEventListener('click', () => {Socket.send(JSON.stringify({serviceId: "CableLamp", type: "setLampStatus", data: true}));});
-	// document.getElementById('BTN_2').addEventListener('click', () => {Socket.send(JSON.stringify({serviceId: "CableLamp", type: "setLampStatus", data: false}));});
-	// document.getElementById('BTN_3').addEventListener('click', () => {Socket.send(JSON.stringify({serviceId: "CableLamp", type: "runLightProgram"}));});
-
 
 	this.toggleLight = function() {
 		return this.setLightState(!this.state.lampOn);

@@ -17,11 +17,12 @@ wss.on("connection", _conn => {
 // Remove disconnected clients
 const interval = setInterval(function () {
   wss.clients.forEach(function (conn) {
+    if (conn.justConnectedTimeout) return;
     if (conn.isAlive === false) return conn.terminate();
     conn.isAlive = false;
     conn.ping();
   });
-}, 30000);
+}, 10000);
 
 
 
@@ -33,6 +34,8 @@ function Client(_conn) {
 
     const Conn = _conn;
     Conn.isAlive = true;
+    Conn.justConnectedTimeout = true;
+    setTimeout(() => {Conn.justConnectedTimeout = false}, 10000);
     Conn.on('pong', () => {Conn.isAlive = true});
 
 
@@ -69,8 +72,8 @@ function Client(_conn) {
         if (!allowed) return Conn.send(JSON.stringify({error: "Invalid Key"}));
         This.authenticated = true;
         This.service = service;
-        service.setDevicesClient(This);
         Conn.send(JSON.stringify({type: "auth", data: true}));
+        service.setDevicesClient(This);
         console.log('Bound Client ' + This.id + ' to service ' + This.service.id);
     });
 

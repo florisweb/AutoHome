@@ -19,8 +19,12 @@ export function Service({id, SubscriberTemplate = Subscriber}) {
             data: !!this.client
         });
         this.curState.deviceOnline = !!this.client;
+        if (this.client) return this.onDeviceConnect();
+        this.onDeviceDisconnect();
     }
-    
+    this.onDeviceConnect = () => {};
+    this.onDeviceDisconnect = () => {};
+
     this.setup = () => {};
     this.authenticate = (_key) => {
         if (!this.key) return true;

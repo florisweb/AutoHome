@@ -32,7 +32,7 @@ const CableLampPanel = new function() {
 		];
 	}
 
-	this.setLampStatus = (_lampOn) => {
+	this.setLampState = (_lampOn) => {
 		if (!this.html.lampStatus) return console.log('doesn\'t exist yet');
 		setTextToElement(this.html.lampStatus, _lampOn ? "Lamp On" : "Lamp Off");
 		this.html.lightBolbIcon.setAttribute('src', "images/lightBolb" + (_lampOn ? "On" : "Off") + ".png");
@@ -55,26 +55,23 @@ const CableLamp = new function() {
 			break;
 			case "curState": 
 				this.state = _event.data;
-				CableLampPanel.setLampStatus(this.state.lampOn);
+				CableLampPanel.setLampState(this.state.lampOn);
 				CableLampPanel.setOnlineState(this.state.deviceOnline);
 			break;
 			case "lampStatus": 
 				this.state.lampOn = _event.data;
-				CableLampPanel.setLampStatus(this.state.lampOn); 
+				CableLampPanel.setLampState(this.state.lampOn); 
 			break;
 		}
 	}
 
-	// document.getElementById('BTN_1').addEventListener('click', () => {Socket.send(JSON.stringify({serviceId: "CableLamp", type: "setLampStatus", data: true}));});
-	// document.getElementById('BTN_2').addEventListener('click', () => {Socket.send(JSON.stringify({serviceId: "CableLamp", type: "setLampStatus", data: false}));});
-	// document.getElementById('BTN_3').addEventListener('click', () => {Socket.send(JSON.stringify({serviceId: "CableLamp", type: "runLightProgram"}));});
 
 
 	this.toggleLight = function() {
-		return this.setLightState(!this.state.lampOn);
+		return this.setLampState(!this.state.lampOn);
 	}
 
-	this.setLightState = function(_lampOn) {
-		return this.send({type: "setLampStatus", data: _lampOn})
+	this.setLampState = function(_lampOn) {
+		return this.send({type: "setLampState", data: _lampOn})
 	}
 }
