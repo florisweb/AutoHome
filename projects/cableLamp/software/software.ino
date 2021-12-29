@@ -1,30 +1,33 @@
-#include <WiFi.h> // Include WIFi Library for ESP32
-#include <WebServer.h> // Include WebSwever Library for ESP32
-#include <ArduinoJson.h> // Include ArduinoJson Library
-#include <WebSocketsServer.h>  // Include Websocket Library
-#include "time.h"
+#include "connectionManager.h";
+#include "time.h";
+#include <array>;
 
+connectionManager ConnectionManager;
 
 const char* ssid = "";
 const char* password = "";
+const String deviceId = "";
+const String deviceKey = "";
 
-String web = "<body><h1>Received message: <span id='message'>-</span></h1><button type='button' id='BTN_1'> <h1>ON</h1> </button><button type='button' id='BTN_2'> <h1>OFF</h1> </button><button type='button' id='BTN_3'> <h1>ANIMATE</h1> </button></body><script> var Socket; document.getElementById('BTN_1').addEventListener('click', button_1_pressed);document.getElementById('BTN_3').addEventListener('click', button_3_pressed); document.getElementById('BTN_2').addEventListener('click', button_2_pressed); function init() { Socket = new WebSocket('ws://' + window.location.hostname + ':81/'); Socket.onmessage = function(event) { processCommand(event); }; } function processCommand(event) { var obj = JSON.parse(event.data); document.getElementById('message').innerHTML = JSON.stringify(obj); console.log(obj);} function button_1_pressed() { Socket.send(JSON.stringify({type: 1, data: true})); } function button_2_pressed() {Socket.send(JSON.stringify({type: 1, data: false})); }; function button_3_pressed() {Socket.send(JSON.stringify({type: 2})); } window.onload = function(event) { init(); }</script></html>";
-
-String jsonString; // Temporary storage for the JSON String
-
-boolean lampOn = false; // Holds the status of the pin
 const int lampEnablePin = 32;
 const int buttonPin     = 33;
+
+boolean lampOn = false;
+bool buttonState = false;
 bool prevButtonState = false;
 
 
-String executeLightProgramTime = "13:30";
-unsigned int curLightProgram[64] = {3, 800, 3, 800, 3, 700, 3, 700, 3, 600, 3, 600, 3, 500, 3, 500, 3, 400, 3, 400, 3, 300, 3, 300, 3, 200, 3, 200, 3, 100, 3, 100, 3, 200, 3, 200, 3, 300, 3, 300, 3, 400, 3, 400, 3, 500, 3, 500, 3, 600, 3, 600, 3, 700, 3, 700, 3, 800, 3, 800};
-int curLightProgramIndex = -1;
+String executeLightProgramTime = "";
 unsigned int waitUntilMillis = 0;
 
-WebServer server(80);  // create instance for web server on port "80"
-WebSocketsServer webSocket = WebSocketsServer(81);  //create instance for webSocket server on port"81"
+int curLightProgramIndex = -1;
+const int maxProgramSize = 64;
+std::array<int, maxProgramSize> curLightProgram;
+
+String programTrigger = "";
+std::array<int, maxProgramSize> lightProgram = {};
+
+
 
 
 // Get the time
@@ -32,69 +35,98 @@ const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = 3600;
 const int   daylightOffset_sec = 3600;
 
+void onMessage(DynamicJsonDocument message) {
+  String error = message["error"];
+  int packetType = message["type"];
+
+  Serial.print("[OnMessage] Error: ");
+  Serial.println(error);
+  Serial.print("[OnMessage] type: ");
+  Serial.println(packetType);
+
+  String trigger = message["data"]["trigger"].as<String>();
+
+
+  switch (packetType)
+  {
+    case 1: // Set lamp state
+      setLampState(message["data"]);
+      break;
+    case 2: // Execute a given program
+      for (int i = 0; i < maxProgramSize; i++)
+      {
+        int instruction = message["data"][i];
+        curLightProgram[i] = instruction;
+      }
+      curLightProgramIndex = 0;
+      break;
+
+    case 3: // Import/set light program
+      for (int i = 0; i < maxProgramSize; i++)
+      {
+        int instruction = message["data"]["program"][i];
+        lightProgram[i] = instruction;
+      }
+      programTrigger = trigger;
+      break;
+    case 4: // Run program
+      curLightProgram = lightProgram;
+      curLightProgramIndex = 0;
+      break;
+  }
+}
+
 
 
 
 
 void setup() {
-  // put your setup code here, to run once:
-  pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(lampEnablePin, OUTPUT);
   pinMode(buttonPin, INPUT);
-
+  pinMode(lampEnablePin, OUTPUT);
   digitalWrite(lampEnablePin, LOW);
-  Serial.begin(115200); // Init Serial for Debugging.
 
+  Serial.begin(115200);
 
+  //  Serial.setDebugOutput(true);
 
+  delay(1000);
+  Serial.println("Waking up...");
 
-  WiFi.begin(ssid, password); // Connect to Wifi
-  while (WiFi.status() != WL_CONNECTED) { // Check if wifi is connected or not
-    delay(500);
-    Serial.print(".");
-  }
-
-  Serial.println();
-  // Print the IP address in the serial monitor windows.
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
-  // Initialize a web server on the default IP address. and send the webpage as a response.
-  server.on("/", []() {
-    server.send(200, "text\html", web);
-  });
-  server.begin(); // init the server
-  webSocket.begin();  // init the Websocketserver
-  webSocket.onEvent(webSocketEvent);  // init the webSocketEvent function when a websocket event occurs
-
+  ConnectionManager.setup(ssid, password, deviceId, deviceKey, &onMessage);
 
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 }
 
-bool buttonState = false;
+unsigned int programStarterClock = 0;
 void loop() {
-  server.handleClient();  // webserver methode that handles all Client
-  webSocket.loop(); // websocket server methode that handles all Client
+
+  ConnectionManager.loop();
+
   buttonState = digitalRead(buttonPin);
   if (prevButtonState != buttonState && buttonState)
   {
-    Serial.println("click");
     setLampState(!lampOn);
+    ConnectionManager.send("{\"type\": \"buttonPressed\"}");
   }
-
   prevButtonState = buttonState;
 
 
 
   // Time detector/program starter
-  if (millis() % 10000 == 0 && curLightProgramIndex == -1)
+  programStarterClock++;
+  if (programStarterClock > 100000) programStarterClock = 0;
+  if (programStarterClock == 0 && curLightProgramIndex == -1)
   {
-    Serial.println("Test if it's time");
     struct tm timeinfo;
     if (getLocalTime(&timeinfo))
     {
       char timeChar[3];
       strftime(timeChar, 6, "%H:%M", &timeinfo);
-      if (String(timeChar) == executeLightProgramTime) curLightProgramIndex = 0;
+      if (String(timeChar) == programTrigger)
+      {
+        curLightProgram = lightProgram;
+        curLightProgramIndex = 0;
+      }
     }
   }
 
@@ -110,131 +142,54 @@ void loop() {
 
 
   // Light program executer
-  if (curLightProgramIndex != -1 && waitUntilMillis < millis())
-  {
-    Serial.print(curLightProgramIndex);
-    Serial.print("/");
-    Serial.println(sizeof(curLightProgram) / sizeof(int));
-    if (curLightProgramIndex % 2 == 0)
-    {
-      switch (curLightProgram[curLightProgramIndex])
-      {
-        case 0:
-          curLightProgramIndex = -2; // -2 + 1 = -1
-          break;
-        case 1:
-          setLampState(true);
-          break;
-        case 2:
-          setLampState(false);
-          break;
-        case 3:
-          setLampState(!lampOn);
-          break;
-      }
-    } else {
-      waitUntilMillis = millis() + curLightProgram[curLightProgramIndex];
-      Serial.print("Set timer to: ");
-      Serial.println(waitUntilMillis);
-    }
-
-    curLightProgramIndex++;
-    if (sizeof(curLightProgram) / sizeof(int) < curLightProgramIndex) curLightProgramIndex = -1;
-  }
+  updateProgramExecutor();
 }
 
 
 
+void updateProgramExecutor() {
+  if (curLightProgramIndex == -1 || waitUntilMillis > millis()) return;
 
-
-// This function gets a call when a WebSocket event occurs
-void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length) {
-  switch (type) {
-    case WStype_DISCONNECTED: // enum that read status this is used for debugging.
-      Serial.print("WS Type ");
-      Serial.print(type);
-      Serial.println(": DISCONNECTED");
-      break;
-    case WStype_CONNECTED:  // Check if a WebSocket client is connected or not
-      Serial.print("WS Type ");
-      Serial.print(type);
-      Serial.println(": CONNECTED");
-
-      update_webpage();// update the webpage accordingly
-
-      break;
-    case WStype_TEXT: // check responce from client
-      bool newState;
-      //      int program[16];
-
-      Serial.println(); // the payload variable stores teh status internally
-      Serial.println(length);
-      Serial.println(num);
-
-      char *request = reinterpret_cast<char*>(payload);
-      Serial.println(request);
-      Serial.println("Raw Data:");
-      for (int i = 0; i < length; i++) Serial.println(payload[i]);
-
-      DynamicJsonDocument doc(1024);
-      deserializeJson(doc, request);
-      int type = doc["type"];
-      Serial.println(type);
-      switch (type)
-      {
-        case 1:
-          newState = doc["data"];
-          setLampState(newState);
-          break;
-        case 2:
-
-          for (int i = 0; i < 16; i++)
-          {
-            int a = doc["data"][i];
-            Serial.print(a);
-          }
-          //          curLightProgram = {1, 500, 2, 500, 1, 500, 2, 500};
-          curLightProgramIndex = 0;
-
-          break;
-        case 4:
-          //          char* Time = doc["data"].as<char>();
-          executeLightProgramTime = doc["data"].as<String>();
-          //          executeLightProgramTime = Time;
-          setLampState(!lampOn);
-          delay(500);
-          setLampState(!lampOn);
-          break;
-      }
-
-      break;
+  if (curLightProgramIndex % 2 == 0)
+  {
+    switch (curLightProgram[curLightProgramIndex])
+    {
+      case 0:
+        curLightProgramIndex = -2; // -2 + 1 = -1
+        break;
+      case 1:
+        setLampState(true);
+        break;
+      case 2:
+        setLampState(false);
+        break;
+      case 3:
+        setLampState(!lampOn);
+        break;
+    }
+  } else {
+    waitUntilMillis = millis() + curLightProgram[curLightProgramIndex];
   }
+
+  curLightProgramIndex++;
+  if (sizeof(curLightProgram) / sizeof(int) < curLightProgramIndex) curLightProgramIndex = -1;
 }
 
 
 
 void setLampState(bool turnLampOn) {
+  String statusMessage = "{\"type\": \"lampStatus\", \"data\":";
   if (turnLampOn)
   {
     lampOn = true;
-    digitalWrite(LED_BUILTIN, HIGH);
     digitalWrite(lampEnablePin, HIGH);
+    statusMessage += "true";
   } else {
     lampOn = false;
-    digitalWrite(LED_BUILTIN, LOW);
     digitalWrite(lampEnablePin, LOW);
+    statusMessage += "false";
   }
-  update_webpage();
-}
 
-void update_webpage()
-{
-  StaticJsonDocument<100> doc;
-  // create an object
-  JsonObject object = doc.to<JsonObject>();
-  object["lampOn"] = lampOn;
-  serializeJson(doc, jsonString); // serialize the object and save teh result to teh string variable.
-  Serial.println( jsonString ); // print the string for debugging.
-  webSocket.broadcastTXT(jsonString); // send the JSON object through the websocket
-  jsonString = ""; // clear the String.
+  statusMessage += "}";
+  ConnectionManager.send(statusMessage);
 }
