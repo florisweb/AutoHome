@@ -13,13 +13,22 @@ const CableLampPanel = new function() {
 		toggleButton.onclick = () => {CableLamp.toggleLight()}
 
 		let lightBolbIcon = <img className='panelIcon' src='images/lightBolbOn.png'></img>;
-		This.html["toggleButton"] = toggleButton;
-		This.html["lampStatus"] = lampStatus;
-		This.html["lightBolbIcon"] = lightBolbIcon;
+		
+		let preparedProgramIndicator = 	<div className='preparedProgramIndicator'>
+											<img className='alarmIcon' src='images/alarmIcon.png'></img>
+											<div className='text'></div>
+										</div>;
+		This.html.preparedProgramIndicator = preparedProgramIndicator;
+		This.html["toggleButton"] 	= toggleButton;
+		This.html["lampStatus"] 	= lampStatus;
+		This.html["lightBolbIcon"] 	= lightBolbIcon;
 
-		This.setLampStatus(CableLamp.lampOn);
+		This.setLampState(CableLamp.state.lampOn);
 		let onlineIndicator = This.renderOnlineIndicator();
 		This.setOnlineState(CableLamp.state.deviceOnline);
+		This.setPreparedProgramIndicator(CableLamp.state.preparedProgram);
+
+		This.updateContent();
 
 		return [
 			lightBolbIcon,
@@ -27,6 +36,7 @@ const CableLampPanel = new function() {
 			onlineIndicator,
 			lampStatus,
 			<div className='bottomBar'>
+				{preparedProgramIndicator}
 				{toggleButton}
 			</div>
 		];
@@ -38,6 +48,20 @@ const CableLampPanel = new function() {
 		this.html.lightBolbIcon.setAttribute('src', "images/lightBolb" + (_lampOn ? "On" : "Off") + ".png");
 	}
 
+	this.setPreparedProgramIndicator = (_program) => {
+		let text = '';
+		This.html.preparedProgramIndicator.classList.add("hide");
+		if (_program && _program.trigger) 	
+		{
+			This.html.preparedProgramIndicator.classList.remove("hide");
+			text = _program.trigger;
+		}
+		setTextToElement(This.html.preparedProgramIndicator.children[1], text);
+	}
+
+	this.updateContent = () => {
+		CableLamp.send({type: "getPreparedProgram"});
+	}
 }
 
 const CableLamp = new function() {
@@ -57,6 +81,7 @@ const CableLamp = new function() {
 				this.state = _event.data;
 				CableLampPanel.setLampState(this.state.lampOn);
 				CableLampPanel.setOnlineState(this.state.deviceOnline);
+				CableLampPanel.setPreparedProgramIndicator(this.state.preparedProgram);
 			break;
 			case "lampStatus": 
 				this.state.lampOn = _event.data;
@@ -64,7 +89,6 @@ const CableLamp = new function() {
 			break;
 		}
 	}
-
 
 
 	this.toggleLight = function() {

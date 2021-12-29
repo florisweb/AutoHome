@@ -13,7 +13,6 @@ export function Service({id, SubscriberTemplate = Subscriber}) {
     this.curState = {};
     this.setDevicesClient = (_deviceClient) => {
         this.client = _deviceClient;
-        console.log("onlineStatusUpdate", !!this.client);
         this.pushEvent({
             type: "onlineStatusUpdate",
             data: !!this.client

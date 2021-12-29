@@ -17,7 +17,6 @@ wss.on("connection", _conn => {
 // Remove disconnected clients
 const interval = setInterval(function () {
   wss.clients.forEach(function (conn) {
-    if (conn.justConnectedTimeout) return;
     if (conn.isAlive === false) return conn.terminate();
     conn.isAlive = false;
     conn.ping();
@@ -34,9 +33,10 @@ function Client(_conn) {
 
     const Conn = _conn;
     Conn.isAlive = true;
-    Conn.justConnectedTimeout = true;
-    setTimeout(() => {Conn.justConnectedTimeout = false}, 10000);
-    Conn.on('pong', () => {Conn.isAlive = true});
+    Conn.on('pong', () => {
+        Conn.isAlive = true;
+        if (This.service) This.service.setDevicesClient(This);
+    });
 
 
 

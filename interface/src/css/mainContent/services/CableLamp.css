@@ -13,3 +13,32 @@
 	text-align: center;
 	margin-left: auto;
 }
+
+.Panel.CableLamp .bottomBar .preparedProgramIndicator {
+	position: absolute;
+	height: 30px;
+
+	margin-left: 0;
+	opacity: 1;
+	transition: margin-left .3s, opacity .3s;
+}
+.Panel.CableLamp .bottomBar .preparedProgramIndicator.hide {
+	margin-left: -10px;
+	opacity: 0;
+	pointer-events: none;
+}
+
+
+.Panel.CableLamp .bottomBar .preparedProgramIndicator .alarmIcon {
+	float:  left;
+	height: 20px;
+	width: auto;
+
+	margin:  5px;
+	opacity: .5;
+}
+.Panel.CableLamp .bottomBar .preparedProgramIndicator .text {
+	float: left;
+	line-height: 30px;
+	font-size: 12px;
+}
