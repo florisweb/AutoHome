@@ -45,19 +45,16 @@ export function InterfaceClient(_conn) {
     this.isInterfaceClient = true;
     console.log('Upgraded client ' + this.id + ' to InterfaceClient');
 
-    this.subscriptions = new SubscriptionList([
-        ServiceManager.getService('CableLamp').subscribe({onEvent: handleCableLampEvent}),
-        // ServiceManager.getService('MovementTracker').subscribe({onEvent: handleMovementEvent})
-    ]);
 
-    function handleCableLampEvent(_event) {
-        _event.serviceId = 'CableLamp';
-        Conn.send(JSON.stringify(_event));
-    }
-    function handleMovementEvent(_event) {
-        _event.serviceId = 'MovementTracker';
-        Conn.send(JSON.stringify(_event));
-    }
+    let UIServices = ServiceManager.getUIServices();
+    this.subscriptions = new SubscriptionList(
+        UIServices.map(service => service.subscribe({
+            onEvent: (_event) => {
+                _event.serviceId = service.id;
+                Conn.send(JSON.stringify(_event));
+            }
+        }))
+    );
 
     Conn.on("message", buffer => {
         let message;

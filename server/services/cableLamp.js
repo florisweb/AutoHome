@@ -1,5 +1,7 @@
 
-import { Subscriber, DeviceService } from './serviceLib.js';
+import { Subscriber, SubscriptionList, DeviceService } from './serviceLib.js';
+import ServiceManager from './serviceManager.js';
+
 
 function CustomSubscriber() {
     Subscriber.call(this, ...arguments);
@@ -60,6 +62,19 @@ export default new function() {
         This.pushEvent(_message);
     }
 
+    this.subscriptions = [];
+    this.setup = function() {
+        this.subscriptions = new SubscriptionList([
+            ServiceManager.getService('MovementTracker').subscribe({onEvent: handleMovementTrackerEvent}),
+        ]);
+    }
+
+    function handleMovementTrackerEvent(_event) {
+        console.log('turn lights off?', _event);
+        if (_event.type != 'status') return;
+        if (_event.data.isAtHome) return;
+        This.send({type: 1, data: false}); // Turn the lamp off
+    }
 
     this.onDeviceConnect = () => {
         if (!this.curState.preparedProgram) return;

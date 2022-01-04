@@ -35,11 +35,27 @@ export default new function() {
         if (wasInRoom) return;
         This.pushEvent({
             type: "status",
-            isInRoom: This.isInRoom,
-            isAtHome: This.isAtHome,
+            data: {
+                isInRoom: This.isInRoom,
+                isAtHome: This.isAtHome,
+                trigger: "CableLamp"
+            }
         });
     }
     function handleRouterEvent(_event) {
+        if (_event.type != "deviceDisconnected") return;
+        if (_event.data.type != 'phone') return;
+        This.isInRoom = false;
+        This.isAtHome = false;
+        
+        This.pushEvent({
+            type: "status",
+            data: {
+                isInRoom: This.isInRoom,
+                isAtHome: This.isAtHome,
+                trigger: "Router",
+            }
+        });
     }
 }
 

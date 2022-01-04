@@ -65,7 +65,7 @@ export default new function() {
               break;
             }
             if (wasOnline == device.online) continue;
-            console.log("[RouterManager] Device " + (device.online ? "connected" : "disconnected"), device.name);
+            console.log("[RouterManager] Device " + (device.online ? "connected" : "disconnected"), device.name, device.type);
             this.pushEvent({
                 type: device.online ? "deviceConnected" : "deviceDisconnected",
                 data: device,

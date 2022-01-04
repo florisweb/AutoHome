@@ -19,4 +19,8 @@ export default new function() {
     this.getService = function(_id) {
         return Services.find((s) => s.id == _id);
     }
+
+    this.getUIServices = function() {
+        return Services.filter(_service => _service.config.hasUI);
+    }
 }
