@@ -64,8 +64,11 @@ const CableLampPanel = new function() {
 	}
 }
 
+
+
+
 const CableLamp = new function() {
-	Service.call(this, {serviceId: 'CableLamp', name: 'Cable Lamp'});
+	Service.call(this, {serviceId: 'CableLamp', name: 'Cable Lamp', homeScreenPanel: CableLampPanel});
 	this.state = {
 		lampOn: false
 	};
@@ -75,17 +78,17 @@ const CableLamp = new function() {
 		{
 			case "onlineStatusUpdate": 
 				this.state.deviceOnline = _event.data;
-				CableLampPanel.setOnlineState(this.state.deviceOnline);
+				this.homeScreenPanel.setOnlineState(this.state.deviceOnline);
 			break;
 			case "curState": 
 				this.state = _event.data;
-				CableLampPanel.setLampState(this.state.lampOn);
-				CableLampPanel.setOnlineState(this.state.deviceOnline);
-				CableLampPanel.setPreparedProgramIndicator(this.state.preparedProgram);
+				this.homeScreenPanel.setLampState(this.state.lampOn);
+				this.homeScreenPanel.setOnlineState(this.state.deviceOnline);
+				this.homeScreenPanel.setPreparedProgramIndicator(this.state.preparedProgram);
 			break;
 			case "lampStatus": 
 				this.state.lampOn = _event.data;
-				CableLampPanel.setLampState(this.state.lampOn); 
+				this.homeScreenPanel.setLampState(this.state.lampOn); 
 			break;
 		}
 	}

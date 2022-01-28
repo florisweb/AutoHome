@@ -33,7 +33,7 @@ const ELumenPanel = new function() {
 }
 
 const ELumen = new function() {
-	Service.call(this, {serviceId: 'ELumen', name: 'eLumen'});
+	Service.call(this, {serviceId: 'ELumen', name: 'eLumen', homeScreenPanel: ELumenPanel});
 	this.state = {
 		humidty: 0,
 		temperature: 0,
@@ -44,7 +44,7 @@ const ELumen = new function() {
 		{
 			case "curState": 
 				this.state = _event.data;
-				ELumenPanel.updateData();
+				this.homeScreenPanel.updateData();
 			break;
 		}
 	}

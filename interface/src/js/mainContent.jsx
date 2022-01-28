@@ -50,13 +50,19 @@ function MainContent_homePage() {
 
 
 	function render() {
+		let servicePanels = [];
+		for (let service of ServiceManager.services)
+		{
+			if (!service.homeScreenPanel) continue;
+			servicePanels.push(service.homeScreenPanel.render())
+		}
+
 		return <div>
 			<div className='pageOverview'>
 				<img src='images/logoInverted.png' className='icon'></img>
 				<div className='text title'>HomePage</div>
 			</div>
-			{CableLampPanel.render()}
-			{ELumenPanel.render()}
+			{servicePanels}
 		</div>;
 	}
 
