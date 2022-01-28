@@ -19,17 +19,10 @@ function _MainContent() {
 
 function MainContent_page({index, pageRenderer, onOpen}) {
 	const HTML = {};
-
 	this.render = function() {
-		HTML.page = <div className='page'>
-						<div className='pageHeader'>
-							<div className='text titleHolder'>Title</div>
-						</div>
+		HTML.page = <div className='page'>	
 						<div className='pageContent'>
 							{pageRenderer()}
-							<a href='https://user.florisweb.dev/login?APIKey=TESTSERVICE' className='signInWithFloriswebButton'>
-								Sign in with Florisweb >
-							</a>
 						</div>
 					</div>;
 		return HTML.page;
@@ -58,6 +51,10 @@ function MainContent_homePage() {
 
 	function render() {
 		return <div>
+			<div className='pageOverview'>
+				<img src='images/logoInverted.png' className='icon'></img>
+				<div className='text title'>HomePage</div>
+			</div>
 			{CableLampPanel.render()}
 			{ELumenPanel.render()}
 		</div>;

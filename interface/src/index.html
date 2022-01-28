@@ -4,6 +4,8 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="main_min.css">
+		<meta name="theme-color" content="#6496FF" />
+		<link rel="shortcut icon" href="images/logo.png">
 		<title>AutoHome</title>
 
 
@@ -24,11 +26,19 @@
 				color: #777;
 				font-size: 12px;
 			}
+
 		</style>
 	</head>
 	<body>
 		<div id='mainContent'></div>
-
+		<div id='logoBackground'>
+			<img src='images/logoInverted.png'>
+			<div class='text'>ThuisWolk</div>
+		</div>
+		<script>
+			// setTimeout(() => {logoBackground.classList.add('hide')}, 2000);
+			setTimeout(() => {logoBackground.classList.add('hide')}, 200);
+		</script>
 
 		<script src='main_min.js'></script>
 	</body>

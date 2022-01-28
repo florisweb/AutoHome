@@ -18,11 +18,16 @@ const Server = new function() {
 			{
 				This.authenticated = message.status;
 				console.warn("[Server].authenticated = ", This.authenticated);
-				if (!message.status) Auth.clearKey();
+				if (!message.status) 
+				{
+					Auth.clearKey();
+					window.location.replace('https://user.florisweb.dev/login?APIKey=TESTSERVICE');
+				}
 				return;
 			}
 			
 			let service = This.serviceListeners.find((_service) => {return _service.serviceId == message.serviceId});
+			if (!service) return;
 			service.onEvent(message);
 		};
 

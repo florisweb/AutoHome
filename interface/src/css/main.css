@@ -4,7 +4,6 @@
 }
 
 body {
-  position: fixed;
   left:  0;
   top:  0;
 
@@ -15,5 +14,61 @@ body {
   margin: 0;
 
   font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-  background: #fcfcfc;
+  background: #6496FF;
+}
+
+
+
+#logoBackground {
+  position: absolute;
+  left:  0;
+  top:  0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 100;
+
+  background: #6496FF;
+  transition: all .3s;
+}
+#logoBackground.hide {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(1.1);
+}
+#logoBackground img {
+  position: relative;
+  width: 60vw;
+  max-width: 130px;
+  height: auto;
+  
+  margin: auto;
+  top:  45vh;
+  transform: translateY(-50%);
+  display: block;
+  animation: animate_logo 5s infinite;
+}
+
+@keyframes animate_logo {
+    0% {
+      transform: scale(1) translateY(-50%);
+      opacity: 1;
+    }
+    35% {
+      transform: scale(.93) translateY(-50%);
+      opacity: .8;
+    }
+    100% {
+      transform: scale(1) translateY(-50%);
+      opacity: 1;
+    }
+}
+#logoBackground .text {
+  position: relative;
+  width:  100vw;
+  height: 40px;
+  
+  left:  0;
+  text-align: center;
+  color:  #fff;
+  top:  calc(45vh - 70px);
 }
