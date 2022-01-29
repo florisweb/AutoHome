@@ -3,6 +3,7 @@ let MainContent;
 const App = new function() {
 	this.setup = function() {
 		MainContent = new _MainContent();
+		MainContent.setup();
 		Server.setup();
 	}
 	

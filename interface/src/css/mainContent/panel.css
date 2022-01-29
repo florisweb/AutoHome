@@ -17,12 +17,32 @@
     box-shadow: 5px 5px 10px 10px rgba(0, 0, 0, .05);
     background: #fff;
     box-sizing: border-box;
+    transition: transform .3s;
+
+
+    display: grid;
+    grid-template-areas: 
+        'icon title onlineIndicator'
+        'icon subText subText';
+        /*'empty empty empty';*/
+    grid-template-columns: 40px auto 20px;
+    grid-template-rows: 30px 20px;
+    grid-column-gap: 5px;
+}
+
+.Panel.h2 {
+    height: calc(var(--componentHeight) * 2 - 10px * 2);
+}
+.Panel.h3 {
+    height: calc(var(--componentHeight) * 3 - 10px * 2);
+}
+.Panel.w2 {
+    width: calc(var(--componentWidth) * 2 - 10px * 2);
 }
 
 
 .Panel.animateIn {
     opacity: 0;
-
     animation: animatePanelIn .5s 1;
     animation-fill-mode: forwards;
 }
@@ -112,18 +132,15 @@
 }
 
 .Panel .panelIcon {
-    float:  left;
-    width:  40px;
-    height: 40px;
+    grid-area: icon;
+    width: 100%;
+    height: auto;
     margin-right: 5px;
     margin-bottom: 10px;
 }
 
 .Panel .text.panelTitle {
-    float:  left;
-    width:  calc(100% - 40px - 5px - 10px);
-    height: 30px;
-
+    grid-area: title;
 
     line-height: 30px;
     font-size: 20px;
@@ -132,9 +149,15 @@
     color:  #666;
 }
 
+.Panel .text.subText {
+    grid-area: subText;
+    font-size: 12px;
+}
+
+
 .Panel .onlineIndicator {
+    grid-area: onlineIndicator;
     position: relative;
-    float:  left;
     width:  8px;
     height: 8px;
     margin:  11px 1px;

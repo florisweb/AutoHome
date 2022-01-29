@@ -2,27 +2,25 @@
 
 const ELumenPanel = new function() {
 	const This = this;
-	Panel.call(this, {
+	HomePagePanel.call(this, {
 		customClass: "ELumen",
 		onRender: render
 	});
+	
 	let renderOnlineIndicator = this.renderOnlineIndicator;
 	function render() {
-		// let lampStatus = <div className='text'>lamp off</div>;
+		let icon = <img className='panelIcon' src='images/eLumenIcon.png'></img>;
+		let state = <div className='text subText waterPercentage'>&#128167;52% filled</div>;
+		This.html["icon"] 		= icon;
 
-		// let lightBolbIcon = <img className='panelIcon' src='images/lightBolbOn.png'></img>;
-		// This.html["lampStatus"] = lampStatus;
-		// This.html["lightBolbIcon"] = lightBolbIcon;
-
-
-		// let onlineIndicator = This.renderOnlineIndicator();
-		// This.setOnlineState(CableLamp.state.deviceOnline);
+		let onlineIndicator = This.renderOnlineIndicator();
+		This.setOnlineState(This.service.state.deviceOnline);
 
 		return [
-			// lightBolbIcon,
-			<div className='text panelTitle'>eLumen</div>
-			// onlineIndicator,
-			// lampStatus,
+			icon,
+			state,
+			<div className='text panelTitle'>{This.service.name}</div>,
+			onlineIndicator,
 		];
 	}
 

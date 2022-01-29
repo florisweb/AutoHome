@@ -8,7 +8,16 @@
     padding:  10px;
     width:  calc(100% - 10px * 2);
     height: calc(100% - 1px * 2);
+    
+    transition: transform .4s, opacity .4s;
 }
+
+#mainContent .page.hide {
+    transform: scale(.9) translateY(40px);
+    opacity: 0;
+    pointer-events: none;
+}
+
 
 #mainContent .page .pageHeader {
     position: relative;
@@ -54,6 +63,16 @@
     display: block;
     opacity: .8;
 }
+#mainContent .page .pageOverview .icon.whiteBackgroundBox {
+    width: 60vw;
+    max-width: 60px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px 10px rgba(0, 0, 0, .05);
+    margin-bottom: 10px;
+}
+
 #mainContent .page .pageOverview .text.title {
     position: relative;
     margin:  auto;
