@@ -73,7 +73,7 @@ function MainContent_homePage() {
 
 		return <div>
 			<div className='pageOverview'>
-				<img src='images/logoInverted.png' className='icon'></img>
+				<img src='images/logoInverted.png' className='icon overviewIcon'></img>
 				<div className='text title'>ThuisWolk</div>
 			</div>
 			<div className='PanelBox'>

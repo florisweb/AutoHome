@@ -69,26 +69,27 @@ let CableLamp;
 
 
 
+	const programs = [
+		{
+			name: "Morning program",
+			id: 0,
+		},
+		{
+			name: "Blink",
+			id: 1,
+		}
+	];
 
 
 	const page = new function() {
 		const This = this;
 		ServicePage.call(this);
 
+
 		let directControlPanel = new function() {
 			Panel.call(this, {onRender: onRender, customClass: "directControlPanel h2"});
 
-			let dropDown = new DropDown({options: [
-				{
-					name: "Morning program",
-					value: 0,
-				},
-				{
-					name: "Blink",
-					value: 1,
-				}
-			]});
-
+			let dropDown = new DropDown({options: programs.map(p => {p.value = p.id; return p})});
 			let toggleButton = new Button({
 				text: "Toggle",
 				onclick: (_e) => {
@@ -102,7 +103,8 @@ let CableLamp;
 			function onRender() {
 				return <div>
 					<div className='text panelTitle'>Lamp</div>
-					{toggleButton.render()},
+					{toggleButton.render()}
+					<div className='text'>Run Program</div>
 					{dropDown.render()}
 				</div>;
 			}
@@ -110,20 +112,32 @@ let CableLamp;
 
 		let triggerPanel = new function() {
 			Panel.call(this, {onRender: onRender, customClass: "triggerPanel h2"});
+			
+			let dropDown = new DropDown({options: programs.map(p => {p.value = p.id; return p})});
+			let triggerInputField = new InputField({placeholder: "00:00"});
+
 			function onRender() {
 				return <div>
-					<div className='text panelTitle'>Programs</div>
+					<div className='text panelTitle'>Timer</div>
+					{triggerInputField.render()}
+					{dropDown.render()}
 				</div>;
 			}
 		}
 
 
 		this.render = () => {
-			this.html.icon = <img src='images/lightBolbOff.png' className='icon whiteBackgroundBox' onclick={() => {CableLamp.toggleLight()}}></img>;
-			this.html.self = 
-				<div className='pageContent'>
+			this.html.backButton = <img src='images/backIcon.png' className='icon overviewIcon overviewButton' onclick={() => {MainContent.homePage.open()}}></img>;
+			this.html.icon = <img src='images/lightBolbOff.png' className='icon overviewIcon whiteBackgroundBox' onclick={() => {CableLamp.toggleLight()}}></img>;
+			this.html.settingsButton = <img src='images/hamburgerIcon.png' className='icon overviewIcon overviewButton' onclick={() => {MainContent.homePage.open()}}></img>;
+
+			this.html.self = <div className='pageContent'>
 					<div className='pageOverview' style='margin-bottom: 50px'>
-						{this.html.icon}
+						<div className='iconHolder'>
+							<div>{this.html.backButton}</div>
+							{this.html.icon}
+							<div>{this.html.settingsButton}</div>
+						</div>
 						<div className='text title'>{This.service.name}</div>
 					</div>
 					<div className='PanelBox'>
@@ -154,6 +168,8 @@ let CableLamp;
 		this.state = {
 			lampOn: false
 		};
+
+		this.programs = programs;
 
 		this.onEvent = (_event) => {
 			switch (_event.type)

@@ -66,3 +66,15 @@ function Button({onclick, text}) {
 		return this.html.self;
 	}
 }
+
+
+function InputField({placeholder = null}) {
+	const This = this;
+	this.html = {};
+	
+	this.render = function() {
+		this.html.self = <input className='text inputField' placeholder={placeholder}></input>;
+		return this.html.self;
+	}
+}
+
