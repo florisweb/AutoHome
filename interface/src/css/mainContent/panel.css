@@ -32,7 +32,6 @@
     grid-template-areas: 
         'icon title onlineIndicator'
         'icon subText subText';
-        /*'empty empty empty';*/
     grid-template-columns: 40px auto 20px;
     grid-template-rows: 30px 20px;
     grid-column-gap: 5px;

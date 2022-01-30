@@ -36,9 +36,9 @@ function MainContent_page({index, pageRenderer, onOpen, onClose}) {
 		MainContent.curPage = this;
 		this.openState = true;
 		this.HTML.page.classList.remove('hide');
-		try {
+		// try {
 			return onOpen(...arguments);
-		} catch (e) {console.error("Error while opening page", e)};
+		// } catch (e) {console.error("Error while opening page", e)};
 	}
 
 	this.close = function() {
@@ -85,7 +85,7 @@ function MainContent_homePage() {
 function MainContent_servicePage() {
 	MainContent_page.call(this, {
 		index: 0, 
-		pageRenderer: render,
+		pageRenderer: () => <div>Loading...</div>,
 		onOpen: onOpen
 	});
 	const This = this;
@@ -99,10 +99,6 @@ function MainContent_servicePage() {
 		This.HTML.page.append(_servicePage.render());
 	}
 
-
-	function render() {
-		return <div></div>;
-	}
 }
 
 

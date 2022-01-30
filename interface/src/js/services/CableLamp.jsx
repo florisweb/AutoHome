@@ -69,6 +69,10 @@ let CableLamp;
 
 
 
+
+
+
+
 	const programs = [
 		{
 			name: "Morning program",
@@ -87,28 +91,57 @@ let CableLamp;
 
 
 		let directControlPanel = new function() {
+			const CurPanel = this;
 			Panel.call(this, {onRender: onRender, customClass: "directControlPanel h2"});
+
+			this.html.lightBolbIcon = <img className='panelIcon' src='images/lightBolbOn.png'></img>;
+			this.html.lampStatus = <div className='text subText'>Lamp On</div>;
+
 
 			let dropDown = new DropDown({options: programs.map(p => {p.value = p.id; return p})});
 			let toggleButton = new Button({
 				text: "Toggle",
+				customClass: 'toggleButton',
 				onclick: (_e) => {
 					CableLamp.toggleLight();
 					_e.stopPropagation();
 				}
 			});
 
-
+			let runProgramButton = new Button({
+				text: "Run",
+				customClass: 'runProgramButton',
+				boxy: true,
+				filled: false,
+				onclick: (_e) => {
+					CableLamp.toggleLight();
+					_e.stopPropagation();
+				}
+			});
+			
+			this.setLampState = (_lampOn) => {
+				if (!this.html.lampStatus || !this.html.lightBolbIcon) return console.log('doesn\'t exist yet');
+				setTextToElement(this.html.lampStatus, _lampOn ? "Lamp On" : "Lamp Off");
+				this.html.lightBolbIcon.setAttribute('src', "images/lightBolb" + (_lampOn ? "On" : "Off") + ".png");
+			}
 
 			function onRender() {
-				return <div>
-					<div className='text panelTitle'>Lamp</div>
-					{toggleButton.render()}
-					<div className='text'>Run Program</div>
-					{dropDown.render()}
-				</div>;
+				return [
+					CurPanel.html.lightBolbIcon,
+					<div className='text panelTitle'>{This.service.name}</div>,
+					CurPanel.html.lampStatus,
+
+					toggleButton.render(),
+					<br></br>,
+					<div className='text header'>Run Program</div>,
+					<div className='controlsHolder'>
+						{dropDown.render()}
+						{runProgramButton.render()}
+					</div>
+				];
 			}
 		}
+		this.directControlPanel = directControlPanel;
 
 		let triggerPanel = new function() {
 			Panel.call(this, {onRender: onRender, customClass: "triggerPanel h2"});
@@ -152,6 +185,7 @@ let CableLamp;
 		this.setLampState = (_lampOn) => {
 			if (!this.html.icon || !this.openState) return console.log('doesn\'t exist yet');
 			this.html.icon.setAttribute('src', "images/lightBolb" + (_lampOn ? "On" : "Off") + ".png");
+			directControlPanel.setLampState(_lampOn);
 		}
 	}
 

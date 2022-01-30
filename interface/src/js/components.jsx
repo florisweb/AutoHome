@@ -56,12 +56,13 @@ function DropDown({onChange, customClass = '', options = []}) {
 	}
 }
 
-function Button({onclick, text}) {
+function Button({onclick, text, customClass = '', boxy = false, filled = true}) {
 	const This = this;
 	this.html = {};
 	
 	this.render = function() {
-		this.html.self = <div className='button bDefault text'>{text}</div>;
+		let className = 'button bDefault text ' + (boxy ? "bBoxy " : '') + (filled ? "filled " : ' ') + customClass;
+		this.html.self = <div className={className}>{text}</div>;
 		this.html.self.onclick = onclick;
 		return this.html.self;
 	}

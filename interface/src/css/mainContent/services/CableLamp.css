@@ -12,6 +12,7 @@
 
 	text-align: center;
 	margin-left: auto;
+	float: right;
 }
 
 .Panel.CableLamp .bottomBar .preparedProgramIndicator {
@@ -46,8 +47,32 @@
 
 /*Page*/
 .Panel.directControlPanel {
-
+	grid-template-areas: 
+        'icon title toggleButton'
+        'icon subText toggleButton'
+        'empty programHeader programHeader'
+        'empty controls controls';
+    grid-template-columns: 40px auto 80px;
+    grid-template-rows: 30px 20px 50px 30px;
 }
-.Panel.CableLamp .bottomBar .text.button.bDefault {
+
+.Panel.directControlPanel .text.button.bDefault.toggleButton {
+	grid-area: toggleButton;
+	margin-top: 5px;
+	margin-bottom: 15px;
+}
 
 
+.Panel.directControlPanel .text.header {
+	grid-area: programHeader;
+	margin-top: 28px;
+}
+.Panel.directControlPanel .controlsHolder {
+	grid-area: controls;
+	display: flex;
+}
+
+.Panel.directControlPanel .text.button.bDefault.runProgramButton {
+	margin-left: 10px;
+	/*width: 30px;*/
+}

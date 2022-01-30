@@ -7,9 +7,11 @@
 
 	border-radius: 30px;
 	font-size: 13px;
+	line-height: 15px;
 
 	overflow: hidden;
 	cursor: pointer;
+	display: inline-block;
 }
 	.button.bBoxy {
 		border-radius: 4px;	
@@ -17,6 +19,10 @@
 
 	.button.bDefault {
 		/*background: #7592BF !important;*/
+		border: 1px solid rgb(140, 153, 247);
+		color: rgb(140, 153, 247) !important;
+	}
+	.button.bDefault.filled {
 		background: rgb(140, 153, 247);
 		color: #fff !important;
 	}
@@ -100,8 +106,7 @@
 .text.header {
 	font-family: Verdana, Geneva, sans-serif;
 	color: #888;
-	font-size: 14px;
-	font-weight: bolder !important;
+	font-size: 13px;
 }
 
 
