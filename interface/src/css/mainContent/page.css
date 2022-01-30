@@ -71,6 +71,7 @@
     border-radius: 10px;
     box-shadow: 5px 5px 10px 10px rgba(0, 0, 0, .05);
     margin-bottom: 10px;
+    opacity: 1;
 }
 
 #mainContent .page .pageOverview .text.title {

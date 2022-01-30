@@ -120,16 +120,17 @@ let CableLamp;
 
 		this.render = () => {
 			this.html.icon = <img src='images/lightBolbOff.png' className='icon whiteBackgroundBox' onclick={() => {CableLamp.toggleLight()}}></img>;
-			this.html.self = <div>
-				<div className='pageOverview' style='margin-bottom: 50px'>
-					{this.html.icon}
-					<div className='text title'>{This.service.name}</div>
-				</div>
+			this.html.self = 
 				<div className='pageContent'>
-					{directControlPanel.render()}
-					{triggerPanel.render()}
-				</div>
-			</div>
+					<div className='pageOverview' style='margin-bottom: 50px'>
+						{this.html.icon}
+						<div className='text title'>{This.service.name}</div>
+					</div>
+					<div className='PanelBox'>
+						{directControlPanel.render()}
+						{triggerPanel.render()}
+					</div>
+				</div>;
 			this.setLampState(this.service.state.lampOn);
 			return this.html.self;
 		}

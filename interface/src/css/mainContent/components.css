@@ -35,6 +35,8 @@
   background: #fff;
   box-sizing: border-box;
   transition: transform .3s, opacity .3s;
+
+  z-index: 1000;
 }
 .DropDownWrapper .popup.hide {
 	opacity: 0;

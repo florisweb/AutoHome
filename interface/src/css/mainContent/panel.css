@@ -3,6 +3,14 @@
     --componentHeight: 100px;
 }
 
+.PanelBox {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+
 .Panel {
     position: relative;
     float: left;

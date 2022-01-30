@@ -76,7 +76,9 @@ function MainContent_homePage() {
 				<img src='images/logoInverted.png' className='icon'></img>
 				<div className='text title'>ThuisWolk</div>
 			</div>
-			{servicePanels}
+			<div className='PanelBox'>
+				{servicePanels}
+			</div>
 		</div>;
 	}
 }
