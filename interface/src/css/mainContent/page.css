@@ -9,6 +9,9 @@
     width:  calc(100% - 10px * 2);
     height: calc(100% - 1px * 2);
     
+    overflow-x: hidden;
+    overflow-y: visible;
+       
     transition: transform .4s, opacity .4s;
 }
 
@@ -40,9 +43,6 @@
     font-size: 18px;
 }
 
-.page .pageContent {
-    
-}
 
 
 #mainContent .page .pageOverview {

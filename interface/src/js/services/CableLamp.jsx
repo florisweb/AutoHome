@@ -150,7 +150,7 @@ let CableLamp;
 			const CurPanel = this;
 			Panel.call(this, {onRender: onRender, customClass: "programPanel"});
 
-			this.html.icon = <img className='panelIcon' src='images/timerIcon.png'></img>; // TODO: ProgramIcon
+			this.html.icon = <img className='panelIcon' src='images/executeIcon.png'></img>;
 			let dropDown = new DropDown({options: programs.map(p => {p.value = p.id; return p})});
 			let triggerInputField = new InputField({isTimeInput: true});
 			let runButton = new Button({
