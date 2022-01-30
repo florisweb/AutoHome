@@ -49,11 +49,9 @@
 .Panel.directControlPanel {
 	grid-template-areas: 
         'icon title toggleButton'
-        'icon subText toggleButton'
-        'empty programHeader programHeader'
-        'empty controls controls';
+        'icon subText toggleButton';
     grid-template-columns: 40px auto 80px;
-    grid-template-rows: 30px 20px 50px 30px;
+    grid-template-rows: 30px 20px;
 }
 
 .Panel.directControlPanel .text.button.bDefault.toggleButton {
@@ -63,16 +61,48 @@
 }
 
 
-.Panel.directControlPanel .text.header {
-	grid-area: programHeader;
-	margin-top: 28px;
+
+
+
+
+.Panel .inputWrapper {
+	grid-area: inputWrapper;
+	margin-top: 5px;
 }
-.Panel.directControlPanel .controlsHolder {
-	grid-area: controls;
-	display: flex;
+.Panel .inputWrapper > * {
+	float:  right;
 }
 
-.Panel.directControlPanel .text.button.bDefault.runProgramButton {
-	margin-left: 10px;
-	/*width: 30px;*/
+
+
+
+.Panel.alarmPanel {
+	grid-template-areas: 
+        'icon title inputWrapper';
+    grid-template-columns: 40px 40px auto;
 }
+
+.Panel.alarmPanel .inputWrapper .DropDownWrapper .DropDown {
+	max-width: 120px;
+}
+.Panel.alarmPanel .inputWrapper .inputField.timeInput {
+	margin-left: 5px;
+}
+
+
+
+
+.Panel.programPanel {
+	grid-template-areas: 
+        'icon title inputWrapper';
+    grid-template-columns: 40px 40px auto;
+}
+
+.Panel.programPanel .inputWrapper .DropDownWrapper .DropDown {
+	max-width: 120px;
+}
+.Panel.programPanel .inputWrapper .button {
+	margin-left: 5px;
+}
+
+

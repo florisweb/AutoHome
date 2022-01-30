@@ -92,7 +92,7 @@ let CableLamp;
 
 		let directControlPanel = new function() {
 			const CurPanel = this;
-			Panel.call(this, {onRender: onRender, customClass: "directControlPanel h2"});
+			Panel.call(this, {onRender: onRender, customClass: "directControlPanel"});
 
 			this.html.lightBolbIcon = <img className='panelIcon' src='images/lightBolbOn.png'></img>;
 			this.html.lampStatus = <div className='text subText'>Lamp On</div>;
@@ -108,16 +108,6 @@ let CableLamp;
 				}
 			});
 
-			let runProgramButton = new Button({
-				text: "Run",
-				customClass: 'runProgramButton',
-				boxy: true,
-				filled: false,
-				onclick: (_e) => {
-					CableLamp.toggleLight();
-					_e.stopPropagation();
-				}
-			});
 			
 			this.setLampState = (_lampOn) => {
 				if (!this.html.lampStatus || !this.html.lightBolbIcon) return console.log('doesn\'t exist yet');
@@ -132,31 +122,59 @@ let CableLamp;
 					CurPanel.html.lampStatus,
 
 					toggleButton.render(),
-					<br></br>,
-					<div className='text header'>Run Program</div>,
-					<div className='controlsHolder'>
+				];
+			}
+		}
+
+		let alarmPanel = new function() {
+			const CurPanel = this;
+			Panel.call(this, {onRender: onRender, customClass: "alarmPanel"});
+
+			this.html.icon = <img className='panelIcon' src='images/timerIcon.png'></img>;
+			let dropDown = new DropDown({options: programs.map(p => {p.value = p.id; return p})});
+			let triggerInputField = new InputField({isTimeInput: true});
+
+			function onRender() {
+				return [
+					CurPanel.html.icon,
+					<div className='text panelTitle centered'>Alarm</div>,
+					<div className='inputWrapper'>
+						{triggerInputField.render()}
 						{dropDown.render()}
-						{runProgramButton.render()}
 					</div>
 				];
 			}
 		}
-		this.directControlPanel = directControlPanel;
 
-		let triggerPanel = new function() {
-			Panel.call(this, {onRender: onRender, customClass: "triggerPanel h2"});
-			
+		let programPanel = new function() {
+			const CurPanel = this;
+			Panel.call(this, {onRender: onRender, customClass: "programPanel"});
+
+			this.html.icon = <img className='panelIcon' src='images/timerIcon.png'></img>; // TODO: ProgramIcon
 			let dropDown = new DropDown({options: programs.map(p => {p.value = p.id; return p})});
-			let triggerInputField = new InputField({placeholder: "00:00"});
+			let triggerInputField = new InputField({isTimeInput: true});
+			let runButton = new Button({
+				text: "Run",
+				boxy: true,
+				onclick: (_e) => {
+					CableLamp.toggleLight();
+					_e.stopPropagation();
+				}
+			});
+
 
 			function onRender() {
-				return <div>
-					<div className='text panelTitle'>Timer</div>
-					{triggerInputField.render()}
-					{dropDown.render()}
-				</div>;
+				return [
+					CurPanel.html.icon,
+					<div className='text panelTitle centered'>Programs</div>,
+					<div className='inputWrapper'>
+						{runButton.render()}
+						{dropDown.render()}
+					</div>
+				];
 			}
 		}
+
 
 
 		this.render = () => {
@@ -175,7 +193,8 @@ let CableLamp;
 					</div>
 					<div className='PanelBox'>
 						{directControlPanel.render()}
-						{triggerPanel.render()}
+						{programPanel.render()}
+						{alarmPanel.render()}
 					</div>
 				</div>;
 			this.setLampState(this.service.state.lampOn);

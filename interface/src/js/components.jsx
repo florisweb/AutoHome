@@ -69,12 +69,17 @@ function Button({onclick, text, customClass = '', boxy = false, filled = true}) 
 }
 
 
-function InputField({placeholder = null}) {
+function InputField({placeholder = null, isTimeInput}) {
 	const This = this;
 	this.html = {};
 	
 	this.render = function() {
 		this.html.self = <input className='text inputField' placeholder={placeholder}></input>;
+		if (isTimeInput)
+		{
+			this.html.self.setAttribute('type', 'time');
+			this.html.self.classList.add('timeInput');
+		}
 		return this.html.self;
 	}
 }

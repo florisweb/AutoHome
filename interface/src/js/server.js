@@ -16,6 +16,7 @@ const Server = new function() {
 			if (message.type == 'auth')
 			{
 				This.authenticated = message.status;
+				if (This.authenticated) logoBackground.classList.add('hide');
 				console.warn("[Server].authenticated = ", This.authenticated);
 				if (!message.status) 
 				{

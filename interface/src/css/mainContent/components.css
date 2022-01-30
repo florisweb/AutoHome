@@ -16,6 +16,7 @@
 	line-height: 10px;
 	white-space: nowrap;
 	font-size: 13px;
+	overflow: hidden;
 
 	cursor: pointer;
 }
@@ -61,3 +62,16 @@
 .DropDownWrapper .popup .option:last-child {
 	border-bottom: 0 solid red;
 }
+
+
+
+
+
+.inputField.timeInput {
+	height: 28px;
+	padding: 0 5px;
+	width: 50px;
+	border: 1px solid #ddd;
+	border-radius: 5px;
+}
+
