@@ -38,18 +38,20 @@ export function Service({id, SubscriberTemplate = Subscriber}) {
     this.pushEvent = function(_event) {
         for (let subscriber of this.subscribers) subscriber.onEvent(_event);
     }
+
+    this.pushCurState = function(_sub) {
+        let event = {type: "curState", data: this.curState};
+        if (!_sub) return this.pushEvent(event);
+        _sub.onEvent(event);
+    }
+
+
     this.subscribe = function(_subscriber) {
         let sub = new SubscriberTemplate(_subscriber);
         sub.service = this;
         this.subscribers.push(sub);
         this.pushCurState(sub);
         return sub;
-    }
-
-    this.pushCurState = function(_sub) {
-        let event = {type: "curState", data: this.curState};
-        if (!_sub) return this.pushEvent(event);
-        _sub.onEvent(event);
     }
 }
 
@@ -112,10 +114,24 @@ export function SubscriptionList(_list = []) {
     return _list;
 }
 
-export function Subscriber({onEvent}) {
-    this.service = false;
-    this.onEvent = onEvent;
 
-    this.handleRequest = () => {console.log('Subscriber doesn\'t have the handleRequest-function set')}
+
+
+export function Subscriber({onEvent, handleRequest = () => {}}) {
+    this.service = false;
+    this.onEvent = (_data) => {return onEvent(_data)}; // Given by client
+
+    this.handleRequest = async (_message) => { // Given by service
+        switch (_message.type )
+        {
+            case "getDownTime": 
+                let data = await this.service.downTimeTracker.getData();
+                return this.onEvent({type: "downTime", data: data});
+            default: 
+                try {
+                    return handleRequest(_message);
+                } catch (e) {console.log(this.service.id, "subscriber had an error", e)};
+        }
+    }
 }
 

@@ -3,25 +3,26 @@ import { Subscriber, SubscriptionList, DeviceService } from './serviceLib.js';
 import ServiceManager from './serviceManager.js';
 
 
-function CustomSubscriber() {
-    Subscriber.call(this, ...arguments);
+function CustomSubscriber(_config) {
+    Subscriber.call(this, {..._config, handleRequest: handleRequest});
+    const This = this;
     const commandIndicesByName = {
         setLampState: 1,
         executeGivenProgram: 2,
         executePreparedProgram: 4,
     }   
-    this.handleRequest = function(_message) {
+    function handleRequest(_message) {
         let index = commandIndicesByName[_message.type];
-        if (index) return this.service.send({type: index, data: _message.data});
+        if (index) return This.service.send({type: index, data: _message.data});
         switch (_message.type)
         {
             case "prepareProgram": 
-                if (!_message.data) return this.onEvent({error: "Data missing", message: _message});
+                if (!_message.data) return This.onEvent({error: "Data missing", message: _message});
                 _message.data.trigger = filterTriggerString(_message.data.trigger);
-                this.service.curState.preparedProgram = _message.data;
-                if (!_message.data.trigger) this.service.curState.preparedProgram = false;
-                this.service.send({type: 3, data: _message.data});
-                this.service.pushCurState();
+                This.service.curState.preparedProgram = _message.data;
+                if (!_message.data.trigger) This.service.curState.preparedProgram = false;
+                This.service.send({type: 3, data: _message.data});
+                This.service.pushCurState();
             break;
         }
     }

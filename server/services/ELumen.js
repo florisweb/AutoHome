@@ -1,18 +1,19 @@
 
 import { Subscriber, DeviceService } from './serviceLib.js';
 
-function CustomSubscriber() {
-    Subscriber.call(this, ...arguments);
+function CustomSubscriber(_config) {
+    const This = this;
+    Subscriber.call(this, {..._config, handleRequest: handleRequest});
 
     const commandIndicesByName = {
         giveWater: 1,
         calibrate: 2,
     };
 
-    this.handleRequest = function(_message) {
+    function handleRequest(_message) {
         console.log('ELumensubscriber.handleRequest', _message);
         let index = commandIndicesByName[_message.type];
-        if (index) return this.service.send({type: index, data: _message.data});
+        if (index) return This.service.send({type: index, data: _message.data});
     }
 }
 

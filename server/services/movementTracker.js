@@ -4,7 +4,6 @@ import ServiceManager from './serviceManager.js';
 
 function CustomSubscriber() {
     Subscriber.call(this, ...arguments);
-    this.handleRequest = function(_message) {}
 }
 
 export default new function() {

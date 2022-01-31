@@ -1,5 +1,9 @@
 import fs from 'fs';
-const dataStoragePath = './DBData';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const dataStoragePath = __dirname + '/DBData';
 
 const DBManager = new function() {
     this.FileManager = FileManager;

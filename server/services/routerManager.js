@@ -7,7 +7,6 @@ import { Subscriber, Service } from './serviceLib.js';
 
 function CustomSubscriber() {
     Subscriber.call(this, ...arguments);
-    this.handleRequest = function(_message) {}
 }
 
 export default new function() {

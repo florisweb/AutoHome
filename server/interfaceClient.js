@@ -56,7 +56,7 @@ export function InterfaceClient(_conn) {
         }))
     );
 
-    Conn.on("message", buffer => {
+    Conn.on("message", async (buffer) => {
         let message;
         try {
             message = JSON.parse(buffer);
@@ -66,12 +66,7 @@ export function InterfaceClient(_conn) {
 
         let subscription = This.subscriptions.get(message.serviceId);
         if (!subscription) return Conn.send(JSON.stringify({error: "Subscription not found"}));
-
-        console.log(
-            "Subscriber of service " + subscription.service.id + ".handleRequest()", 
-            message, 
-            subscription.handleRequest(message)
-        );
+        subscription.handleRequest(message)
     });
 }
 
