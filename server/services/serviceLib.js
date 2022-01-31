@@ -1,5 +1,6 @@
 import ServiceConfig from './serviceConfig.js';
 import Errors from '../errors.js';
+import { FileManager } from '../DBManager.js';
 
 
 export function Service({id, SubscriberTemplate = Subscriber}) {
@@ -9,6 +10,8 @@ export function Service({id, SubscriberTemplate = Subscriber}) {
     this.key            = ServiceConfig.services[id].key;
     this.config         = ServiceConfig.services[id];
     
+    this.downTimeTracker = new Service_downTimeTracker(this);
+
     this.client         = false;
     this.curState = {};
     this.setDevicesClient = (_deviceClient) => {
@@ -18,6 +21,8 @@ export function Service({id, SubscriberTemplate = Subscriber}) {
             data: !!this.client
         });
         this.curState.deviceOnline = !!this.client;
+        this.downTimeTracker.updateConnectionState(!!this.client);
+
         if (this.client) return this.onDeviceConnect();
         this.onDeviceDisconnect();
     }
@@ -48,6 +53,42 @@ export function Service({id, SubscriberTemplate = Subscriber}) {
     }
 }
 
+
+
+function Service_downTimeTracker(_parent) {
+    let fm = new FileManager(_parent.id + "_downTime.json");
+    this.getData = function() {
+        return new Promise((resolve) => {
+            fm.getContent().then((_result) => {
+                if (typeof _result != 'object') return resolve([]);
+                resolve(_result);
+            }, () => resolve([]));
+        });
+    }
+
+    this.updateConnectionState = async function(_connected) {
+        let data = await this.getData();
+        let lastSet = data[data.length - 1];
+        if (!lastSet) // Data init
+        {
+            if (!_connected) return;
+            data[0] = [Date.now()];
+            return fm.writeContent(data);
+        }
+
+        if (_connected)
+        {
+            if (lastSet.length == 1) return;
+            let newSet = [Date.now()]
+            data.push(newSet);
+            return fm.writeContent(data);
+        }
+
+        if (lastSet.length != 1) return;
+        data[data.length - 1][1] = Date.now();
+        return fm.writeContent(data);
+    }
+}
 
 
 export function DeviceService({id, onMessage}) {

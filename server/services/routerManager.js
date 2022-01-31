@@ -3,7 +3,6 @@ import fetch from 'node-fetch';
 import fritz from 'fritzapi';
 import { Subscriber, Service } from './serviceLib.js';
 
-// const maxDataAge = 1000 * 60 * 2;
 
 
 function CustomSubscriber() {
