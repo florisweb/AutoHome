@@ -198,6 +198,31 @@
 
 
 
+
+
+
+
+
+
+.Panel.graphPanel {
+    grid-template-areas: 
+        'title title'
+        'graph graph';
+    grid-template-columns: 40px auto;
+    grid-template-rows: 30px auto;
+    grid-row-gap: 10px
+}
+
+.Panel.graphPanel .GraphHolder {
+    margin:  -20px -20px;
+    width:  auto;
+}
+
+
+
+
+
+
 @media screen and (max-width: 1200px) {
     :root {
         --componentWidth: 33.3%;

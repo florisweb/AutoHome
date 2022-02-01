@@ -46,8 +46,8 @@ function HomePagePanel(_params = {onRender, customClass}) {
 }
 
 
-function GraphPanel({customClass, xLabel, yLabel}) {
-	Panel.call(this, {onRender: onRender, customClass: customClass});
+function GraphPanel({panelTitle, customClass = "", xLabel, yLabel}) {
+	Panel.call(this, {onRender: onRender, customClass: customClass + " graphPanel"});
 
 	let graph = new Graph(...arguments);
 	this.setData = function(_lines) {
@@ -56,7 +56,7 @@ function GraphPanel({customClass, xLabel, yLabel}) {
 
 	function onRender() {
 		return [
-			<div className='text panelTitle small'>Moisture</div>,
+			<div className='text panelTitle small'>{panelTitle}</div>,
 			graph.render()
 		];
 	}

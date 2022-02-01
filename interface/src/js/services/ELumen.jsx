@@ -36,7 +36,11 @@
 		ServicePage.call(this);
 
 		let moisturePanel = new function() {
-			GraphPanel.call(this, {customClass: "moisturePanel w2 h3", xLabel: "Time", yLabel: "Moisture (%)", yRange: [0, 100]});
+			GraphPanel.call(this, {panelTitle: "Moisture", customClass: "w2 h3", xLabel: "Time", yLabel: "Moisture (%)", yRange: [0, 100]});
+		}
+
+		let waterVolumePanel = new function() {
+			GraphPanel.call(this, {panelTitle: "Water Volume", customClass: "w2 h3", xLabel: "Time", yLabel: "WaterVolume (%)", yRange: [0, 100]});
 		}
 
 
@@ -57,6 +61,7 @@
 					</div>
 					<div className='PanelBox'>
 						{moisturePanel.render()}
+						{waterVolumePanel.render()}
 					</div>
 				</div>;
 
@@ -71,6 +76,11 @@
 		}
 		
 		this.updateGraph = (_data) => {
+			updateMoistureGraph(_data);
+			updateWaterVolumeGraph(_data);
+		}
+
+		function updateMoistureGraph(_data) {
 			let lines = [[], [], [], []];
 			for (let row of _data)
 			{
@@ -90,6 +100,20 @@
 			}
 
 			moisturePanel.setData(lines);
+		}
+
+		function updateWaterVolumeGraph(_data) {
+			let lines = [[]];
+			for (let row of _data)
+			{
+				let time = row.time / 1000;
+				lines[0].push([
+					time,
+					row.data.volumePerc
+				]);
+			}
+
+			waterVolumePanel.setData(lines);
 		}
 	}
 
