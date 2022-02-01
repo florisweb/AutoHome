@@ -69,7 +69,7 @@ function DropDown({onChange, customClass = '', options = []} = {}) {
 		This.close();
 		try {
 			onChange(This.value);
-		} catch (e) {console.error(e)}
+		} catch (e) {}
 	}
 }
 

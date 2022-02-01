@@ -24,6 +24,10 @@ function Service({serviceId, name, homeScreenPanel, servicePage}) {
 		_json.serviceId = this.serviceId;
 		return Server.send(_json);
 	};
+
+	this.identify = () => {
+		this.send({type: "identify"});
+	}
 }
 
 

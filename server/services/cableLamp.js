@@ -6,12 +6,8 @@ import ServiceManager from './serviceManager.js';
 function CustomSubscriber(_config) {
     Subscriber.call(this, {..._config, handleRequest: handleRequest});
     const This = this;
-    const commandIndicesByName = {
-        setLampState: 1,
-        executeGivenProgram: 2,
-        executePreparedProgram: 4,
-    }   
     async function handleRequest(_message) {
+        // Intercept messages
         switch (_message.type)
         {
             case "getPrograms": 
@@ -20,19 +16,21 @@ function CustomSubscriber(_config) {
                 return This.onEvent({type: "alarmData", data: await This.service.alarmManager.getAlarm()});
         }
 
-        let index = commandIndicesByName[_message.type];
-        if (index) return This.service.send({type: index, data: _message.data});
+        // Servermodified messages
         switch (_message.type)
         {
             case "prepareProgram": 
                 if (!_message.data) return This.onEvent({error: "Data missing", message: _message});
                 _message.data.trigger = filterTriggerString(_message.data.trigger);
+                
                 This.service.alarmManager.setAlarm(_message.data);
-
                 This.service.send({type: 3, data: _message.data});
                 This.service.pushCurState();
             break;
         }
+
+        // Default messages
+        return This.service.send(_message);
     }
 
     function filterTriggerString(_str) {
@@ -86,6 +84,7 @@ export default new function() {
         switch (_message.type)
         {
             case "lampStatus": This.curState.lampOn = _message.data; break;
+            case "programRunState": This.curState.programRunState = _message.data; break;
         }
         This.pushEvent(_message);
     }
@@ -112,6 +111,9 @@ export default new function() {
             program: program.program
         }
         this.send({type: 3, data: data});
+        setTimeout(() => {
+            This.send({type: "identify"});
+        }, 1000 * 5);
     }
 }
 

@@ -5,20 +5,18 @@ function CustomSubscriber(_config) {
     const This = this;
     Subscriber.call(this, {..._config, handleRequest: handleRequest});
 
-    const commandIndicesByName = {
-        giveWater: 1,
-        calibrate: 2,
-    };
-
     async function handleRequest(_message) {
         console.log('ELumensubscriber.handleRequest', _message);
+
+        // Server intercepted messages
         switch (_message.type)
         {
             case "getData": 
                 return This.onEvent({type: "data", data: await This.service.dataManager.getData()});
         }
-        let index = commandIndicesByName[_message.type];
-        if (index) return This.service.send({type: index, data: _message.data});
+        
+        // Default messages
+        return This.service.send(_message);
     }
 }
 
