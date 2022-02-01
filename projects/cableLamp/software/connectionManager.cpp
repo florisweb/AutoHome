@@ -35,7 +35,6 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
     case WStype_DISCONNECTED:
       Serial.printf("[WSc] Disconnected!\n");
       authenticated = false;
-      digitalWrite(LED_BUILTIN, LOW);
       break;
     case WStype_CONNECTED:
       Serial.printf("[WSc] Connected to url: %s\n", payload);
@@ -48,9 +47,16 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
       Serial.printf("[WSc] get text: %s\n", payload);
       if (authenticated)
       {
-        digitalWrite(LED_BUILTIN, HIGH);
         DynamicJsonDocument doc(1024);
         deserializeJson(doc, payload);
+
+        if (doc["type"] == "identify") 
+        {
+          digitalWrite(LED_BUILTIN, HIGH);
+          delay(400);
+          digitalWrite(LED_BUILTIN, LOW);
+          return;
+        }
         onMessagePointer(doc);
 
       } else {
@@ -61,7 +67,6 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
         Serial.print("Error: ");
         Serial.println(error);
-        digitalWrite(LED_BUILTIN, LOW);
         if (packetType == "auth" && doc["data"] == true)
         {
           Serial.println("Successfully authenticated.");

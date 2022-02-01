@@ -37,45 +37,43 @@ const int   daylightOffset_sec = 3600;
 
 void onMessage(DynamicJsonDocument message) {
   String error = message["error"];
-  int packetType = message["type"];
+  String packetType = message["type"];
 
   Serial.print("[OnMessage] Error: ");
   Serial.println(error);
   Serial.print("[OnMessage] type: ");
   Serial.println(packetType);
 
-  String trigger = message["data"]["trigger"].as<String>();
-
-
-  switch (packetType)
+  if (packetType == "setLampState")
   {
-    case 1: // Set lamp state
-      setLampState(message["data"]);
-      break;
-    case 2: // Execute a given program
-      for (int i = 0; i < maxProgramSize; i++)
-      {
-        int instruction = message["data"][i];
-        curLightProgram[i] = instruction;
-      }
-      curLightProgramIndex = 0;
-      break;
+    setLampState(message["data"]);
+  } else if (packetType == "executeGivenProgram")
+  {
+    if (curLightProgramIndex != -1) return; // Can't start a new program when there's still one running
+    for (int i = 0; i < maxProgramSize; i++)
+    {
+      int instruction = message["data"][i];
+      curLightProgram[i] = instruction;
+    }
+    runCurLightProgram();
+  } else if (packetType == "prepareProgram")
+  {
+    String trigger = message["data"]["trigger"].as<String>();
 
-    case 3: // Import/set light program
-      for (int i = 0; i < maxProgramSize; i++)
-      {
-        int instruction = message["data"]["program"][i];
-        lightProgram[i] = instruction;
-      }
-      programTrigger = trigger;
-      break;
-    case 4: // Run program
-      curLightProgram = lightProgram;
-      curLightProgramIndex = 0;
-      break;
+    for (int i = 0; i < maxProgramSize; i++)
+    {
+      int instruction = message["data"]["program"][i];
+      lightProgram[i] = instruction;
+    }
+    programTrigger = trigger;
+
+  } else if (packetType == "executePreparedProgram")
+  {
+    if (curLightProgramIndex != -1) return; // Can't start a new program when there's still one running
+    curLightProgram = lightProgram;
+    runCurLightProgram();
   }
 }
-
 
 
 
@@ -155,7 +153,9 @@ void updateProgramExecutor() {
     switch (curLightProgram[curLightProgramIndex])
     {
       case 0:
-        curLightProgramIndex = -2; // -2 + 1 = -1
+        curLightProgramIndex = -1; // -2 + 1 = -1
+        ConnectionManager.send("{\"type\": \"programRunState\", \"data\": false}");
+        return;
         break;
       case 1:
         setLampState(true);
@@ -172,7 +172,11 @@ void updateProgramExecutor() {
   }
 
   curLightProgramIndex++;
-  if (sizeof(curLightProgram) / sizeof(int) < curLightProgramIndex) curLightProgramIndex = -1;
+  if (sizeof(curLightProgram) / sizeof(int) < curLightProgramIndex)
+  {
+    curLightProgramIndex = -1;
+    ConnectionManager.send("{\"type\": \"programRunState\", \"data\": false}");
+  }
 }
 
 
@@ -192,4 +196,12 @@ void setLampState(bool turnLampOn) {
 
   statusMessage += "}";
   ConnectionManager.send(statusMessage);
+}
+
+
+
+
+void runCurLightProgram() {
+  curLightProgramIndex = 0;
+  ConnectionManager.send("{\"type\": \"programRunState\", \"data\": true}");
 }
