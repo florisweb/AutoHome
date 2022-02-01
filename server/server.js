@@ -26,6 +26,8 @@ const interval = setInterval(function () {
 
 
 
+
+
 function Client(_conn) {
     const This = this;
     this.authenticated = false;
@@ -69,8 +71,11 @@ function Client(_conn) {
 
         let service = ServiceManager.getService(data.id);
         if (!service) return Conn.send(JSON.stringify({error: "Service not found"}));
+        if (!service.config.isDeviceService) return Conn.send(JSON.stringify({error: "Service is not a deviceService"}));
+        
         let allowed = service.authenticate(data.key);
         if (!allowed) return Conn.send(JSON.stringify({error: "Invalid Key"}));
+        
         This.authenticated = true;
         This.service = service;
         Conn.send(JSON.stringify({type: "auth", data: true}));
@@ -80,7 +85,6 @@ function Client(_conn) {
 
 
     Conn.on("close", () => {
-        console.log("Start disconnect");
         clients = clients.filter(s => s.id !== This.id);
         if (This.service) This.service.setDevicesClient(false);
         console.log('[Client disconnected] Total: ' + clients.length);

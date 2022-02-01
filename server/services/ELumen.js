@@ -1,5 +1,5 @@
 
-import { Subscriber, DeviceService } from './serviceLib.js';
+import { Subscriber, DeviceService, ServiceFileManager } from './serviceLib.js';
 
 function CustomSubscriber(_config) {
     const This = this;
@@ -25,8 +25,23 @@ export default new function() {
         onMessage: onMessage
     });
 
+    this.dataManager = new function() {
+        let fm = new ServiceFileManager({path: "data.json", defaultValue: []}, This);
+        this.addDataRow = async function(_data) {
+            let data = await fm.getContent();
+            data.push({time: Date.now(), data: _data});
+            return fm.writeContent(data);
+        }
+    }
+
+
     function onMessage(_message) {
         console.log('ELumen.onMessage', _message);
+        switch (_message.type)
+        {
+            case "sensorState": This.dataManager.addDataRow(_message.data); break;
+        }
+        
         This.pushEvent(_message);
     }
 

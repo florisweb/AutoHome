@@ -10,24 +10,7 @@ export function Service({id, SubscriberTemplate = Subscriber}) {
     this.key            = ServiceConfig.services[id].key;
     this.config         = ServiceConfig.services[id];
     
-    this.downTimeTracker = new Service_downTimeTracker(this);
-
-    this.client         = false;
-    this.curState = {};
-    this.setDevicesClient = (_deviceClient) => {
-        this.client = _deviceClient;
-        this.pushEvent({
-            type: "onlineStatusUpdate",
-            data: !!this.client
-        });
-        this.curState.deviceOnline = !!this.client;
-        this.downTimeTracker.updateConnectionState(!!this.client);
-
-        if (this.client) return this.onDeviceConnect();
-        this.onDeviceDisconnect();
-    }
-    this.onDeviceConnect = () => {};
-    this.onDeviceDisconnect = () => {};
+    this.curState       = {};    
 
     this.setup = () => {};
     this.authenticate = (_key) => {
@@ -57,16 +40,72 @@ export function Service({id, SubscriberTemplate = Subscriber}) {
 
 
 
-function Service_downTimeTracker(_parent) {
-    let fm = new FileManager(_parent.id + "_downTime.json");
-    this.getData = function() {
+
+export function DeviceService({id, onMessage}) {
+    Service.call(this, ...arguments);
+    this.downTimeTracker = new Service_downTimeTracker(this);
+    this.curState       = {deviceOnline: false};
+
+    this.client         = false;
+    this.setDevicesClient = (_deviceClient) => {
+        let isNewClient = this.client ? _deviceClient.id != this.client.id : true;
+        this.client = _deviceClient;
+        this.curState.deviceOnline = !!this.client;
+
+        if (!isNewClient) return;
+        this.downTimeTracker.updateConnectionState(!!this.client);
+
+        this.pushEvent({
+            type: "onlineStatusUpdate",
+            data: this.curState.deviceOnline
+        });
+        if (this.client) return this.onDeviceConnect();
+        this.onDeviceDisconnect();
+    }
+
+    this.onDeviceConnect = () => {};
+    this.onDeviceDisconnect = () => {};
+
+
+    this.onMessage = (_event) => {
+        try {
+            onMessage(_event);
+        } catch (e) {console.log(e)};
+    }
+    this.send = function(_data) {
+        if (!this.client) return Errors.NotConnectedService;
+        this.client.send(JSON.stringify(_data));
+    }
+}
+
+
+
+
+export function ServiceFileManager({path, defaultValue = {}}, _service) {
+    let fm = new FileManager(_service.id + "_" + path);
+    this.getContent = () => {
         return new Promise((resolve) => {
             fm.getContent().then((_result) => {
-                if (typeof _result != 'object') return resolve([]);
+                if (typeof _result != 'object') return resolve(defaultValue);
                 resolve(_result);
-            }, () => resolve([]));
+            }, () => resolve(defaultValue));
         });
     }
+    this.writeContent = function() {
+        return new Promise((resolve) => {
+            fm.writeContent(...arguments).then(
+                (_result) => {resolve(_result)}, 
+                () => {resolve(false)}
+            );
+        })
+        
+    };
+}
+
+
+function Service_downTimeTracker(_parent) {
+    let fm = new ServiceFileManager({path: "downTime.json", defaultValue: []}, _parent);
+    this.getData = function() {return fm.getContent(...arguments)};
 
     this.updateConnectionState = async function(_connected) {
         let data = await this.getData();
@@ -93,18 +132,15 @@ function Service_downTimeTracker(_parent) {
 }
 
 
-export function DeviceService({id, onMessage}) {
-    Service.call(this, ...arguments);
-    this.onMessage = (_event) => {
-        try {
-            onMessage(_event);
-        } catch (e) {console.log(e)};
-    }
-    this.send = function(_data) {
-        if (!this.client) return Errors.NotConnectedService;
-        this.client.send(JSON.stringify(_data));
-    }
-}
+
+
+
+
+
+
+
+
+
 
 
 export function SubscriptionList(_list = []) {

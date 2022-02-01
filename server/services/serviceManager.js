@@ -6,6 +6,7 @@ export default new function() {
         let promises = [];
         for (let id in ServiceConfig.services)
         {
+            if (ServiceConfig.services[id].disabled) continue;
             promises.push(import('./' + id + '.js').then((mod) => {
                 Services.push(mod.default);
             }));
