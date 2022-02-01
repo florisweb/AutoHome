@@ -23,8 +23,8 @@ function CustomSubscriber(_config) {
                 if (!_message.data) return This.onEvent({error: "Data missing", message: _message});
                 _message.data.trigger = filterTriggerString(_message.data.trigger);
                 
-                This.service.alarmManager.setAlarm(_message.data);
                 This.service.send({type: 3, data: _message.data});
+                This.service.alarmManager.setAlarm(_message.data);
                 This.service.pushCurState();
             break;
         }
@@ -72,7 +72,7 @@ export default new function() {
             return await fm.getContent();
         }
         this.setAlarm = async function(_data) {
-            let data = {programIndex: _data.programIndex, trigger: data.trigger};
+            let data = {programIndex: _data.programIndex, trigger: _data.trigger};
             if (!data.trigger || !_data) data = {};
             This.curState.alarm = data;
             return await fm.writeContent(data);
