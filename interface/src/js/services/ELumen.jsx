@@ -30,8 +30,74 @@
 		}
 	}
 
+
+	const page = new function() {
+		const This = this;
+		ServicePage.call(this);
+
+		let moisturePanel = new function() {
+			GraphPanel.call(this, {customClass: "moisturePanel w2 h3", xLabel: "Time", yLabel: "Moisture (%)", yRange: [0, 100]});
+		}
+
+
+
+		this.render = () => {
+			this.html.backButton = <img src='images/backIcon.png' className='icon overviewIcon overviewButton' onclick={() => {MainContent.homePage.open()}}></img>;
+			this.html.icon = <img src='images/lightBolbOff.png' className='icon overviewIcon whiteBackgroundBox' onclick={() => {CableLamp.toggleLight()}}></img>;
+			this.html.settingsButton = <img src='images/hamburgerIcon.png' className='icon overviewIcon overviewButton' onclick={() => {MainContent.homePage.open()}}></img>;
+
+			this.html.self = <div className='pageContent'>
+					<div className='pageOverview' style='margin-bottom: 50px'>
+						<div className='iconHolder'>
+							<div>{this.html.backButton}</div>
+							{this.html.icon}
+							<div>{this.html.settingsButton}</div>
+						</div>
+						<div className='text title'>{This.service.name}</div>
+					</div>
+					<div className='PanelBox'>
+						{moisturePanel.render()}
+					</div>
+				</div>;
+
+
+			this.service.send({type: "getData"})
+
+			return this.html.self;
+		}
+
+		this.updateData = () => {
+
+		}
+		
+		this.updateGraph = (_data) => {
+			let lines = [[], [], [], []];
+			for (let row of _data)
+			{
+				let time = row.time / 1000;
+				lines[0].push([
+					time,
+					row.data.humidity
+				]);
+				lines[1].push([
+					time,
+					row.data.moisture1
+				]);
+				lines[2].push([
+					time,
+					row.data.moisture2
+				]);
+			}
+
+			moisturePanel.setData(lines);
+		}
+	}
+
+
+
+
 	const ELumen = new function() {
-		Service.call(this, {serviceId: 'ELumen', name: 'eLumen', homeScreenPanel: panel});
+		Service.call(this, {serviceId: 'ELumen', name: 'eLumen', homeScreenPanel: panel, servicePage: page});
 		this.state = {
 			humidty: 0,
 			temperature: 0,
@@ -43,6 +109,10 @@
 				case "curState": 
 					this.state = _event.data;
 					this.homeScreenPanel.updateData();
+					this.servicePage.updateData();
+				break;
+				case "data": 
+					this.servicePage.updateGraph(_event.data);
 				break;
 			}
 		}

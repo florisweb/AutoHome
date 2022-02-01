@@ -43,5 +43,21 @@ function HomePagePanel(_params = {onRender, customClass}) {
 		if (!_isOnline) return;
 		this.html.onlineIndicator.classList.add("online");
 	}
+}
 
+
+function GraphPanel({customClass, xLabel, yLabel}) {
+	Panel.call(this, {onRender: onRender, customClass: customClass});
+
+	let graph = new Graph(...arguments);
+	this.setData = function(_lines) {
+		graph.setData(_lines);
+	}
+
+	function onRender() {
+		return [
+			<div className='text panelTitle small'>Moisture</div>,
+			graph.render()
+		];
+	}
 }

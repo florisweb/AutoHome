@@ -5,3 +5,20 @@
 	width: calc(var(--componentWidth) - 10px * 2);
   	height: calc(var(--componentHeight) * 2 - 10px * 2);
 }
+
+
+
+/*Page*/
+.Panel.moisturePanel {
+	grid-template-areas: 
+        'title title'
+        'graph graph';
+    grid-template-columns: 40px auto;
+    grid-template-rows: 30px auto;
+    grid-row-gap: 10px
+}
+
+.Panel.moisturePanel .GraphHolder {
+	margin:  -20px -20px;
+	width:  auto;
+}
