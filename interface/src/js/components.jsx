@@ -7,7 +7,7 @@ const Colors = [
   '#0fa',
 ];
 
-function DropDown({onChange, customClass = '', options = []}) {
+function DropDown({onChange, customClass = '', options = []} = {}) {
 	const This = this;
 	this.value = false;
 	this.options = options;
@@ -15,14 +15,7 @@ function DropDown({onChange, customClass = '', options = []}) {
 	this.html = {};
 	
 	this.render = function() {
-		let optionElements = [];
-		for (let option of this.options) 
-		{
-			let element = <div className='option'>{option.name}</div>;
-			element.addEventListener('click', () => onOptionClick(option));
-			optionElements.push(element);
-		}
-		this.html.popup = <div className='popup hide'>{optionElements}</div>;
+		this.html.popup = <div className='popup hide'></div>;
 		
 		this.html.self = <div className='DropDownWrapper'>
 			<div className={'DropDown text' + customClass}></div>
@@ -36,8 +29,24 @@ function DropDown({onChange, customClass = '', options = []}) {
 			This.open();
 		});
 
+		this.setOptions(options);
+
 		return this.html.self;
 	}
+
+	this.setOptions = (_options = []) => {
+		this.options = Object.assign([], _options);
+		if (!this.html.popup) return;
+		this.html.popup.innerHTML = '';
+		for (let option of this.options) 
+		{
+			let element = <div className='option'>{option.name}</div>;
+			element.addEventListener('click', () => onOptionClick(option));
+			option.select = () => {onOptionClick(option)}
+			this.html.popup.append(element);
+		}
+	}
+
 	this.setValue = function(_value) {
 		let option = this.options.find((_option) => _option.value === _value);
 		This.value = _value;
@@ -64,6 +73,9 @@ function DropDown({onChange, customClass = '', options = []}) {
 	}
 }
 
+
+
+
 function Button({onclick, text, customClass = '', boxy = false, filled = true}) {
 	const This = this;
 	this.html = {};
@@ -77,7 +89,9 @@ function Button({onclick, text, customClass = '', boxy = false, filled = true}) 
 }
 
 
-function InputField({placeholder = null, isTimeInput}) {
+
+
+function InputField({placeholder = null, isTimeInput, onChange, onBlur}) {
 	const This = this;
 	this.html = {};
 	
@@ -86,10 +100,15 @@ function InputField({placeholder = null, isTimeInput}) {
 		if (isTimeInput)
 		{
 			this.html.self.setAttribute('type', 'time');
+			this.html.self.value = '00:00';
 			this.html.self.classList.add('timeInput');
 		}
+		if (onChange) this.html.self.addEventListener('change', onChange);
+		if (onBlur) this.html.self.addEventListener('blur', onBlur);
 		return this.html.self;
 	}
+
+	this.getValue = () => this.html.self.value;
 }
 
 

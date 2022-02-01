@@ -10,8 +10,13 @@ function CustomSubscriber(_config) {
         calibrate: 2,
     };
 
-    function handleRequest(_message) {
+    async function handleRequest(_message) {
         console.log('ELumensubscriber.handleRequest', _message);
+        switch (_message.type)
+        {
+            case "getData": 
+                return This.onEvent({type: "data", data: await This.service.dataManager.getData()});
+        }
         let index = commandIndicesByName[_message.type];
         if (index) return This.service.send({type: index, data: _message.data});
     }
@@ -31,6 +36,9 @@ export default new function() {
             let data = await fm.getContent();
             data.push({time: Date.now(), data: _data});
             return fm.writeContent(data);
+        }
+        this.getData = function() {
+            return fm.getContent();
         }
     }
 

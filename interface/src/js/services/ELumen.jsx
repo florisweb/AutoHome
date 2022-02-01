@@ -47,7 +47,7 @@
 
 		this.render = () => {
 			this.html.backButton = <img src='images/backIcon.png' className='icon overviewIcon overviewButton' onclick={() => {MainContent.homePage.open()}}></img>;
-			this.html.icon = <img src='images/eLumenIcon.png' className='icon overviewIcon whiteBackgroundBox' onclick={() => {CableLamp.toggleLight()}}></img>;
+			this.html.icon = <img src='images/eLumenIcon.png' className='icon overviewIcon whiteBackgroundBox'></img>;
 			this.html.settingsButton = <img src='images/hamburgerIcon.png' className='icon overviewIcon overviewButton' onclick={() => {MainContent.homePage.open()}}></img>;
 
 			this.html.self = <div className='pageContent'>
