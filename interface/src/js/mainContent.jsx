@@ -3,8 +3,9 @@ function _MainContent() {
 	const HTML = {
 		mainContent: mainContent
 	}
-	this.homePage 		= new MainContent_homePage();
-	this.servicePage 	= new MainContent_servicePage();
+	this.homePage 			= new MainContent_homePage();
+	this.servicePage 		= new MainContent_servicePage();
+	this.serviceConfigPage 	= new MainContent_serviceConfigPage();
 	this.curPage;
 	
 	this.setup = function() {
@@ -15,11 +16,12 @@ function _MainContent() {
 	this.render = function() {
 		mainContent.append(this.homePage.render());
 		mainContent.append(this.servicePage.render());
+		mainContent.append(this.serviceConfigPage.render());
 	}
 }
 
 
-function MainContent_page({index, pageRenderer, onOpen, onClose}) {
+function MainContent_page({pageRenderer, onOpen, onClose}) {
 	this.HTML = {};
 	this.openState = false;
 	this.render = function() {
@@ -53,7 +55,6 @@ function MainContent_page({index, pageRenderer, onOpen, onClose}) {
 
 function MainContent_homePage() {
 	MainContent_page.call(this, {
-		index: 0, 
 		pageRenderer: render,
 		onOpen: onOpen
 	});
@@ -82,9 +83,9 @@ function MainContent_homePage() {
 		</div>;
 	}
 }
+
 function MainContent_servicePage() {
 	MainContent_page.call(this, {
-		index: 0, 
 		pageRenderer: () => <div>Loading...</div>,
 		onOpen: onOpen
 	});
@@ -98,7 +99,52 @@ function MainContent_servicePage() {
 		This.HTML.page.innerHTML = '';
 		This.HTML.page.append(_servicePage.render());
 	}
+}
 
+
+function MainContent_serviceConfigPage() {
+	MainContent_page.call(this, {
+		pageRenderer: () => <div>Loading...</div>,
+		onOpen: onOpen
+	});
+	const This = this;
+
+	function onOpen(_service) {
+		renderPageContent(_service);
+	}
+
+	let downTimePanel = new DownTimePanel({customClass: "w2 h3"})
+	let backButton = <img src='images/backIcon.png' className='icon overviewIcon overviewButton' onclick={() => {MainContent.homePage.open()}}></img>;
+	let icon = <img src='images/lightBolbOff.png' className='icon overviewIcon whiteBackgroundBox' onclick={() => {CableLamp.toggleLight()}}></img>;
+	let placeHolderButton = <img className='icon overviewIcon overviewButton' style='opacity: 0'></img>;
+
+	function renderPageContent(_service) {
+		_service.send({type: "getDownTime"});
+		let pageContent = <div className='pageContent'>
+			<div className='pageOverview' style='margin-bottom: 50px'>
+				<div className='iconHolder'>
+					<div>{backButton}</div>
+					{icon}
+					<div>{placeHolderButton}</div>
+				</div>
+				<div className='text title'>{_service.name}</div>
+			</div>
+			<div className='PanelBox'>
+				{downTimePanel.render()}
+			</div>
+		</div>;
+		backButton.onclick = () => {
+			MainContent.servicePage.open(_service);
+		}
+
+		This.HTML.page.innerHTML = '';
+		This.HTML.page.append(pageContent);
+	}
+
+
+	this.updateDownTimePanel = function(_data) {
+		downTimePanel.setData(_data);
+	}
 }
 
 

@@ -43,13 +43,11 @@
 			GraphPanel.call(this, {panelTitle: "Water Volume", customClass: "w2 h3", xLabel: "Time", yLabel: "WaterVolume (%)", yRange: [0, 100]});
 		}
 
-		let downTimePanel = new DownTimePanel({customClass: "w2 h3"})
-		this.downTimePanel = downTimePanel;
 
 		this.render = () => {
 			this.html.backButton = <img src='images/backIcon.png' className='icon overviewIcon overviewButton' onclick={() => {MainContent.homePage.open()}}></img>;
 			this.html.icon = <img src='images/eLumenIcon.png' className='icon overviewIcon whiteBackgroundBox'></img>;
-			this.html.settingsButton = <img src='images/hamburgerIcon.png' className='icon overviewIcon overviewButton' onclick={() => {MainContent.homePage.open()}}></img>;
+			this.html.settingsButton = <img src='images/hamburgerIcon.png' className='icon overviewIcon overviewButton' onclick={() => {MainContent.serviceConfigPage.open(This.service)}}></img>;
 
 			this.html.self = <div className='pageContent'>
 					<div className='pageOverview' style='margin-bottom: 50px'>
@@ -63,7 +61,6 @@
 					<div className='PanelBox'>
 						{moisturePanel.render()}
 						{waterVolumePanel.render()}
-						{downTimePanel.render()}
 					</div>
 				</div>;
 
@@ -142,7 +139,7 @@
 					this.servicePage.updateGraph(_event.data);
 				break;
 				case "downTime": 
-					this.servicePage.downTimePanel.setData(_event.data);
+					MainContent.serviceConfigPage.updateDownTimePanel(_event.data);
 				break;
 			}
 		}

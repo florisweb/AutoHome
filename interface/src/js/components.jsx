@@ -380,9 +380,11 @@ function DownTimeGraph({} = {}) {
 
 	function renderDayWrapper(_hourData, _date) {
 		let hourPills = [];
+
 		for (let i = 0; i < 24; i++)
 		{
-			hourPills.push(renderHourPill(_hourData[i]));
+			let maxDate = _date.getTime() + i * 60 * 60 * 1000;
+			hourPills.push(renderHourPill(_hourData[i], Date.now() < maxDate));
 		}
 		let dateName = _date.getDate() + " " + _date.getMonths()[_date.getMonth()].name.substr(0, 3)
 		return <div className='dayWrapper'>
@@ -391,8 +393,9 @@ function DownTimeGraph({} = {}) {
 		</div>;
 	}
 
-	function renderHourPill(_onlinePercentage) {
+	function renderHourPill(_onlinePercentage, _isFuturePill = false) {
 		let hourPill = <div className='hourPill'></div>;
+		if (_isFuturePill) return hourPill;
 		hourPill.style.background = 'rgb(' + (255 * (1 - _onlinePercentage)) + ', ' + (255 * _onlinePercentage) + ', 128)';
 		return hourPill;
 	}
@@ -440,7 +443,6 @@ function DownTimeGraph({} = {}) {
 				}
 
 
-
 				let curHour = minHour;
 				while (curHour < maxHour - 1)
 				{
@@ -456,13 +458,12 @@ function DownTimeGraph({} = {}) {
 
 		return hourData;
 	}
-
-
-
-
-
-
 }
+
+
+
+
+
 
 function createFilledArray(_length, _value) {
 	let arr = [];
