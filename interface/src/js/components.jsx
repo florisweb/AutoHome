@@ -332,7 +332,6 @@ function Graph({xLabel = '', yLabel = '', yRange}) {
 	  }
 	  return [min, max];
 	}
-
 }
 
 
@@ -344,3 +343,129 @@ function numberToTwoDigitString(_number) {
   return '0' + _number;
 }
 
+
+
+
+
+function DownTimeGraph({} = {}) {
+	const This = this;
+	const msPerDay = 60 * 60 * 24 * 1000;
+	let data = [];
+
+
+	this.html = {};
+	this.setData = function(_data) {
+		data = convertDomainsToHourData(_data);
+		renderContent();
+	}
+
+	this.render = () => {
+		this.html.self = <div className='DownTimeGraph'></div>;
+
+		renderContent();
+		return this.html.self;
+	}
+
+	function renderContent() {
+		This.html.self.innerHTML = '';
+		if (!data || !data.data) return;
+		for (let i = 0; i < data.data.length; i++)
+		{
+			let curDate = new Date(data.startDate.getTime() + msPerDay * i);
+			let day = renderDayWrapper(data.data[i], curDate);
+			This.html.self.append(day);
+		}
+	}
+
+
+	function renderDayWrapper(_hourData, _date) {
+		let hourPills = [];
+		for (let i = 0; i < 24; i++)
+		{
+			hourPills.push(renderHourPill(_hourData[i]));
+		}
+		let dateName = _date.getDate() + " " + _date.getMonths()[_date.getMonth()].name.substr(0, 3)
+		return <div className='dayWrapper'>
+			<div className='text tagHolder'>{dateName}</div>
+			<div className='text contentHolder'>{hourPills}</div>
+		</div>;
+	}
+
+	function renderHourPill(_onlinePercentage) {
+		let hourPill = <div className='hourPill'></div>;
+		hourPill.style.background = 'rgb(' + (255 * (1 - _onlinePercentage)) + ', ' + (255 * _onlinePercentage) + ', 128)';
+		return hourPill;
+	}
+
+
+	function convertDomainsToHourData(_data) {
+		if (!_data.length) return;
+
+		let startDate = new Date(_data[0][0]);
+		startDate.setHours(0);
+		startDate.setMinutes(0);
+		startDate.setSeconds(0);
+		let hourData = {startDate: startDate, data: []};
+
+		let startTime = startDate.getTime();
+		let curTime = startTime;
+
+		let curDateIndex = 0;
+		while (curTime < Date.now())
+		{
+			hourData.data[curDateIndex] = createFilledArray(24, 0);
+
+			for (let domain of _data)
+			{
+				if (domain[0] > curTime + msPerDay || domain[1] < curTime) continue;
+
+				let dStart = domain[0] - curTime;
+				let sectionLength = domain[1] - domain[0];
+				
+				let startHour = dStart / 60 / 60 / 1000;
+				let endHour = (dStart + sectionLength) / 60 / 60 / 1000;
+				let minHour = Math.floor(startHour);
+				let maxHour = Math.floor(endHour);
+				let sectionLengthInHours = sectionLength / 60 / 60 / 1000;
+
+
+				let startMomentInFirstHour = startHour % 1;
+				let maxTimeInFirstHour = 1 - startMomentInFirstHour;
+				hourData.data[curDateIndex][minHour] += Math.min(maxTimeInFirstHour, sectionLengthInHours);
+
+				let endMomentInLastHour = endHour % 1;
+				if (minHour != maxHour && maxHour < 24) 
+				{
+					hourData.data[curDateIndex][maxHour] += endMomentInLastHour;
+				}
+
+
+
+				let curHour = minHour;
+				while (curHour < maxHour - 1)
+				{
+					curHour++;
+					if (curHour > 23) break;
+					hourData.data[curDateIndex][curHour] += 1;
+				}
+			}
+
+			curTime += msPerDay
+			curDateIndex++;
+		}
+
+		return hourData;
+	}
+
+
+
+
+
+
+}
+
+function createFilledArray(_length, _value) {
+	let arr = [];
+	for (let i = 0; i < _length; i++) arr.push(_value);
+	return arr;
+}

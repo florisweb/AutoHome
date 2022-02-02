@@ -218,6 +218,9 @@
     width:  auto;
 }
 
+.Panel.graphPanel.downTimePanel .DownTimeGraph {
+    grid-area: graph;
+}
 
 
 

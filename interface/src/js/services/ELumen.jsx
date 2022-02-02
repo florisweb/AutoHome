@@ -43,7 +43,8 @@
 			GraphPanel.call(this, {panelTitle: "Water Volume", customClass: "w2 h3", xLabel: "Time", yLabel: "WaterVolume (%)", yRange: [0, 100]});
 		}
 
-
+		let downTimePanel = new DownTimePanel({customClass: "w2 h3"})
+		this.downTimePanel = downTimePanel;
 
 		this.render = () => {
 			this.html.backButton = <img src='images/backIcon.png' className='icon overviewIcon overviewButton' onclick={() => {MainContent.homePage.open()}}></img>;
@@ -62,17 +63,19 @@
 					<div className='PanelBox'>
 						{moisturePanel.render()}
 						{waterVolumePanel.render()}
+						{downTimePanel.render()}
 					</div>
 				</div>;
 
 
-			this.service.send({type: "getData"})
+			this.service.send({type: "getData"});
+			this.service.send({type: "getDownTime"})
 
 			return this.html.self;
 		}
 
 		this.updateData = () => {
-
+	
 		}
 		
 		this.updateGraph = (_data) => {
@@ -137,6 +140,9 @@
 				break;
 				case "data": 
 					this.servicePage.updateGraph(_event.data);
+				break;
+				case "downTime": 
+					this.servicePage.downTimePanel.setData(_event.data);
 				break;
 			}
 		}

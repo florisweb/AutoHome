@@ -61,3 +61,22 @@ function GraphPanel({panelTitle, customClass = "", xLabel, yLabel}) {
 		];
 	}
 }
+
+
+
+
+function DownTimePanel({customClass = ''}) {
+	Panel.call(this, {onRender: onRender, customClass: customClass + " graphPanel downTimePanel"});
+
+	let downTimeGraph = new DownTimeGraph();
+	this.setData = function() {
+		return downTimeGraph.setData(...arguments);
+	}
+	
+	function onRender() {
+		return [
+			<div className='text panelTitle small'>Downtime</div>,
+			downTimeGraph.render()
+		];
+	}
+}
