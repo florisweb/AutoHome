@@ -184,7 +184,11 @@
 	height: 20px;
 	border-radius: 3px;
 	margin: 0 2px;
-	background: rgba(0, 0, 0, .05);
+	background: rgba(0, 0, 0, .04);
+	box-sizing: border-box;
 }
 
+.DownTimeGraph .dayWrapper .contentHolder .hourPill.isNowPill {
+	background: rgba(0, 0, 0, .1);
+}
 

@@ -7,7 +7,12 @@
 
 
 Date.prototype.copy = function() {return new Date().setDateFromStr(this.toString(true));}
-
+Date.prototype.removeTime = function() {
+	this.setHours(0);
+	this.setMinutes(0);
+	this.setSeconds(0);
+	return this;
+}
 Date.prototype.stringIsDate = function(_date) {
 	if (!_date) return false;
 	return !isNaN(

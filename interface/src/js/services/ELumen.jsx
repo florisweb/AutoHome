@@ -66,7 +66,6 @@
 
 
 			this.service.send({type: "getData"});
-			this.service.send({type: "getDownTime"})
 
 			return this.html.self;
 		}

@@ -384,7 +384,8 @@ function DownTimeGraph({} = {}) {
 		for (let i = 0; i < 24; i++)
 		{
 			let maxDate = _date.getTime() + i * 60 * 60 * 1000;
-			hourPills.push(renderHourPill(_hourData[i], Date.now() < maxDate));
+			let isCurPill = Math.abs(Date.now() - maxDate) < 60 * 60 * 1000 && Date.now() - maxDate < 0;
+			hourPills.push(renderHourPill(_hourData[i], Date.now() < maxDate, isCurPill));
 		}
 		let dateName = _date.getDate() + " " + _date.getMonths()[_date.getMonth()].name.substr(0, 3)
 		return <div className='dayWrapper'>
@@ -393,8 +394,9 @@ function DownTimeGraph({} = {}) {
 		</div>;
 	}
 
-	function renderHourPill(_onlinePercentage, _isFuturePill = false) {
-		let hourPill = <div className='hourPill'></div>;
+	function renderHourPill(_onlinePercentage, _isFuturePill = false, _isNowPill = false) {
+		let className = 'hourPill ' + (_isNowPill ? "isNowPill" : "");
+		let hourPill = <div className={className}></div>;
 		if (_isFuturePill) return hourPill;
 		hourPill.style.background = 'rgb(' + (255 * (1 - _onlinePercentage)) + ', ' + (255 * _onlinePercentage) + ', 128)';
 		return hourPill;
@@ -404,10 +406,7 @@ function DownTimeGraph({} = {}) {
 	function convertDomainsToHourData(_data) {
 		if (!_data.length) return;
 
-		let startDate = new Date(_data[0][0]);
-		startDate.setHours(0);
-		startDate.setMinutes(0);
-		startDate.setSeconds(0);
+		let startDate = new Date(_data[0][0]).removeTime();
 		let hourData = {startDate: startDate, data: []};
 
 		let startTime = startDate.getTime();
@@ -454,6 +453,25 @@ function DownTimeGraph({} = {}) {
 
 			curTime += msPerDay
 			curDateIndex++;
+		}
+
+		// Add the current session, since its data is still being gathered (the device hasn't disconnected yet)
+		let curSession = _data[_data.length - 1];
+		if (curSession.length == 1) 
+		{
+			minDate = new Date(curSession[0]).removeTime();
+			curTime = minDate.getTime();
+			curDateIndex = Math.round((minDate.getTime() - startTime) / msPerDay);
+
+			while (curTime < Date.now())
+			{
+				if (curTime == minDate.getTime())
+				{
+					let startHour = new Date(curSession[0]).getHours() - 1;
+					for (let i = startHour; i < 24; i++) hourData.data[curDateIndex][i] = 1;
+				} else hourData.data[curDateIndex] = createFilledArray(24, 1);
+				curTime += msPerDay;
+			}
 		}
 
 		return hourData;
