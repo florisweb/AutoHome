@@ -7,10 +7,13 @@ const Server = new function() {
 	this.registerServiceListener = (_service) => {this.serviceListeners.push(_service)}
 
 	let Socket;
-	this.setup = () => {return this.connect()}
-	this.connect = function() {
-		Socket = new WebSocket('ws://thuiswolk.local:8081/'); 
+	this.setup = () => {return this.connect(true)}
+	this.connect = function(_connectToProxy = false) {
+		let serverUrl = _connectToProxy ? 'wss://thuiswolk.ga:8081/' : 'ws://thuiswolk.local:8081/';
+		Socket = new WebSocket(serverUrl);
+		this.Socket = Socket;
 		Socket.onmessage = function(_event) { 
+			console.log(window.e = _event, _event.data)
 			let message = JSON.parse(_event.data);
 			console.log(message);
 			if (message.type == 'auth')
@@ -32,6 +35,16 @@ const Server = new function() {
 		};
 
 		Socket.onopen = function() {
+			if (_connectToProxy)
+			{
+				Socket.send(JSON.stringify({
+					isServerMessage: true, 
+					proxyId: 'thuisWolkProxy',
+					key: 'client here'
+				}));
+				return;
+			} 
+
 			// Authenticate as interfaceClient
 			Socket.send(JSON.stringify({id: "InterfaceClient", key: Auth.getKey()}));
 		}
