@@ -6,3 +6,4 @@ interface/dist/*
 server/services/serviceConfig.js
 server/config.js
 server/DBData/*
+proxyServer/config.json

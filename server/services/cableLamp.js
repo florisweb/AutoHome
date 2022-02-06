@@ -111,9 +111,6 @@ export default new function() {
             program: program.program
         }
         this.send({type: 3, data: data});
-        setTimeout(() => {
-            This.send({type: "identify"});
-        }, 1000 * 5);
     }
 }
 

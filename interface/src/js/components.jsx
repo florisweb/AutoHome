@@ -200,7 +200,6 @@ function Graph({xLabel = '', yLabel = '', yRange}) {
 
 
 	function drawXAxis() {
-		console.log(minXLabelRoom);
 		let maxStepCount = Math.floor(ctx.canvas.width / minXLabelRoom);
 		const stepSize = getStepSize(maxStepCount, dx, xAxisTagIsDate);
 
@@ -405,6 +404,7 @@ function DownTimeGraph({} = {}) {
 
 	function convertDomainsToHourData(_data) {
 		if (!_data.length) return;
+		if (_data[_data.length - 1].length == 1) _data[_data.length - 1].push(Date.now()); // Current session
 
 		let startDate = new Date(_data[0][0]).removeTime();
 		let hourData = {startDate: startDate, data: []};
@@ -453,25 +453,6 @@ function DownTimeGraph({} = {}) {
 
 			curTime += msPerDay
 			curDateIndex++;
-		}
-
-		// Add the current session, since its data is still being gathered (the device hasn't disconnected yet)
-		let curSession = _data[_data.length - 1];
-		if (curSession.length == 1) 
-		{
-			minDate = new Date(curSession[0]).removeTime();
-			curTime = minDate.getTime();
-			curDateIndex = Math.round((minDate.getTime() - startTime) / msPerDay);
-
-			while (curTime < Date.now())
-			{
-				if (curTime == minDate.getTime())
-				{
-					let startHour = new Date(curSession[0]).getHours() - 1;
-					for (let i = startHour; i < 24; i++) hourData.data[curDateIndex][i] = 1;
-				} else hourData.data[curDateIndex] = createFilledArray(24, 1);
-				curTime += msPerDay;
-			}
 		}
 
 		return hourData;

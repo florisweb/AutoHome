@@ -39,11 +39,18 @@ var decrypt = function (encryptedMessage, encryptionMethod, secret, iv) {
 
 
 
+
 export function InterfaceClient(_conn) {
     const This = this;
     const Conn = _conn;
     this.isInterfaceClient = true;
     console.log('Upgraded client ' + this.id + ' to InterfaceClient');
+    
+    let ProxyManager = ServiceManager.getService('ProxyManager');
+    if (ProxyManager) Conn.send(JSON.stringify({
+        type: "proxyKey",
+        data: ProxyManager.config.proxyKey
+    }));
 
 
     let UIServices = ServiceManager.getUIServices();
@@ -61,6 +68,7 @@ export function InterfaceClient(_conn) {
         try {
             message = JSON.parse(buffer);
         } catch (e) {return Conn.send(JSON.stringify({error: "Invalid request"}))};
+        if (message.isProxyServerMessage) return;
 
         console.log('interfaceclient request', This.id, message);
 

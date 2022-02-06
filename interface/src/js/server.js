@@ -1,32 +1,49 @@
 
 const Server = new function() {
 	const This = this;
-	this.authenticated = false;
+	const primaryUrl = 'ws://thuiswolk.local:8081/';
+	const proxyUrl = 'wss://thuiswolk.ga:8081/';
 
 	this.serviceListeners = [];
 	this.registerServiceListener = (_service) => {this.serviceListeners.push(_service)}
 
+	this.connectedToProxy = false;
+
 	let Socket;
-	this.setup = () => {return this.connect(true)}
+	this.setup = () => {
+		upgradeSocketLoop();
+		return this.connect();
+	}
+	this.isConnected = function() {
+		return Socket && Socket.readyState == 1;
+	}
+
 	this.connect = function(_connectToProxy = false) {
-		let serverUrl = _connectToProxy ? 'wss://thuiswolk.ga:8081/' : 'ws://thuiswolk.local:8081/';
+		this.connectedToProxy = _connectToProxy;
+		let serverUrl = _connectToProxy ? proxyUrl : primaryUrl;
 		Socket = new WebSocket(serverUrl);
+		console.log("[Server] Starting to connect to ", serverUrl);
+
 		this.Socket = Socket;
 		Socket.onmessage = function(_event) { 
-			console.log(window.e = _event, _event.data)
 			let message = JSON.parse(_event.data);
 			console.log(message);
 			if (message.type == 'auth')
 			{
-				This.authenticated = message.status;
-				if (This.authenticated) logoBackground.classList.add('hide');
-				console.warn("[Server].authenticated = ", This.authenticated);
+				if (message.status) logoBackground.classList.add('hide');
+				console.warn("[Server].authenticated = ", message.status);
 				if (!message.status) 
 				{
 					Auth.clearKey();
 					window.location.replace('https://user.florisweb.dev/login?APIKey=TESTSERVICE');
 				}
 				return;
+			}
+			
+			if (message.type == 'proxyKey') return Auth.setProxyKey(message.data);
+			if (message.isProxyServerMessage && message.type == 'ProxyConnectState')
+			{
+				return Socket.send(JSON.stringify({id: "InterfaceClient", key: Auth.getKey()}));
 			}
 			
 			let service = This.serviceListeners.find((_service) => {return _service.serviceId == message.serviceId});
@@ -37,13 +54,12 @@ const Server = new function() {
 		Socket.onopen = function() {
 			if (_connectToProxy)
 			{
-				Socket.send(JSON.stringify({
-					isServerMessage: true, 
+				return Socket.send(JSON.stringify({
+					isProxyServerMessage: true, 
 					proxyId: 'thuisWolkProxy',
-					key: 'client here'
+					key: Auth.getProxyKey()
 				}));
-				return;
-			} 
+			}
 
 			// Authenticate as interfaceClient
 			Socket.send(JSON.stringify({id: "InterfaceClient", key: Auth.getKey()}));
@@ -52,13 +68,44 @@ const Server = new function() {
 		Socket.onclose = function() {
 			console.log('closed, reconnecting...');
 			setTimeout(() => {
-				Server.connect();
-			}, 1000);
+				Server.connect(!This.connectedToProxy);
+			}, 5000);
 		}
 	}
+	
+	async function upgradeSocketLoop() {
+		if (This.connectedToProxy)
+		{
+			let primaryServerAvailable = await This.checkUrlAvailability(primaryUrl);
+			console.log('[Server] Trying to upgrade:', primaryServerAvailable);
+			if (primaryServerAvailable) Server.connect(false);
+		}
+
+		setTimeout(upgradeSocketLoop, 1000 * 30);
+	}
+
 
 	this.send = function(_json) {
-		if (!this.authenticated) return;
+		if (!this.isConnected()) return;
 		Socket.send(JSON.stringify(_json));
+	}
+
+
+	this.checkUrlAvailability = function(_url) {
+		return new Promise((resolve, reject) => {
+			try {
+				let socket = new WebSocket(_url)
+				socket.onopen = () => {
+					resolve(true);
+					socket.close();
+				};
+
+				setTimeout(() => {
+					resolve(socket.readyState == 1);
+				}, 500);
+			} catch (e) {
+				resolve(false);
+			}
+		});
 	}
 }
