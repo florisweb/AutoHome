@@ -1,5 +1,6 @@
 
 function _MainContent() {
+	const This = this;
 	const HTML = {
 		mainContent: mainContent
 	}
@@ -17,6 +18,15 @@ function _MainContent() {
 		mainContent.append(this.homePage.render());
 		mainContent.append(this.servicePage.render());
 		mainContent.append(this.serviceConfigPage.render());
+
+		let lastSwipe = new Date();
+		GestureManager.onSwipeRight(mainContent, function(_dx, _dy, _start) {
+			if (_start[0] > 150 || Math.abs(_dx) < 50) return;
+			if (new Date() - lastSwipe < 400) return;
+			lastSwipe = new Date();
+			if (This.servicePage.openState) return This.homePage.open();
+			if (This.serviceConfigPage.openState) return This.servicePage.open(This.serviceConfigPage.curService);
+		});
 	}
 }
 
@@ -108,8 +118,10 @@ function MainContent_serviceConfigPage() {
 		onOpen: onOpen
 	});
 	const This = this;
+	this.curService = false;
 
 	function onOpen(_service) {
+		This.curService = _service;
 		renderPageContent(_service);
 	}
 
