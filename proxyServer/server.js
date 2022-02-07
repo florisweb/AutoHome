@@ -15,12 +15,11 @@ ErrorMessages[NotAuthenticatedWithinTimeError]  = "Not authenticated within time
 
 
 
-
 const WebSocket = require('ws');
 const fs = require('fs');
 const https = require('https');
 
-const Config = JSON.parse(fs.readFileSync("./config.json"));
+const Config = JSON.parse(fs.readFileSync(__dirname + "/config.json"));
 const DOMAIN = "thuiswolk.ga";
 const sshKeys = {
     key:    fs.readFileSync("/etc/letsencrypt/archive/" + DOMAIN + "/privkey1.pem"),
@@ -93,7 +92,7 @@ function _Client(_connection) {
     }, Config.authTimeLimit);
     this.connection.on('close', function(reasonCode, description) {
         console.log('[Remove] Client ' + This.id + " disconnected");
-        This.remove()
+        This.remove();
     });
 
 
