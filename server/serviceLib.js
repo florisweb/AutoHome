@@ -1,6 +1,6 @@
 import ServiceConfig from './serviceConfig.js';
-import Errors from '../errors.js';
-import { FileManager } from '../DBManager.js';
+import Errors from './errors.js';
+import { FileManager } from './DBManager.js';
 
 
 export function Service({id, SubscriberTemplate = Subscriber}) {
@@ -9,10 +9,17 @@ export function Service({id, SubscriberTemplate = Subscriber}) {
     this.id             = id;
     this.key            = ServiceConfig.services[id].key;
     this.config         = ServiceConfig.services[id];
+
+    this.enabled            = false;
+    this.requiredServices   = this.config.requires ? this.config.requires : [];
+    this.wantedServices     = this.config.wants ? this.config.wants : [];
+
     
-    this.curState       = {};    
+    this.curState       = {};
+    this.subscriptions  = new SubscriptionList([]);
 
     this.setup = () => {};
+    this.enable = () => {};
     this.authenticate = (_key) => {
         if (!this.key) return true;
         return this.key == _key;
@@ -36,6 +43,9 @@ export function Service({id, SubscriberTemplate = Subscriber}) {
         this.pushCurState(sub);
         return sub;
     }
+
+    this.onLoadRequiredServices = function(services) {};
+    this.onWantedServiceLoad = function(service) {};
 }
 
 

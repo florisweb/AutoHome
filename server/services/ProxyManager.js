@@ -1,5 +1,5 @@
 
-import { Subscriber, Service } from './serviceLib.js';
+import { Subscriber, Service } from '../serviceLib.js';
 import Client from '../client.js';
 import WebSocket from 'ws';
 

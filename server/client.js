@@ -1,4 +1,4 @@
-import ServiceManager from './services/serviceManager.js';
+import ServiceManager from './serviceManager.js';
 import { InterfaceClient, authenticateInterfaceClient } from './interfaceClient.js';
 
 

@@ -1,7 +1,7 @@
 import * as crypto from "crypto";
 import Config from './config.js';
-import ServiceManager from './services/serviceManager.js';
-import { SubscriptionList } from './services/serviceLib.js';
+import ServiceManager from './serviceManager.js';
+import { SubscriptionList } from './serviceLib.js';
 
 const encryptionMethod = 'AES-256-CBC';
 const keyIvSplitter = "&iv=";

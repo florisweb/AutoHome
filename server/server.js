@@ -1,5 +1,5 @@
 import WebServer from './webServer.js';
-import ServiceManager from './services/serviceManager.js';
+import ServiceManager from './serviceManager.js';
 import Client from './client.js';
 
 import { WebSocketServer } from 'ws';

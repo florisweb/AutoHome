@@ -1,5 +1,5 @@
 
-import { Subscriber, DeviceService, ServiceFileManager } from './serviceLib.js';
+import { Subscriber, DeviceService, ServiceFileManager } from '../serviceLib.js';
 
 function CustomSubscriber(_config) {
     const This = this;

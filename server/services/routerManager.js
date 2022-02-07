@@ -1,7 +1,7 @@
 
 import fetch from 'node-fetch';
 import fritz from 'fritzapi';
-import { Subscriber, Service } from './serviceLib.js';
+import { Subscriber, Service } from '../serviceLib.js';
 
 
 

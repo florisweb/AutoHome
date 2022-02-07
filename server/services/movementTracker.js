@@ -1,6 +1,5 @@
 
-import { Subscriber, Service, SubscriptionList } from './serviceLib.js';
-import ServiceManager from './serviceManager.js';
+import { Subscriber, Service, SubscriptionList } from '../serviceLib.js';
 
 function CustomSubscriber() {
     Subscriber.call(this, ...arguments);
@@ -12,31 +11,39 @@ export default new function() {
         id: 'MovementTracker',
         SubscriberTemplate: CustomSubscriber
     });
+
+    this.curState = {
+        isInRoom: false,
+        isAtHome: false,
+    }
         
-    this.subscriptions = [];
-    this.setup = function() {
-        this.subscriptions = new SubscriptionList([
-            ServiceManager.getService('CableLamp').subscribe({onEvent: handleCableLampEvent}),
-            ServiceManager.getService('RouterManager').subscribe({onEvent: handleRouterEvent})
-        ]);
+    
+    this.onWantedServiceLoad = function(service) {
+        let eventHandler = handleCableLampEvent;
+        switch (service.id)
+        {
+            case 'RouterManager':     eventHandler = handleRouterEvent; break;
+            case 'CableLamp':         eventHandler = handleCableLampEvent; break;
+            default: return;
+        }
+        this.subscriptions.push(service.subscribe({onEvent: eventHandler}));
     }
 
-    this.isInRoom = false;
-    this.isAtHome = false;
+
 
     function handleCableLampEvent(_event) {
         if (_event.type != 'buttonPressed') return;
 
-        let wasInRoom = This.isInRoom;
-        This.isInRoom = true;
-        This.isAtHome = true;
+        let wasInRoom = This.curState.isInRoom;
+        This.curState.isInRoom = true;
+        This.curState.isAtHome = true;
         
         if (wasInRoom) return;
         This.pushEvent({
             type: "status",
             data: {
-                isInRoom: This.isInRoom,
-                isAtHome: This.isAtHome,
+                isInRoom: This.curState.isInRoom,
+                isAtHome: This.curState.isAtHome,
                 trigger: "CableLamp"
             }
         });
@@ -44,14 +51,14 @@ export default new function() {
     function handleRouterEvent(_event) {
         if (_event.type != "deviceDisconnected") return;
         if (_event.data.type != 'phone') return;
-        This.isInRoom = false;
-        This.isAtHome = false;
+        This.curState.isInRoom = false;
+        This.curState.isAtHome = false;
         
         This.pushEvent({
             type: "status",
             data: {
-                isInRoom: This.isInRoom,
-                isAtHome: This.isAtHome,
+                isInRoom: This.curState.isInRoom,
+                isAtHome: This.curState.isAtHome,
                 trigger: "Router",
             }
         });

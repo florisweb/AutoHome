@@ -1,6 +1,4 @@
-
-import { Subscriber, SubscriptionList, DeviceService, ServiceFileManager } from './serviceLib.js';
-import ServiceManager from './serviceManager.js';
+import { Subscriber, SubscriptionList, DeviceService, ServiceFileManager } from '../serviceLib.js';
 
 
 function CustomSubscriber(_config) {
@@ -23,7 +21,7 @@ function CustomSubscriber(_config) {
                 if (!_message.data) return This.onEvent({error: "Data missing", message: _message});
                 _message.data.trigger = filterTriggerString(_message.data.trigger);
                 
-                This.service.send({type: 3, data: _message.data});
+                This.service.send(_message);
                 This.service.alarmManager.setAlarm(_message.data);
                 This.service.pushCurState();
             break;
@@ -89,13 +87,21 @@ export default new function() {
         This.pushEvent(_message);
     }
 
-    this.subscriptions = [];
     this.setup = async function() {
-        this.subscriptions = new SubscriptionList([
-            ServiceManager.getService('MovementTracker').subscribe({onEvent: handleMovementTrackerEvent}),
-        ]);
         this.curState.alarm = await this.alarmManager.getAlarm();
     }
+
+
+    this.onWantedServiceLoad = function(service) {
+        let eventHandler = handleMovementTrackerEvent;
+        switch (service.id)
+        {
+            case 'MovementTracker': eventHandler = handleMovementTrackerEvent; break;
+            default: return;
+        }
+        this.subscriptions.push(service.subscribe({onEvent: eventHandler}));
+    }
+
 
     function handleMovementTrackerEvent(_event) {
         if (_event.type != 'status') return;
@@ -103,14 +109,17 @@ export default new function() {
         This.send({type: 1, data: false}); // Turn the lamp off
     }
 
+
+
     this.onDeviceConnect = async () => {
         if (!this.curState.alarm || !this.curState.alarm.trigger) return;
         let program = (await this.programManager.getPrograms())[this.curState.alarm.programIndex];
+        if (!program) return;
         let data = {
             trigger: this.curState.alarm.trigger,
             program: program.program
         }
-        this.send({type: 3, data: data});
+        this.send({type: 'prepareProgram', data: data});
     }
 }
 
