@@ -3,7 +3,7 @@
 **/package-lock.json
 **/dist/*
 interface/dist/*
-server/serviceConfig.js
+server/serviceConfig.json
 server/config.js
 server/DBData/*
 proxyServer/config.json

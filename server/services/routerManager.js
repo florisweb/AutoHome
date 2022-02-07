@@ -9,7 +9,7 @@ function CustomSubscriber() {
     Subscriber.call(this, ...arguments);
 }
 
-export default new function() {
+export default function() {
     const This = this;
     Service.call(this, {
         id: 'RouterManager',

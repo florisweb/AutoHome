@@ -1,15 +1,23 @@
-import ServiceConfig from './serviceConfig.js';
-const Services = [];
+import { FileManager } from './DBManager.js';
+let Services = [];
 
 export default new function() {
     const This = this;
+    let fm = new FileManager("../serviceConfig.json");
+    this.config;
+    this.loadConfig = async function() {
+        this.config = await fm.getContent();
+    }
+
     this.loadServices = async function() {
+        await this.loadConfig();
+
         let promises = [];
-        for (let id in ServiceConfig.services)
+        for (let id in this.config.services)
         {
-            if (ServiceConfig.services[id].disabled) continue;
+            if (this.config.services[id].disabled) continue;
             promises.push(import('./services/' + id + '.js').then((mod) => {
-                Services.push(mod.default);
+                Services.push(new mod.default);
             }));
         }
         await Promise.all(promises);
@@ -21,14 +29,10 @@ export default new function() {
 
         // Enable all services
         for (let service of Services) await enableService(service);
-
-
-        console.log("[ServiceManager] Loaded " + Services.length + "/" + Object.keys(ServiceConfig.services).length + " services.");
+        console.log("[ServiceManager] Loaded " + Services.length + "/" + Object.keys(this.config.services).length + " services.");
     }
 
     this.loadServices();
-
-
     this.getService = function(_id) {
         return Services.find((s) => s.id == _id);
     }

@@ -8,7 +8,7 @@ function CustomSubscriber() {
 }
 
 
-export default new function() {
+export default function() {
     const This = this;
     Service.call(this, {
         id: 'ProxyManager',

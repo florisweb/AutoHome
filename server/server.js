@@ -12,10 +12,9 @@ wss.on("connection", _conn => {
 
     _conn.on("close", () => {
         if (client.service) client.service.setDevicesClient(false);
-        console.log('[Client disconnected] Total: ' + wss.clients.length);
+        console.log('[Client disconnected] Total: ' + wss.clients.size);
     });
-
-    console.log('[Client connected] Total: ' + wss.clients.length);
+    console.log('[Client connected] Total: ' + wss.clients.size);
 });
 
 // Remove disconnected clients

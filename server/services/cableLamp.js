@@ -51,7 +51,7 @@ function CustomSubscriber(_config) {
     }
 }
 
-export default new function() {
+export default function() {
     const This = this;
     DeviceService.call(this, {
         id: 'CableLamp',

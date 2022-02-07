@@ -1,4 +1,4 @@
-import ServiceConfig from './serviceConfig.js';
+import ServiceManager from './serviceManager.js';
 import Errors from './errors.js';
 import { FileManager } from './DBManager.js';
 
@@ -7,8 +7,8 @@ export function Service({id, SubscriberTemplate = Subscriber}) {
     console.log('[Service] Loaded ' + id);
     this.subscribers    = [];
     this.id             = id;
-    this.key            = ServiceConfig.services[id].key;
-    this.config         = ServiceConfig.services[id];
+    this.key            = ServiceManager.config.services[id].key;
+    this.config         = ServiceManager.config.services[id];
 
     this.enabled            = false;
     this.requiredServices   = this.config.requires ? this.config.requires : [];
