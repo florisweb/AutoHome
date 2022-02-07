@@ -119,6 +119,25 @@ function Service_downTimeTracker(_parent) {
 
     this.updateConnectionState = async function(_connected) {
         let data = await this.getData();
+        let curDateTime = new Date();
+        curDateTime.setHours(0);
+        curDateTime.setMinutes(0);
+        curDateTime.setSeconds(0);
+        const minTime = curDateTime.getTime() - 1000 * 60 * 60 * 24 * 6; // 7 days
+        // Filter the data so it will only be one week old
+        for (let i = data.length - 1; i >= 0; i--)
+        {
+            if (data[i][0] > minTime) continue;
+            
+            if (data[i].length == 2 && data[i][1] < minTime)
+            {
+                data.splice(i, 1);
+            } else data[i][0] = minTime;
+        }
+
+
+
+
         let lastSet = data[data.length - 1];
         if (!lastSet) // Data init
         {
