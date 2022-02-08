@@ -38,12 +38,12 @@ body {
 }
 #logoBackground img {
   position: relative;
+  top:  40vh;
   width: 60vw;
   max-width: 130px;
   height: auto;
   
   margin: auto;
-  top:  45vh;
   transform: translateY(-50%);
   display: block;
   animation: animate_logo 5s infinite;
@@ -71,5 +71,27 @@ body {
   left:  0;
   text-align: center;
   color:  #fff;
-  top:  calc(45vh - 70px);
+  top:  calc(40vh - 70px);
 }
+
+
+#signInWithFloriswebButton.text {
+  position: relative;
+
+  left: calc(50% - 191px / 2);
+  margin: auto;
+  display: initial;
+  color: #fff !important;
+  border-color: #fff;
+
+  transition: all .6s;
+}
+
+#signInWithFloriswebButton.hide {
+  opacity: 0;
+  top:  calc(40vh - 45px);
+  pointer-events: none;
+}
+
+
+
