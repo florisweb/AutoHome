@@ -1,21 +1,30 @@
 import ServiceManager from './serviceManager.js';
 import { InterfaceClient, authenticateInterfaceClient } from './interfaceClient.js';
 
+export let clients = [];
+export function Client(_conn) {
+    clients.push(this);
+    console.log('[Client connected] Total: ' + clients.length);
 
-export default function Client(_conn) {
     const This = this;
     this.authenticated = false;
     this.service;
     this.id = newId();
 
     const Conn = _conn;
-    Conn.isAlive = true;
+    this.conn = _conn;
+    
+    this.isAlive = true;
     Conn.on('pong', () => {
-        Conn.isAlive = true;
+        This.isAlive = true;
         if (This.service) This.service.setDevicesClient(This);
     });
 
-
+    Conn.on("close", () => {
+        clients = clients.filter((client) => client.id != This.id);
+        if (This.service) This.service.setDevicesClient(false);
+        console.log('[Client disconnected] ' + This.id + ' Total: ' + clients.length);
+    });
 
     Conn.on("message", buffer => {
         if (This.isInterfaceClient) return;
@@ -74,7 +83,6 @@ export default function Client(_conn) {
         Conn.send(_string);
     }
 }
-
 
 
 

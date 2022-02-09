@@ -7,7 +7,8 @@ const Server = new function() {
 	const This = this;
 	const primaryUrl = 'ws://thuiswolk.local:8081/';
 	const proxyUrl = 'wss://thuiswolk.ga:8081/';
-	const connectionTimeoutLength = 1000 * 5;
+	const connectionTimeoutLength 	= 5 * 1000;
+	const heartbeatFrequency 		= 10 * 1000;
 
 	this.serviceListeners = [];
 	this.registerServiceListener = (_service) => {this.serviceListeners.push(_service)}
@@ -19,7 +20,8 @@ const Server = new function() {
 
 	let Socket;
 	this.setup = () => {
-		upgradeSocketLoop();
+		// setInterval(upgradeSocketLoop, 1000 * 30);
+		setInterval(heartbeatLoop, heartbeatFrequency);
 		return this.connect();
 	}
 	this.isConnected = function() {
@@ -71,29 +73,33 @@ const Server = new function() {
 
 		Socket.onmessage = function(_event) { 
 			let message = JSON.parse(_event.data);
-			console.log(message);
-			if (message.type == 'auth')
+			switch (message.type)
 			{
-				console.warn("[Server].authenticated = ", message.status);
-				
-				This.setAuthenticationState(message.status);
-				if (message.status) return closeLoadScreen();
-				return requireAuthentication();
+				case 'heartbeat': lastHeartbeat = new Date(); break;
+				case 'auth': 
+					console.warn("[Server].authenticated = ", message.status);
+					
+					This.setAuthenticationState(message.status);
+					if (message.status) return closeLoadScreen();
+					requireAuthentication();
+				break;
+				case 'proxyKey': Auth.setProxyKey(message.data); break;
+				case 'ProxyConnectState': 
+					if (!message.isProxyServerMessage) return;
+					Socket.send(JSON.stringify({id: "InterfaceClient", key: Auth.getKey()}));
+				break;
+				default:
+					console.log(message);
+					let service = This.serviceListeners.find((_service) => {return _service.serviceId == message.serviceId});
+					if (!service) return;
+					service.onEvent(message);
+				break;
 			}
-			
-			if (message.type == 'proxyKey') return Auth.setProxyKey(message.data);
-			if (message.isProxyServerMessage && message.type == 'ProxyConnectState')
-			{
-				return Socket.send(JSON.stringify({id: "InterfaceClient", key: Auth.getKey()}));
-			}
-			
-			let service = This.serviceListeners.find((_service) => {return _service.serviceId == message.serviceId});
-			if (!service) return;
-			service.onEvent(message);
 		};
 
 		Socket.onopen = function() {
 			connectionAttempts = 0;
+			lastHeartbeat = new Date();
 			if (_connectToProxy)
 			{
 				return Socket.send(JSON.stringify({
@@ -121,15 +127,13 @@ const Server = new function() {
 	}
 
 	
-	async function upgradeSocketLoop() {
-		if (This.connectedToProxy)
-		{
-			let primaryServerAvailable = await This.checkUrlAvailability(primaryUrl);
-			console.log('[Server] Trying to upgrade:', primaryServerAvailable);
-			if (primaryServerAvailable) Server.connect(false);
-		}
 
-		setTimeout(upgradeSocketLoop, 1000 * 30);
+	let lastHeartbeat = new Date();
+	function heartbeatLoop() {
+		if (!This.isConnected()) return;
+		if (new Date() - lastHeartbeat < heartbeatFrequency * 2) return; // Only disconnect after two missed heartbeats
+		console.warn("[Server] Connection timed out due to a missing heartbeat.");
+		This.disconnect();
 	}
 
 
@@ -145,21 +149,32 @@ const Server = new function() {
 	}
 
 
-	this.checkUrlAvailability = function(_url) {
-		return new Promise((resolve, reject) => {
-			try {
-				let socket = new WebSocket(_url)
-				socket.onopen = () => {
-					resolve(true);
-					socket.close();
-				};
 
-				setTimeout(() => {
-					resolve(socket.readyState == 1);
-				}, connectionTimeoutLength);
-			} catch (e) {
-				resolve(false);
-			}
-		});
-	}
+
+	// async function upgradeSocketLoop() {
+	// 	if (This.connectedToProxy)
+	// 	{
+	// 		let primaryServerAvailable = await This.checkUrlAvailability(primaryUrl);
+	// 		console.log('[Server] Trying to upgrade:', primaryServerAvailable);
+	// 		if (primaryServerAvailable) Server.connect(false);
+	// 	}
+	// }
+
+	// this.checkUrlAvailability = function(_url) {
+	// 	return new Promise((resolve, reject) => {
+	// 		try {
+	// 			let socket = new WebSocket(_url)
+	// 			socket.onopen = () => {
+	// 				resolve(true);
+	// 				socket.close();
+	// 			};
+
+	// 			setTimeout(() => {
+	// 				resolve(socket.readyState == 1);
+	// 			}, connectionTimeoutLength);
+	// 		} catch (e) {
+	// 			resolve(false);
+	// 		}
+	// 	});
+	// }
 }

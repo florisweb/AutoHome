@@ -5,6 +5,7 @@ const InvalidKeyError = Symbol();
 const InvalidRequestError = Symbol();
 const InternalError = Symbol();
 const NotAuthenticatedWithinTimeError = Symbol();
+const InvalidMessageError = Symbol();
 
 const ErrorMessages = {};
 ErrorMessages[ProxyNotFoundError]               = "Proxy not found";
@@ -12,7 +13,7 @@ ErrorMessages[InternalError]                    = "Internal Error";
 ErrorMessages[InvalidKeyError]                  = "Invalid key";
 ErrorMessages[InvalidRequestError]              = "Invalid request";
 ErrorMessages[NotAuthenticatedWithinTimeError]  = "Not authenticated within time";
-
+ErrorMessages[InvalidMessageError]              = "Invalid Message";
 
 
 const WebSocket = require('ws');
@@ -51,7 +52,9 @@ Clients.removeClient = function(_id) {
     {
         if (this[i].id != _id) continue;
         let client = this.splice(i, 1)[0];
-        if (client.connection) client.connection.close();
+        try {
+            client.connection.close()
+        } catch (e) {};
         return true;
     }
     return false;
@@ -71,6 +74,7 @@ const ProxyManager = new function() {
         let proxy = new _Proxy({id: _id, key: _key});
         let result = proxy.enableClient(_owner, _key);
         if (result) this.proxies.push(proxy);
+        proxy.ownerClient = _owner;
         return result ? proxy : false;
     }
 }
@@ -107,8 +111,21 @@ function _Client(_connection) {
             return;
         }
         
-        if (!This.proxy) This.enabled = false;
-        This.proxy.send(This, _message.toString());
+        if (!This.proxy) return This.enabled = false;
+        try {
+            let message = JSON.parse(_message.toString());
+            switch (message.type)
+            {  
+                case "disconnectClient":
+                    if (This.id != This.proxy.ownerClient.id) return; // Only the owner is allowed to remove clients
+                    let client = Clients.find((client) => client.id == message.data);
+                    if (!client) return;
+                    client.remove();
+                break;
+                default: This.proxy.send(This, message); break;
+            }
+
+        } catch (e) {This.sendError(InvalidMessageError)}
     });
 
 
@@ -167,15 +184,26 @@ function _Client(_connection) {
 function _Proxy({id, key}) {
     this.id = id;
     this.key = key;
-    this.clients = [];
+    this.clients = []; // First client is owner
+    this.ownerClient = false;
 
     this.send = function(_client, _message) {
+        _message.senderProxyClientId = _client.id;
+
+        if (_message.targetProxyClientId)
+        {
+            let targetClient = this.clients.find((client) => client.id == _message.targetProxyClientId);
+            if (!targetClient) return console.log("[Proxy] Client not found " + _message.targetProxyClientId);
+            return targetClient.send(JSON.stringify(_message));
+        }
+
         for (let client of this.clients)
         {
             if (client.id == _client.id) continue;
-            client.send(_message);
+            client.send(JSON.stringify(_message));
         }
     }
+
 
     this.enableClient = function(_client, _key) {
         if (_key != this.key) 
@@ -184,10 +212,16 @@ function _Proxy({id, key}) {
             _client.sendPacket({type: "ProxyConnectState", date: false});
             return false;
         }
-            
-        _client.proxy = this;
+        
         this.clients.push(_client);
+        _client.proxy = this;
+        this.send(_client, {
+            isProxyServerMessage: true,
+            type: "clientConnect",
+            data: _client.id,
+        });
         _client.sendPacket({type: "ProxyConnectState", data: true});
+
         console.log("[Proxy] Enabled client " + _client.id + " in proxy " + this.id, this.clients.length);
         return true;
     }
@@ -195,10 +229,16 @@ function _Proxy({id, key}) {
     this.disconnectClient = function(_client) {
         for (let i = 0; i < this.clients.length; i++)
         {
-            if (this.clients[i].id == _client)
+            if (this.clients[i].id == _client.id)
             {
-                this.splice(i, 1);
-                console.log('[Proxy] Disconnected client ' + this.clients[i].id + " from proxy " + this.id);
+                this.clients.splice(i, 1);
+                this.send(_client, {
+                    isProxyServerMessage: true,
+                    type: "clientDisconnect",
+                    data: _client.id,
+                });
+
+                console.log('[Proxy] Disconnected client ' + _client.id + " from proxy " + this.id, this.clients.length);
                 return true;
             }
         }
