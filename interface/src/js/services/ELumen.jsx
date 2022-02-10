@@ -36,11 +36,25 @@
 		ServicePage.call(this);
 
 		let moisturePanel = new function() {
-			GraphPanel.call(this, {panelTitle: "Moisture", customClass: "w2 h3", xLabel: "Time", yLabel: "Moisture (%)", yRange: [0, 100]});
+			GraphPanel.call(this, {
+				panelTitle: "Moisture", 
+				customClass: "w2 h3", 
+				xLabel: "Time", 
+				yLabel: "Moisture (%)", 
+				xRange: [Date.now() / 1000 -  60 * 60 * 24 * 5, Date.now() / 1000],
+				yRange: [0, 100]
+			});
 		}
 
 		let waterVolumePanel = new function() {
-			GraphPanel.call(this, {panelTitle: "Water Volume", customClass: "w2 h3", xLabel: "Time", yLabel: "WaterVolume (%)", yRange: [0, 100]});
+			GraphPanel.call(this, {
+				panelTitle: "Water Volume", 
+				customClass: "w2 h3", 
+				xLabel: "Time", 
+				yLabel: "WaterVolume (%)", 
+				xRange: [Date.now() / 1000 -  60 * 60 * 24 * 5, Date.now() / 1000],
+				yRange: [0, 100]
+			});
 		}
 
 

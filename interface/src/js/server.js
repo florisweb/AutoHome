@@ -131,7 +131,7 @@ const Server = new function() {
 	let lastHeartbeat = new Date();
 	function heartbeatLoop() {
 		if (!This.isConnected()) return;
-		if (new Date() - lastHeartbeat < heartbeatFrequency * 2) return; // Only disconnect after two missed heartbeats
+		if (new Date() - lastHeartbeat < heartbeatFrequency * 1.1) return;
 		console.warn("[Server] Connection timed out due to a missing heartbeat.");
 		This.disconnect();
 	}

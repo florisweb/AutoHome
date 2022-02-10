@@ -113,7 +113,7 @@ function InputField({placeholder = null, isTimeInput, onChange, onBlur}) {
 
 
 
-function Graph({xLabel = '', yLabel = '', yRange}) {
+function Graph({xLabel = '', yLabel = '', yRange, xRange}) {
 	let canvas = <canvas></canvas>;
 	let ctx = canvas.getContext('2d');
 
@@ -130,18 +130,17 @@ function Graph({xLabel = '', yLabel = '', yRange}) {
 
 	let lines = [];
 	let xAxisTagIsDate = false;
-	let xRange = 0;
 	let dy = 0;
 	let dx = 0;
 
 	this.setData = function(_lines) {
 		lines = _lines;
 		if (!yRange) yRange = calcRange(lines, 1);
-		xRange = calcRange(lines, 0);
+		if (!xRange) xRange = calcRange(lines, 0);
 		
 		dy = yRange[1] - yRange[0];
 		dx = xRange[1] - xRange[0];
-		xAxisTagIsDate = xRange[0] > 1000000000;
+		xAxisTagIsDate = xRange[0] > 1000000000 || xRange[1] > 1000000000;
 		draw();
 	}
 	window.addEventListener('resize', () => {draw()});
@@ -186,13 +185,18 @@ function Graph({xLabel = '', yLabel = '', yRange}) {
 		ctx.lineWidth = 1;
 		ctx.strokeStyle = _lineColor;
 		ctx.beginPath();
-		ctx.moveTo(x, y);
+		let startPointAdded = false;
 
-		for (let i = 1; i < _data.length; i++)
+		for (let i = 0; i < _data.length; i++)
 		{
+			if (_data[i][0] < xRange[0] || _data[i][0] > xRange[1]) continue;
 		  let x = indexToXLoc(_data[i][0], ctx);
 		  let y = dataToYLoc(_data[i][1], ctx);
-		  ctx.lineTo(x, y);
+		  if (!startPointAdded)
+		  {
+			  startPointAdded = true;
+			  ctx.moveTo(x, y);
+			} else ctx.lineTo(x, y);
 		}
 
 		ctx.stroke();
@@ -219,18 +223,17 @@ function Graph({xLabel = '', yLabel = '', yRange}) {
 		ctx.lineWidth = .5;
 		ctx.textAlign = 'center';
 		ctx.textBaseline = "middle"; 
-		for (let x = Math.ceil(xRange[0] / stepSize) * stepSize; x < xRange[1] + stepSize; x += stepSize)
+		for (let x = Math.ceil(xRange[0] / stepSize) * stepSize; x < Math.ceil(xRange[1] / stepSize) * stepSize + stepSize; x += stepSize)
 		{
 		  ctx.strokeStyle = subAxisColor;
 		  let xLoc = indexToXLoc(x, ctx);
+		  if (!xLoc) continue;
 		  ctx.beginPath();
 		  ctx.moveTo(xLoc, 0);
 		  ctx.lineTo(xLoc, ctx.canvas.height - xLabelMargin);
 		  
 		  ctx.closePath();
 		  ctx.stroke();
-
-		  if (x === 0) continue;
 		  
 		  ctx.fillStyle = numberColor;
 		  ctx.fillText(getXLabelText(x, stepSize), xLoc, y + xLabelMargin * .5);
@@ -282,20 +285,20 @@ function Graph({xLabel = '', yLabel = '', yRange}) {
 		}
 	}
 
-	function indexToXLoc(_index) {
-		let perc = (_index - xRange[0]) / (xRange[1] - xRange[0]);
+	function indexToXLoc(_x) {
+		let perc = (_x - xRange[0]) / dx;
 		if (perc < 0 || perc > 1.1) return false;
 		return perc * (ctx.canvas.width - yLabelMargin - nonAxisMargin) + yLabelMargin;
 	}
 	function dataToYLoc(_value) {
-	let perc = (_value - yRange[0]) / (yRange[1] - yRange[0]);
-	if (perc < 0 || perc > 1.1) return false;
-	return (ctx.canvas.height - xLabelMargin) - perc * (ctx.canvas.height - xLabelMargin - nonAxisMargin);
+		let perc = (_value - yRange[0]) / dy;
+		if (perc < 0 || perc > 1) return false;
+		return (ctx.canvas.height - xLabelMargin) - perc * (ctx.canvas.height - xLabelMargin - nonAxisMargin);
 	}
 
 	function getStepSize(_maxSteps, _delta, _isDateIndex = false) {
 		let stepOptions = [.1, .2, .5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000];
-		if (_isDateIndex) stepOptions = [1, 5, 10, 30, 60, 120, 300, 600, 900, 1800, 3600, 7200, 14400, 21600, 43200, 86400, 172800, 604800, 864000];
+		if (_isDateIndex) stepOptions = [1, 5, 10, 30, 60, 120, 360, 720, 1440, 2880, 7200, 10080, 20160];
 
 		for (let i = 0; i < stepOptions.length; i++)
 		{
