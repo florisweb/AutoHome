@@ -63,6 +63,11 @@
     display: block;
     opacity: .8;
 }
+#mainContent .page .pageOverview .icon.overviewIcon.hide {
+    opacity: 0;
+    pointer-events: none;
+}
+
 #mainContent .page .pageOverview .icon.overviewIcon.whiteBackgroundBox {
     width: 60vw;
     max-width: 60px;

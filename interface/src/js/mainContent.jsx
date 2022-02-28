@@ -48,9 +48,9 @@ function MainContent_page({pageRenderer, onOpen, onClose}) {
 		MainContent.curPage = this;
 		this.openState = true;
 		this.HTML.page.classList.remove('hide');
-		// try {
+		try {
 			return onOpen(...arguments);
-		// } catch (e) {console.error("Error while opening page", e)};
+		} catch (e) {console.error("Error while opening page", e)};
 	}
 
 	this.close = function() {
@@ -62,16 +62,54 @@ function MainContent_page({pageRenderer, onOpen, onClose}) {
 	}
 }
 
-
-function MainContent_homePage() {
+function MainContent_pageWithHeader({
+		pageRenderer, 
+		title, 
+		headerConfig = {pageIconSrc: 'images/logoInverted.png', pageIconInBox: true, leftButtonSrc: 'images/backIcon.png', rightButtonSrc: ''}, 
+		onOpen, 
+		onClose
+	}) {
+	const This = this;
 	MainContent_page.call(this, {
-		pageRenderer: render,
-		onOpen: onOpen
+		...arguments[0],
+		pageRenderer: render
 	});
 
-	function onOpen() {
+	this.HTML.pageIcon = <img src={headerConfig.pageIconSrc} className={'icon overviewIcon ' + (headerConfig.pageIconInBox ? 'whiteBackgroundBox' : '')}></img>;
+	this.HTML.leftButton = <img src={headerConfig.leftButtonSrc} className='icon overviewIcon overviewButton'></img>;
+	this.HTML.rightButton = <img src={headerConfig.rightButtonSrc} className='icon overviewIcon overviewButton'></img>;
+	if (!headerConfig.leftButtonSrc) this.HTML.leftButton.classList.add('hide');
+	if (!headerConfig.rightButtonSrc) this.HTML.rightButton.classList.add('hide');
 
+
+	console.log(title);
+	function render() {
+		return [
+			<div className='pageOverview' style='margin-bottom: 50px'>
+				<div className='iconHolder'>
+					<div>{This.HTML.leftButton}</div>
+					{This.HTML.pageIcon}
+					<div>{This.HTML.rightButton}</div>
+				</div>
+				<div className='text title'>{title}</div>
+			</div>,
+			<div className='PanelBox'>
+				{pageRenderer()}
+			</div>
+		];
 	}
+}
+
+
+function MainContent_homePage() {
+	MainContent_pageWithHeader.call(this, {
+		pageRenderer: render,
+		title: "ThuisWolk",
+		headerConfig: {
+			pageIconSrc: 'images/logoInverted.png',
+			pageIconInBox: false,
+		}
+	});
 
 
 	function render() {
@@ -82,15 +120,7 @@ function MainContent_homePage() {
 			servicePanels.push(service.homeScreenPanel.render());
 		}
 
-		return <div>
-			<div className='pageOverview'>
-				<img src='images/logoInverted.png' className='icon overviewIcon'></img>
-				<div className='text title'>ThuisWolk</div>
-			</div>
-			<div className='PanelBox'>
-				{servicePanels}
-			</div>
-		</div>;
+		return servicePanels;
 	}
 }
 

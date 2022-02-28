@@ -6,7 +6,6 @@ const App = new function() {
 		MainContent.setup();
 		Server.setup();
 	}
-	
 }
 App.setup();
 
