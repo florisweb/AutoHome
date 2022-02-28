@@ -35,9 +35,10 @@ const Server = new function() {
 			window.location.replace(proxyWebServer);
 			return false;
 		} else { // Proxy Server
+			let promise = this.connect(true);
 			let available = await this.primaryServerAvailable();
 			if (available) return window.location.replace(primaryWebServer);
-			return await this.connect(true);
+			return promise;
 		}
 	}
 
