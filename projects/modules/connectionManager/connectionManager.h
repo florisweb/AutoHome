@@ -14,7 +14,7 @@ class connectionManager
   private:
     String serverIP = "192.168.178.94"; //192.168.178.92
     int serverPort = 8081;
-
+    int heartbeatFrequency = 10000; // ms
 };
 
 

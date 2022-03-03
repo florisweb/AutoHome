@@ -12,6 +12,7 @@ String deviceId;
 String deviceKey;
 bool authenticated = false;
 String jsonString;
+unsigned long lastHeartBeat = 0;
 
 void (*onMessagePointer)(DynamicJsonDocument message);
 
@@ -39,6 +40,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
     case WStype_CONNECTED:
       Serial.printf("[WSc] Connected to url: %s\n", payload);
       authenticated = false;
+      lastHeartBeat = millis();
 
       // Authentication request
       webSocket.sendTXT("{\"id\":\"" + deviceId + "\", \"key\": \"" + deviceKey + "\"}");
@@ -55,6 +57,11 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
           digitalWrite(LED_BUILTIN, HIGH);
           delay(400);
           digitalWrite(LED_BUILTIN, LOW);
+          return;
+        }
+        if (doc["type"] == "heartbeat")
+        {
+          lastHeartBeat = millis();
           return;
         }
         onMessagePointer(doc);
@@ -125,6 +132,15 @@ bool connectionManager::isAuthenticated() {
   return authenticated;
 }
 
+long deltaHeartbeat = 0;
 void connectionManager::loop() {
+  deltaHeartbeat = millis() - lastHeartBeat;
+  if (deltaHeartbeat > heartbeatFrequency * 2 && webSocket.isConnected())
+  {
+    Serial.println("Disconnected due to 2 missing heartbeats"); 
+    webSocket.disconnect();
+  }
+
+  
   webSocket.loop();
 }
