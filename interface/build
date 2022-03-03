@@ -14,7 +14,6 @@ cat src/css/component.css src/css/main.css src/css/mainContent/components.css sr
 
 cp -r src/images dist
 cp src/index.html dist/index.html
-cp src/serviceWorker.js dist/serviceWorker.js
 
 echo \|-------------------\|
 echo \| Finished Building \|

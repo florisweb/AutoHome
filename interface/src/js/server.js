@@ -31,13 +31,13 @@ const Server = new function() {
 		if (this.siteIsPrimaryServer()) // Local server
 		{
 			let connected = await this.connect(false);
-			if (connected) return true;
+			if (connected || waitingForAuthentication) return true;
 			window.location.replace(proxyWebServer);
 			return false;
 		} else { // Proxy Server
 			let promise = this.connect(true);
 			let available = await this.primaryServerAvailable();
-			if (available) return window.location.replace(primaryWebServer);
+			if (available && !waitingForAuthentication) return window.location.replace(primaryWebServer);
 			return promise;
 		}
 	}
