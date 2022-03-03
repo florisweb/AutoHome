@@ -29,7 +29,7 @@ function handleRequest(req, res) {
 }
 
 
-function handleStaticResources (req, res) {
+function handleStaticResources(req, res) {
     let path = new URL('../interface/dist/' + req.url, import.meta.url).pathname;
     res.sendFile(path);
 };

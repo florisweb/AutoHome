@@ -77,10 +77,19 @@ export function DeviceService({id, onMessage}) {
     this.onDeviceDisconnect = () => {};
 
 
-    this.onMessage = (_event) => {
-        try {
-            onMessage(_event);
-        } catch (e) {console.log(e)};
+    this.onMessage = (_message) => {
+        switch (_message.type)
+        {
+            case "setStateByKey": 
+                this.curState[_message.stateKey] = _message.data;
+                this.pushCurState();
+            break;
+            default:
+                try {
+                    onMessage(_message);
+                } catch (e) {console.log(e)};
+            break;
+        }
     }
     this.send = function(_data) {
         if (!this.client) return Errors.NotConnectedService;

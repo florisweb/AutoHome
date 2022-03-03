@@ -153,8 +153,8 @@ void updateProgramExecutor() {
     switch (curLightProgram[curLightProgramIndex])
     {
       case 0:
-        curLightProgramIndex = -1; // -2 + 1 = -1
-        ConnectionManager.send("{\"type\": \"programRunState\", \"data\": false}");
+        curLightProgramIndex = -1; // -2 + 1 = -1;
+        ConnectionManager.send("{\"type\": \"setStateByKey\", \"stateKey\": \"programRunState\", \"data\": false}");
         return;
         break;
       case 1:
@@ -175,14 +175,14 @@ void updateProgramExecutor() {
   if (sizeof(curLightProgram) / sizeof(int) < curLightProgramIndex)
   {
     curLightProgramIndex = -1;
-    ConnectionManager.send("{\"type\": \"programRunState\", \"data\": false}");
+    ConnectionManager.send("{\"type\": \"setStateByKey\", \"stateKey\": \"programRunState\", \"data\": false}");
   }
 }
 
 
 
 void setLampState(bool turnLampOn) {
-  String statusMessage = "{\"type\": \"lampStatus\", \"data\":";
+  String statusMessage = "{\"type\": \"setStateByKey\", \"stateKey\": \"lampOn\", \"data\":";
   if (turnLampOn)
   {
     lampOn = true;
@@ -203,5 +203,5 @@ void setLampState(bool turnLampOn) {
 
 void runCurLightProgram() {
   curLightProgramIndex = 0;
-  ConnectionManager.send("{\"type\": \"programRunState\", \"data\": true}");
+  ConnectionManager.send("{\"type\": \"setStateByKey\", \"stateKey\": \"programRunState\", \"data\": true}");
 }
