@@ -27,6 +27,7 @@ export default function() {
     this.isConnected = function() {
         return Socket && Socket.readyState == 1 && proxyClientEnabled;
     }
+    this.getCondition = () => {return this.isConnected() ? "active" : 'inactive'};
 
     this.connect = function() {
         Socket = new WebSocket('wss://thuiswolk.ga:8081');
@@ -79,6 +80,9 @@ export default function() {
                 case "CreateProxy":
                     proxyClientEnabled = true;
                     console.log('[ProxyManager] Enabled proxy-connection.');
+                break;
+                case "ProxyConnectState":
+                    proxyClientEnabled = message.data;
                 break;
                 default: 
                     console.log('[ProxyManager] Message', message);

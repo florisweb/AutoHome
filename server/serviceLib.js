@@ -20,6 +20,7 @@ export function Service({id, SubscriberTemplate = Subscriber}) {
 
     this.setup = () => {};
     this.enable = () => {};
+    this.getCondition = () => {};
     this.authenticate = (_key) => {
         if (!this.key) return true;
         return this.key == _key;
@@ -52,11 +53,15 @@ export function Service({id, SubscriberTemplate = Subscriber}) {
 
 
 export function DeviceService({id, onMessage}) {
+    const This = this;
     Service.call(this, ...arguments);
+    if (!onMessage) onMessage = function() {This.pushEvent(...arguments)};
+
     this.downTimeTracker = new Service_downTimeTracker(this);
     this.curState       = {deviceOnline: false};
 
     this.client         = false;
+    this.getCondition   = function() {return this.client ? 'online' : 'offline';}
     this.setDevicesClient = (_deviceClient) => {
         let isNewClient = this.client ? _deviceClient.id != this.client.id : true;
         this.client = _deviceClient;

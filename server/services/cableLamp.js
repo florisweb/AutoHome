@@ -56,7 +56,6 @@ export default function() {
     DeviceService.call(this, {
         id: 'CableLamp',
         SubscriberTemplate: CustomSubscriber,
-        onMessage: onMessage
     });
     this.programManager = new function() {
         let fm = new ServiceFileManager({path: "programs.json", defaultValue: []}, This);
@@ -75,16 +74,6 @@ export default function() {
             This.curState.alarm = data;
             return await fm.writeContent(data);
         }
-    }
-
-
-    function onMessage(_message) {
-        switch (_message.type)
-        {
-            case "lampStatus": This.curState.lampOn = _message.data; break;
-            case "programRunState": This.curState.programRunState = _message.data; break;
-        }
-        This.pushEvent(_message);
     }
 
     this.setup = async function() {
@@ -108,7 +97,6 @@ export default function() {
         if (_event.data.isAtHome) return;
         This.send({type: 1, data: false}); // Turn the lamp off
     }
-
 
 
     this.onDeviceConnect = async () => {

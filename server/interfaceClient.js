@@ -71,6 +71,17 @@ export function InterfaceClient(_conn) {
         if (message.isProxyServerMessage) return;
 
         console.log('interfaceclient request', This.id, message);
+        if (message.serviceId == "serviceManager")
+        {
+            switch (message.type) 
+            {
+                case "getServiceConditions": 
+                    Conn.send(JSON.stringify(ServiceManager.getServiceConditions()));
+            }
+
+            return;
+        }
+
 
         let subscription = This.subscriptions.get(message.serviceId);
         if (!subscription) return Conn.send(JSON.stringify({error: "Subscription not found"}));

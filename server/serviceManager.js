@@ -37,6 +37,23 @@ export default new function() {
         return Services.find((s) => s.id == _id);
     }
 
+    this.getServiceConditions = function() {
+        let conditions = {};
+        for (let serviceId in this.config.services)
+        {
+            let service = this.getService(serviceId);
+            let condition = "unknown";
+            if (this.config.services[serviceId].disabled) condition = "disabled";
+            if (service && service.enabled) condition = "enabled";
+            
+            conditions[serviceId] = {
+                condition: condition,
+                customCondition: service && service.getCondition() ? service.getCondition() : false 
+            }
+        }
+        return conditions;
+    }
+
     this.getUIServices = function() {
         return Services.filter(_service => _service.config.hasUI);
     }
