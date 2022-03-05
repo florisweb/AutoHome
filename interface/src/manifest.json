@@ -1,0 +1,21 @@
+{
+  "short_name": "Thuis",
+  "name": "ThuisWolk",
+  "icons": [
+    {
+      "src": "images/logo.png",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo100.png",
+      "type": "image/png",
+      "sizes": "100x100"
+    }
+  ],
+  "start_url": ".",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "theme_color": "#6496FF",
+  "background_color": "#d4efFF"
+}
