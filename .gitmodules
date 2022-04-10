@@ -1,6 +1,9 @@
-[submodule "projects/elektroLumen"]
-	path = projects/elektroLumen
-	url = https://github.com/florisweb/elektroLumen.git
+[submodule "projects/DigiThermo"]
+	path = projects/DigiThermo
+	url = https://github.com/florisweb/DigiThermo.git
+[submodule "projects/ElektroLumen"]
+	path = projects/ElektroLumen
+	url = https://github.com/florisweb/ElektroLumen.git
 [submodule "projects/CableLamp"]
 	path = projects/CableLamp
 	url = https://github.com/florisweb/CableLamp.git
