@@ -1,10 +1,16 @@
-let CableLamp;
 {
+	const service = {
+		serviceId: 'CableLamp',
+		name: 'Cable Lamp',
+		icon: 'images/lightBolbOn.png',
+	};
+
 	const panel = new function() {
 		const This = this;
 		HomePagePanel.call(this, {
-			customClass: "CableLamp",
-			onRender: render
+			customClass: "CableLamp hasIcon hasButtonBar",
+			onRender: render,
+			size: [1, 2]
 		});
 		let renderOnlineIndicator = this.renderOnlineIndicator;
 		function render() {
@@ -72,7 +78,13 @@ let CableLamp;
 
 	const page = new function() {
 		const This = this;
-		ServicePage.call(this);
+		ServicePage.call(this, {
+			serviceInfo: service,
+			headerConfig: {
+				pageIconInBox: true,
+			},
+			pageRenderer: onRender
+		});
 
 
 		let directControlPanel = new function() {
@@ -140,7 +152,10 @@ let CableLamp;
 				if (!triggerInputField.html.self) return;
 				triggerInputField.html.self.value = _alarm.trigger;
 				if (CurPanel.dropDown.options.length <= _alarm.programIndex) return;
-				CurPanel.dropDown.setValue(CurPanel.dropDown.options[_alarm.programIndex].value);
+				
+				let programIndex = _alarm.programIndex;
+				if (typeof programIndex != 'number') programIndex = CurPanel.dropDown.options.length - 1;
+				CurPanel.dropDown.setValue(CurPanel.dropDown.options[programIndex].value);
 			}
 		}
 
@@ -176,30 +191,16 @@ let CableLamp;
 
 
 
-		this.render = () => {
-			this.html.backButton = <img src='images/backIcon.png' className='icon overviewIcon overviewButton' onclick={() => {MainContent.homePage.open()}}></img>;
-			this.html.icon = <img src='images/lightBolbOff.png' className='icon overviewIcon whiteBackgroundBox' onclick={() => {CableLamp.toggleLight()}}></img>;
-			this.html.settingsButton = <img src='images/hamburgerIcon.png' className='icon overviewIcon overviewButton' onclick={() => {MainContent.serviceConfigPage.open(This.service)}}></img>;
-
-			this.html.self = <div className='pageContent'>
-					<div className='pageOverview' style='margin-bottom: 50px'>
-						<div className='iconHolder'>
-							<div>{this.html.backButton}</div>
-							{this.html.icon}
-							<div>{this.html.settingsButton}</div>
-						</div>
-						<div className='text title'>{This.service.name}</div>
-					</div>
-					<div className='PanelBox'>
-						{directControlPanel.render()}
-						{programPanel.render()}
-						{alarmPanel.render()}
-					</div>
-				</div>;
+		function onRender() {
+			This.html.self = <div className='PanelBox'>
+				{directControlPanel.render()}
+				{programPanel.render()}
+				{alarmPanel.render()}
+			</div>;
 			
-			this.service.send({type: "getPrograms"});
-			this.updateContent();
-			return this.html.self;
+			This.service.send({type: "getPrograms"});
+			This.updateContent();
+			return This.html.self;
 		}
 
 		this.setLampState = (_lampOn) => {
@@ -210,7 +211,8 @@ let CableLamp;
 
 		function updatePrograms() {
 			let options = This.service.programs.map((_program, _index) => {_program.value = _program; _program.value.index = _index; return _program});
-			alarmPanel.dropDown.setOptions(options);
+			let alarmOptions = [...options, {name: 'No Alarm', value: {index: false, program: []}}];
+			alarmPanel.dropDown.setOptions(alarmOptions);
 			programPanel.dropDown.setOptions(options);
 		}
 
@@ -229,8 +231,12 @@ let CableLamp;
 
 
 
-	CableLamp = new function() {
+	let CableLamp = new function() {
 		Service.call(this, {serviceId: 'CableLamp', name: 'Cable Lamp', homeScreenPanel: panel, servicePage: page});
+		this.getIconSrc = function() {
+			return this.state.lampOn ? 'images/lightBolbOn.png' : 'images/lightBolbOff.png';
+		}
+
 		this.state = {
 			lampOn: false
 		};

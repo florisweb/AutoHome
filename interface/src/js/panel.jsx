@@ -1,5 +1,5 @@
 
-function Panel({onRender, postRender, customClass = ""}) {
+function Panel({onRender, postRender, customClass = "", size = [1, 1]}) {
 	const This = this;
 	this.html = {};
 	
@@ -7,6 +7,8 @@ function Panel({onRender, postRender, customClass = ""}) {
 		let html = <div className={'Panel animateIn ' + customClass}>
 			{onRender()}
 		</div>;
+		html.style.width = 'calc(var(--componentWidth) * ' + size[0] + ' - 10px * 2)'; 
+		html.style.height = 'calc(var(--componentHeight) * ' + size[1] + ' - 10px * 2)'; 
 
 		this.html.self = html;
 		if (typeof postRender === 'function') postRender(html)
@@ -46,8 +48,12 @@ function HomePagePanel(_params = {onRender, customClass}) {
 }
 
 
-function GraphPanel({panelTitle, customClass = "", xLabel, yLabel}) {
-	Panel.call(this, {onRender: onRender, customClass: customClass + " graphPanel"});
+function GraphPanel(_params = {panelTitle, customClass: "", xLabel, yLabel}) {
+	Panel.call(this, {
+		..._params,
+		onRender: onRender, 
+		customClass: (_params.customClass ? _params.customClass : '') + " graphPanel"
+	});
 
 	let graph = new Graph(...arguments);
 	this.setData = function(_lines) {
@@ -56,7 +62,7 @@ function GraphPanel({panelTitle, customClass = "", xLabel, yLabel}) {
 
 	function onRender() {
 		return [
-			<div className='text panelTitle small'>{panelTitle}</div>,
+			<div className='text panelTitle small'>{_params.panelTitle}</div>,
 			graph.render()
 		];
 	}
@@ -65,8 +71,8 @@ function GraphPanel({panelTitle, customClass = "", xLabel, yLabel}) {
 
 
 
-function DownTimePanel({customClass = ''}) {
-	Panel.call(this, {onRender: onRender, customClass: customClass + " graphPanel downTimePanel"});
+function DownTimePanel(_params = {customClass: ''}) {
+	Panel.call(this, {..._params, onRender: onRender, customClass: (_params.customClass ? _params.customClass : '') + " graphPanel downTimePanel"});
 
 	let downTimeGraph = new DownTimeGraph();
 	this.setData = function() {

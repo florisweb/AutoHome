@@ -36,11 +36,14 @@ function MainContent_page({pageRenderer, onOpen, onClose}) {
 	this.openState = false;
 	this.render = function() {
 		this.HTML.page = <div className='page hide'>	
-						<div className='pageContent'>
-							{pageRenderer()}
-						</div>
+						{this.renderPageContent()}
 					</div>;
 		return this.HTML.page;
+	}
+	this.renderPageContent = function() {
+		return <div className='pageContent'>
+			{pageRenderer()}
+		</div>;
 	}
 
 	this.open = function() {
@@ -62,13 +65,21 @@ function MainContent_page({pageRenderer, onOpen, onClose}) {
 	}
 }
 
-function MainContent_pageWithHeader({
+function PageWithHeader({
 		pageRenderer, 
 		title, 
-		headerConfig = {pageIconSrc: 'images/logoInverted.png', pageIconInBox: true, leftButtonSrc: 'images/backIcon.png', rightButtonSrc: ''}, 
+		headerConfig = {},
 		onOpen, 
 		onClose
 	}) {
+	headerConfig = {
+		pageIconSrc: 'images/logoInverted.png', 
+		pageIconInBox: true, 
+		leftButtonSrc: 'images/backIcon.png', 
+		rightButtonSrc: '',
+		...headerConfig,
+	};
+
 	const This = this;
 	MainContent_page.call(this, {
 		...arguments[0],
@@ -82,17 +93,19 @@ function MainContent_pageWithHeader({
 	if (!headerConfig.rightButtonSrc) this.HTML.rightButton.classList.add('hide');
 
 
-	console.log(title);
 	function render() {
+		This.HTML.pageTitle = <div className='text title'>{title}</div>;
+		This.HTML.pageOverview = <div className='pageOverview' style='margin-bottom: 50px'>
+			<div className='iconHolder'>
+				<div>{This.HTML.leftButton}</div>
+				{This.HTML.pageIcon}
+				<div>{This.HTML.rightButton}</div>
+			</div>
+			{This.HTML.pageTitle}
+		</div>;
+
 		return [
-			<div className='pageOverview' style='margin-bottom: 50px'>
-				<div className='iconHolder'>
-					<div>{This.HTML.leftButton}</div>
-					{This.HTML.pageIcon}
-					<div>{This.HTML.rightButton}</div>
-				</div>
-				<div className='text title'>{title}</div>
-			</div>,
+			This.HTML.pageOverview,
 			<div className='PanelBox'>
 				{pageRenderer()}
 			</div>
@@ -101,12 +114,18 @@ function MainContent_pageWithHeader({
 }
 
 
+
+
+
+
+
 function MainContent_homePage() {
-	MainContent_pageWithHeader.call(this, {
+	PageWithHeader.call(this, {
 		pageRenderer: render,
 		title: "ThuisWolk",
 		headerConfig: {
 			pageIconSrc: 'images/logoInverted.png',
+			leftButtonSrc: false,
 			pageIconInBox: false,
 		}
 	});
@@ -143,8 +162,15 @@ function MainContent_servicePage() {
 
 
 function MainContent_serviceConfigPage() {
+	PageWithHeader.call(this, {
+		pageRenderer: () => [],
+		headerConfig: {
+			pageIconInBox: false,
+		}
+	});
+
 	MainContent_page.call(this, {
-		pageRenderer: () => <div>Loading...</div>,
+		pageRenderer: () => [],
 		onOpen: onOpen
 	});
 	const This = this;
@@ -153,12 +179,15 @@ function MainContent_serviceConfigPage() {
 	function onOpen(_service) {
 		This.curService = _service;
 		renderPageContent(_service);
+		console.log(_service);
+		// This.HTML.pageIcon.setAttribute('src', _service);
+		// This.HTML.pageTitle
 	}
 
-	let downTimePanel = new DownTimePanel({customClass: "w2 h3"})
-	let backButton = <img src='images/backIcon.png' className='icon overviewIcon overviewButton' onclick={() => {MainContent.homePage.open()}}></img>;
-	let icon = <img src='images/lightBolbOff.png' className='icon overviewIcon whiteBackgroundBox' onclick={() => {CableLamp.toggleLight()}}></img>;
-	let placeHolderButton = <img className='icon overviewIcon overviewButton' style='opacity: 0'></img>;
+	let downTimePanel 		= new DownTimePanel({size: [2, 3]})
+	let backButton 			= <img src='images/backIcon.png' className='icon overviewIcon overviewButton' onclick={() => {MainContent.homePage.open()}}></img>;
+	let icon 				= <img src='images/lightBolbOff.png' className='icon overviewIcon whiteBackgroundBox' onclick={() => {CableLamp.toggleLight()}}></img>;
+	let placeHolderButton 	= <img className='icon overviewIcon overviewButton' style='opacity: 0'></img>;
 
 	function renderPageContent(_service) {
 		_service.send({type: "getDownTime"});

@@ -20,6 +20,7 @@ function CustomSubscriber(_config) {
             case "prepareProgram": 
                 if (!_message.data) return This.onEvent({error: "Data missing", message: _message});
                 _message.data.trigger = filterTriggerString(_message.data.trigger);
+                if (_message.data.programIndex === false) _message.data.trigger = '';
                 
                 This.service.send(_message);
                 This.service.alarmManager.setAlarm(_message.data);

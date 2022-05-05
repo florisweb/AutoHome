@@ -1,19 +1,7 @@
 
 
 
-.Panel.CableLamp {
-	width: calc(var(--componentWidth) - 10px * 2);
-  	height: calc(var(--componentHeight) * 2 - 10px * 2);
-}
 
-.Panel.CableLamp .bottomBar .text.button.bDefault {
-	position: relative;
-	width:  55px;
-
-	text-align: center;
-	margin-left: auto;
-	float: right;
-}
 
 .Panel.CableLamp .bottomBar .preparedProgramIndicator {
 	position: absolute;

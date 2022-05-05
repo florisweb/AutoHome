@@ -1,17 +1,23 @@
-
 {
+	const service = {
+		serviceId: 'Elumen',
+		name: 'eLumen',
+		icon: 'images/eLumenIcon.png',
+	};
+
 	const panel = new function() {
 		const This = this;
 		HomePagePanel.call(this, {
-			customClass: "ELumen",
-			onRender: render
+			customClass: "ELumen hasIcon",
+			onRender: render,
+			size: [1, 1]
 		});
 		
 		let renderOnlineIndicator = this.renderOnlineIndicator;
 		function render() {
 			let icon = <img className='panelIcon' src='images/eLumenIcon.png'></img>;
 			let state = <div className='text subText waterPercentage'>&#128167;52% filled</div>;
-			This.html["icon"] 		= icon;
+			This.html["icon"] = icon;
 
 			let onlineIndicator = This.renderOnlineIndicator();
 			This.setOnlineState(This.service.state.deviceOnline);
@@ -33,12 +39,18 @@
 
 	const page = new function() {
 		const This = this;
-		ServicePage.call(this);
+		ServicePage.call(this, {
+			serviceInfo: service,
+			headerConfig: {
+				pageIconInBox: true,
+			},
+			pageRenderer: onRender,
+		});
 
 		let moisturePanel = new function() {
 			GraphPanel.call(this, {
 				panelTitle: "Moisture", 
-				customClass: "w2 h3", 
+				size: [2, 3],
 				xLabel: "Time", 
 				yLabel: "Moisture (%)", 
 				xRange: [Date.now() / 1000 -  60 * 60 * 24 * 5, Date.now() / 1000],
@@ -49,7 +61,7 @@
 		let waterVolumePanel = new function() {
 			GraphPanel.call(this, {
 				panelTitle: "Water Volume", 
-				customClass: "w2 h3", 
+				size: [2, 3],
 				xLabel: "Time", 
 				yLabel: "WaterVolume (%)", 
 				xRange: [Date.now() / 1000 -  60 * 60 * 24 * 5, Date.now() / 1000],
@@ -58,30 +70,16 @@
 		}
 
 
-		this.render = () => {
-			this.html.backButton = <img src='images/backIcon.png' className='icon overviewIcon overviewButton' onclick={() => {MainContent.homePage.open()}}></img>;
-			this.html.icon = <img src='images/eLumenIcon.png' className='icon overviewIcon whiteBackgroundBox'></img>;
-			this.html.settingsButton = <img src='images/hamburgerIcon.png' className='icon overviewIcon overviewButton' onclick={() => {MainContent.serviceConfigPage.open(This.service)}}></img>;
-
-			this.html.self = <div className='pageContent'>
-					<div className='pageOverview' style='margin-bottom: 50px'>
-						<div className='iconHolder'>
-							<div>{this.html.backButton}</div>
-							{this.html.icon}
-							<div>{this.html.settingsButton}</div>
-						</div>
-						<div className='text title'>{This.service.name}</div>
-					</div>
-					<div className='PanelBox'>
+		function onRender() {
+			This.html.self = <div className='PanelBox'>
 						{moisturePanel.render()}
 						{waterVolumePanel.render()}
-					</div>
-				</div>;
+					</div>;
 
 
-			this.service.send({type: "getData"});
+			This.service.send({type: "getData"});
 
-			return this.html.self;
+			return This.html.self;
 		}
 
 		this.updateData = () => {
@@ -131,10 +129,8 @@
 	}
 
 
-
-
 	const ELumen = new function() {
-		Service.call(this, {serviceId: 'ELumen', name: 'eLumen', homeScreenPanel: panel, servicePage: page});
+		Service.call(this, {...service, homeScreenPanel: panel, servicePage: page});
 		this.state = {
 			humidty: 0,
 			temperature: 0,
@@ -157,5 +153,4 @@
 			}
 		}
 	}
-
 }

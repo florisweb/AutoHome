@@ -30,12 +30,45 @@
 
     display: grid;
     grid-template-areas: 
+        'title onlineIndicator'
+        'subText subText';
+    grid-template-columns: auto 20px;
+    grid-template-rows: 30px 20px auto 30px;
+    grid-template-columns: auto 20px;
+    grid-template-rows: 30px 20px;
+    grid-column-gap: 5px;
+}
+
+.Panel.hasIcon {
+    grid-template-areas: 
         'icon title onlineIndicator'
         'icon subText subText';
     grid-template-columns: 40px auto 20px;
     grid-template-rows: 30px 20px;
-    grid-column-gap: 5px;
 }
+
+.Panel.hasButtonBar {
+    grid-template-areas: 
+        'title onlineIndicator'
+        'subText subText'
+        '. .'
+        'bottomBar bottomBar';
+    grid-template-columns: auto 20px;
+    grid-template-rows: 30px 20px auto 30px;
+}
+
+.Panel.hasButtonBar.hasIcon {
+    grid-template-areas: 
+        'icon title onlineIndicator'
+        'icon subText subText'
+        '. . .'
+        'bottomBar bottomBar bottomBar';
+    grid-template-columns: 40px auto 20px;
+    grid-template-rows: 30px 20px auto 30px;
+}
+
+
+
 
 .Panel.h2 {
     height: calc(var(--componentHeight) * 2 - 10px * 2);
@@ -195,6 +228,14 @@
     height: 30px;
 }
 
+.Panel .bottomBar .text.button.bDefault {
+    position: relative;
+    display: flex;
+
+    text-align: center;
+    margin-left: auto;
+    float: right;
+}
 
 
 
