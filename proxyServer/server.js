@@ -209,7 +209,7 @@ function _Proxy({id, key}) {
         if (_key != this.key) 
         {
             console.log("[ProxyStatus] Failed to connect " + _client.id + " to proxy " + this.id, _key, this.clients.length);
-            _client.sendPacket({type: "ProxyConnectState", date: false});
+            _client.sendPacket({type: "ProxyConnectState", data: false});
             return false;
         }
         

@@ -18,7 +18,7 @@ const Auth = new function() {
 	this.clearKey = function() {
 		localStorage.userKey = '';
 	}
-
+	this.clearProxyKey = () => this.setProxyKey('');
 
 	this.setProxyKey = function(_key) {localStorage.proxyKey = _key}
 	this.getProxyKey = function() {return localStorage.proxyKey}

@@ -1,8 +1,11 @@
-
+const PROXY = Symbol();
+const DIRECT = Symbol();
 const Server = new function() {
 	const HTML = {
 		loadingScreen: logoBackground,
-		authButton: signInWithFloriswebButton
+		authButton: signInWithFloriswebButton,
+		setProxyKeyMenu: document.querySelector('.setProxyKeyMenu'),
+		proxyKeyInputField: proxyKeyInputField,
 	}
 	const This = this;
 	const primaryWebServer = 'http://thuiswolk.local:8080';
@@ -15,143 +18,197 @@ const Server = new function() {
 	this.serviceListeners = [];
 	this.registerServiceListener = (_service) => {this.serviceListeners.push(_service)}
 
-	this.connectedToProxy = false;
-	this.authenticated = false;
-	let waitingForAuthentication = false;
-	let primaryServerUnavailable = false;
 
-	let Socket;
-	this.setup = async () => {
-		setInterval(heartbeatLoop, heartbeatFrequency);
+	this.mode = PROXY;
+	this.setup = function() {
+		this.mode = this.siteIsPrimaryServer() ? DIRECT : PROXY;
 
-		this.smartConnect();
+		this.connectAccordingToMode();
 	}
 
-	this.smartConnect = async function() {
-		if (this.siteIsPrimaryServer()) // Local server
-		{
-			let connected = await this.connect(false);
-			if (connected || waitingForAuthentication) return true;
-			window.location.replace(proxyWebServer);
-			return false;
-		} else { // Proxy Server
-			let promise = this.connect(true);
-			let available = await this.primaryServerAvailable();
-			if (available && !waitingForAuthentication) return window.location.replace(primaryWebServer);
-			return promise;
+	let Socket;
+	let connectionAttempts = 0;
+	this.connectAccordingToMode = function() {
+		if (this.mode == PROXY) return this.proxyConnect();
+		return this.directConnect();
+	}
+
+
+	this.directConnect = function() {
+		let serverAuthenticated = false;
+		connectionAttempts++;
+		
+
+		let onOpen = () => {
+			Socket.send(JSON.stringify({id: "InterfaceClient", key: Auth.getKey()}));
+		}
+		let onError = (_error) => {
+			console.log('error', _error);
+			Server.showMessage(_error);
+		}
+		let onClose = () => {
+			setTimeout(() => {This.connectAccordingToMode()}, 1000 * 5);
+			console.log('close');
+		}
+		let onMessage = (_message) => {
+			console.log('onMessage', _message);
+			switch (_message.type)
+			{
+				case 'auth':
+					serverAuthenticated = _message.status;
+
+					if (!serverAuthenticated) 
+					{
+						This.disconnect();
+						return This.requireAuthentication();
+					}
+					
+					closeLoadScreen();
+				break;
+				default: handleSocketMessage(_message); break;
+			}
+		}
+
+		return connect(DIRECT, onOpen, onError, onClose, onMessage);
+	}
+
+
+	this.proxyConnect = function() {
+		let proxyAuthenticated = false;
+		let serverAuthenticated = false;
+
+		connectionAttempts++;
+	
+
+		let onOpen = () => {
+			Socket.send(JSON.stringify({
+				isProxyServerMessage: true, 
+				proxyId: 'thuisWolkProxy',
+				key: Auth.getProxyKey()
+			}));
+		}
+		let onError = (_error) => {
+			console.log('error', _error);
+			Server.showMessage(_error);
+		}
+		let onClose = () => {
+			setTimeout(() => {This.connectAccordingToMode()}, 1000 * 5);
+			console.log('close');
+		}
+		let onMessage = (_message) => {
+			console.log('onMessage', _message);
+			if (!proxyAuthenticated)
+			{
+				if (!_message.isProxyServerMessage) return;
+				if (_message.error) return Server.showMessage(_message.error);
+				if (_message.type != "ProxyConnectState") return;
+				proxyAuthenticated = _message.data;
+				if (!proxyAuthenticated) 
+				{
+					This.disconnect();
+					return This.requireProxyAuthentication();
+				}
+				
+				console.log('[Server.proxy]: Connected to proxy');
+
+				Socket.send(JSON.stringify({id: "InterfaceClient", key: Auth.getKey()}));
+				return;
+			}
+
+			if (_message.isProxyServerMessage)
+			{
+				console.log('Message from proxy', _message);
+				// if (_message.type == 'ProxyConnectState')
+				return;
+			}
+
+
+			switch (_message.type)
+			{
+				case 'auth':
+					serverAuthenticated = _message.status;
+
+					if (!serverAuthenticated) 
+					{
+						This.disconnect();
+						return This.requireAuthentication();
+					}
+					
+					closeLoadScreen();
+				break;
+				default: handleSocketMessage(_message); break;
+			}
+		}
+
+		return connect(PROXY, onOpen, onError, onClose, onMessage);
+	}
+
+	this.showMessage = (_message) => {
+		console.info("[SERVER: show user]", _message);
+	}
+
+
+
+
+
+
+	function connect(_mode, _onOpen, _onError, _onClose, _onMessage) {
+		let serverUrl = _mode == PROXY ? proxyUrl : primaryUrl;
+		console.log("[Server] Starting to connect to ", serverUrl, _mode);
+
+		Socket = new WebSocket(serverUrl);
+		This.Socket = Socket;
+
+		Socket.onmessage = function(_event) { 
+			let message = JSON.parse(_event.data);
+			switch (message.type)
+			{
+				case 'heartbeat': lastHeartbeat = new Date(); break;
+				default: _onMessage(message); break;
+			}
+		};
+
+		Socket.onopen = function() {
+			connectionAttempts = 0;
+			_onOpen();
+		}
+
+		Socket.onerror = function(_e) {
+			_onError(_e);
+		}
+		
+		Socket.onclose = function() {
+			_onClose();
 		}
 	}
 
+	this.disconnect = function() {
+		if (!Socket) return;
+		return Socket.close();
+	}
 
 	this.isConnected = function() {
 		return Socket && Socket.readyState == 1;
 	}
+
+	this.send = function(_json) {
+		if (!this.isConnected()) return;
+		Socket.send(JSON.stringify(_json));
+	}
+
 	this.setAuthenticationState = function(_authed) {
 		this.authenticated = _authed;
 	}
 
-	function requireAuthentication() {
-		openLoadScreen();
-		Auth.clearKey();
-		waitingForAuthentication = true;
-		HTML.authButton.classList.remove('hide');
-		This.setAuthenticationState(false);
-	}
-	function openLoadScreen() {
-		HTML.loadingScreen.classList.remove('hide');
-		HTML.authButton.classList.add('hide');
-	}
-	function closeLoadScreen() {
-		HTML.loadingScreen.classList.add('hide');
-	}
-
-	
-	this.configureServers = function() {
-		this.siteIsPrimaryServer();
-	}
 
 
-	let connectionAttempts = 0;
-	this.connect = function(_connectToProxy = false) {
-		if (waitingForAuthentication) return false; // Not relevant to try to connect since you can't authenticate anyway
-		this.disconnect();
-		this.setAuthenticationState(false);
-		primaryServerUnavailable = false;
-		connectionAttempts++;
 
 
-		let serverUrl = _connectToProxy ? proxyUrl : primaryUrl;
-		this.connectedToProxy = _connectToProxy;
-		
 
-		return new Promise((resolve) => {
-			console.log("[Server] Starting to connect to ", serverUrl);
 
-			Socket = new WebSocket(serverUrl);
-			This.Socket = Socket;
 
-			// Connect attempt timed out
-			setTimeout(() => {
-				if (This.isConnected()) return;
-				console.warn('[Server] Current connection attempt timed out.');
-				primaryServerUnavailable = true;
-				This.disconnect();
-				resolve(false);
-			}, connectionTimeoutLength);
 
-			Socket.onmessage = function(_event) { 
-				let message = JSON.parse(_event.data);
-				switch (message.type)
-				{
-					case 'heartbeat': lastHeartbeat = new Date(); break;
-					case 'auth': 
-						console.warn("[Server].authenticated = ", message.status);
-						
-						This.setAuthenticationState(message.status);
-						if (!message.status) return requireAuthentication();
-						resolve(true);
-						closeLoadScreen();
-					break;
-					case 'proxyKey': Auth.setProxyKey(message.data); break;
-					case 'ProxyConnectState': 
-						if (!message.isProxyServerMessage) return;
-						Socket.send(JSON.stringify({id: "InterfaceClient", key: Auth.getKey()}));
-					break;
-					default: handleSocketMessage(message); break;
-				}
-			};
 
-			Socket.onopen = function() {
-				connectionAttempts = 0;
-				lastHeartbeat = new Date();
-				if (_connectToProxy)
-				{
-					return Socket.send(JSON.stringify({
-						isProxyServerMessage: true, 
-						proxyId: 'thuisWolkProxy',
-						key: Auth.getProxyKey()
-					}));
-				}
-
-				// Authenticate as interfaceClient
-				Socket.send(JSON.stringify({id: "InterfaceClient", key: Auth.getKey()}));
-			}
-			Socket.onerror = function() {
-				resolve(false);
-				console.log('error', ...arguments);
-			}
-			
-			Socket.onclose = function() {
-				resolve(false);
-				if (waitingForAuthentication) return; // Not relevant to try to reconnect since you can't authenticate anyway
-				openLoadScreen();
-				console.log('closed, reconnecting...', connectionAttempts);
-				setTimeout(() => {
-					Server.smartConnect();
-				}, 5000 * Math.pow(2, connectionAttempts));
-			}
-		});
-	}
 
 	function handleSocketMessage(_message) {
 		console.log(_message);
@@ -160,50 +217,58 @@ const Server = new function() {
 		service.onEvent(_message);
 	}
 
-	
 
-	let lastHeartbeat = new Date();
-	function heartbeatLoop() {
-		if (!This.isConnected()) return;
-		if (new Date() - lastHeartbeat < heartbeatFrequency * 1.1) return;
-		console.warn("[Server] Connection timed out due to a missing heartbeat.");
-		This.disconnect();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	this.requireProxyAuthentication = function() {
+		openLoadScreen();
+		Auth.clearProxyKey();
+		waitingForAuthentication = true;
+		HTML.proxyKeyInputField.value = null;
+		HTML.setProxyKeyMenu.classList.remove('hide');
+		This.setAuthenticationState(false);
+	}
+
+	this.requireAuthentication = function() {
+		openLoadScreen();
+		Auth.clearKey();
+		waitingForAuthentication = true;
+		HTML.authButton.classList.remove('hide');
+		This.setAuthenticationState(false);
+	}
+	function openLoadScreen() {
+		HTML.loadingScreen.classList.remove('hide');
+		HTML.setProxyKeyMenu.classList.add('hide');
+		HTML.authButton.classList.add('hide');
+	}
+	function closeLoadScreen() {
+		HTML.loadingScreen.classList.add('hide');
 	}
 
 
-	this.send = function(_json) {
-		if (!this.isConnected()) return;
-		Socket.send(JSON.stringify(_json));
-	}
-
-	this.disconnect = function() {
-		try {
-			Socket.close();
-		} catch (e) {};
-	}
 
 
 
-	this.primaryServerAvailable = function() {
-		return serverAvailable(primaryWebServer);
-	}
 
 
-	function serverAvailable(_url) {
-		return new Promise((resolve) => {
-			let img = document.createElement('img');
-			img.setAttribute('src', _url + '/images/logo.png');
-			img.onerror = function() {
-				resolve(false);
-			}
-			img.onload = function() {
-				resolve(true);
-			}
-			setTimeout(() => {
-				resolve(false);
-			}, connectionTimeoutLength);
-		});
-	}
+
+
+
+
+
 
 
 	this.siteIsPrimaryServer = function() {
