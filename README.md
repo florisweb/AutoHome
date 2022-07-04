@@ -72,3 +72,16 @@ CurState: [server -> any]
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+servic.page.render()
+-> returns div.panelBox

@@ -1,6 +1,6 @@
 {
 	const service = {
-		serviceId: 'Elumen',
+		serviceId: 'ELumen',
 		name: 'eLumen',
 		icon: 'images/eLumenIcon.png',
 	};

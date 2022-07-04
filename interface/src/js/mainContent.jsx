@@ -106,7 +106,7 @@ function PageWithHeader({
 
 		return [
 			This.HTML.pageOverview,
-			<div className='PanelBox'>
+			<div className='panelBoxHolder'>
 				{pageRenderer()}
 			</div>
 		];
@@ -139,7 +139,7 @@ function MainContent_homePage() {
 			servicePanels.push(service.homeScreenPanel.render());
 		}
 
-		return servicePanels;
+		return <div className='PanelBox'>{servicePanels}</div>;
 	}
 }
 
@@ -179,9 +179,6 @@ function MainContent_serviceConfigPage() {
 	function onOpen(_service) {
 		This.curService = _service;
 		renderPageContent(_service);
-		console.log(_service);
-		// This.HTML.pageIcon.setAttribute('src', _service);
-		// This.HTML.pageTitle
 	}
 
 	let downTimePanel 		= new DownTimePanel({size: [2, 3]})
@@ -200,8 +197,10 @@ function MainContent_serviceConfigPage() {
 				</div>
 				<div className='text title'>{_service.name}</div>
 			</div>
-			<div className='PanelBox'>
-				{downTimePanel.render()}
+			<div className='panelBoxHolder'>
+				<div className='PanelBox'>
+					{downTimePanel.render()}
+				</div>
 			</div>
 		</div>;
 		backButton.onclick = () => {

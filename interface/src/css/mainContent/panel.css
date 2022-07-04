@@ -70,16 +70,6 @@
 
 
 
-.Panel.h2 {
-    height: calc(var(--componentHeight) * 2 - 10px * 2);
-}
-.Panel.h3 {
-    height: calc(var(--componentHeight) * 3 - 10px * 2);
-}
-.Panel.w2 {
-    width: calc(var(--componentWidth) * 2 - 10px * 2);
-}
-
 
 .Panel.animateIn {
     opacity: 0;
@@ -150,8 +140,36 @@
 .Panel.animateIn:nth-child(20) {
     animation-delay: calc(var(--delayBetweenAnimateIns) * 20);
 }
-
-
+.Panel.animateIn:nth-child(21) {
+    animation-delay: calc(var(--delayBetweenAnimateIns) * 21);
+}
+.Panel.animateIn:nth-child(22) {
+    animation-delay: calc(var(--delayBetweenAnimateIns) * 22);
+}
+.Panel.animateIn:nth-child(23) {
+    animation-delay: calc(var(--delayBetweenAnimateIns) * 23);
+}
+.Panel.animateIn:nth-child(24) {
+    animation-delay: calc(var(--delayBetweenAnimateIns) * 24);
+}
+.Panel.animateIn:nth-child(25) {
+    animation-delay: calc(var(--delayBetweenAnimateIns) * 25);
+}
+.Panel.animateIn:nth-child(26) {
+    animation-delay: calc(var(--delayBetweenAnimateIns) * 26);
+}
+.Panel.animateIn:nth-child(27) {
+    animation-delay: calc(var(--delayBetweenAnimateIns) * 27);
+}
+.Panel.animateIn:nth-child(28) {
+    animation-delay: calc(var(--delayBetweenAnimateIns) * 28);
+}
+.Panel.animateIn:nth-child(29) {
+    animation-delay: calc(var(--delayBetweenAnimateIns) * 29);
+}
+.Panel.animateIn:nth-child(30) {
+    animation-delay: calc(var(--delayBetweenAnimateIns) * 30);
+}
 @keyframes animatePanelIn {
     0% {
       transform: translateY(40px);
