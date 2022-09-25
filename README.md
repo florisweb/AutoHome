@@ -20,6 +20,66 @@ ServerDevice:
 
 <p3>Client-protocol</p3>
 
+<p2>Connecting and Authentication</p2>
+1. Client starts connection to websocketserver.
+2. OnConnect:
+	Client sends auth message: 
+		{id: deviceId/serviceId, key}
+	Special case, interfaceClient: 
+		{id: 'InterfaceClient', key: FloriswebAuthToken}
+3. Server Responses
+	InterfaceClient:
+		{"type": "auth", "status": true}
+		{"type": "auth", "status": false, "error": "Invalid Key"}
+
+
+	{error: "Parameters missing"}
+	{error: "Invalid request"}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p2>Message types</p2>
+
+<p1>Push</p1>
+{
+	type: (string)
+	data: (any)
+	serviceId
+}
+
+<p1>Request</p1>
+Request: {
+	requestId
+	type: (string)
+	data: (any)
+	serviceId,
+}
+Response: {
+	isResponse: true,
+	requestId - request.requestId
+	response: (any) - response
+}
+
+
+
+
+
+
+
+
 <p2>Messages</p2>
 Default Format:
 {
