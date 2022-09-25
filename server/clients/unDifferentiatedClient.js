@@ -12,39 +12,40 @@ export class UnDifferentiatedClient extends BaseClient {
     authenticated = false;
 
     _onMessage(_buffer) {    
-        let data = super._onMessage(_buffer);
-        if (!data) return;
+        let message = super._onMessage(_buffer);
+        if (!message) return;
+        if (!message.isRequestMessage) return this.send({error: "Parameters missing"});
         
         // Authentication
-        if (!data.id) return this.send({error: "Parameters missing"});
+        if (!message.isAuthMessage) return message.respond({error: "Parameters missing"});
 
         // InterfaceClient
-        if (data.id === "InterfaceClient")
+        if (message.id === "InterfaceClient")
         {
-            if (!authenticateInterfaceClient(data.key))
+            if (!authenticateInterfaceClient(message.key))
             {
                 console.log('[Invalid key] InterfaceClient ' + this.id + " tried to connect with an invalid key.");
-                this.send({"type": "auth", "status": false, "error": "Invalid Key"});
+                message.respond({"type": "auth", "status": false, "error": "Invalid Key"});
                 this.conn.close();
                 return;
             }
             
             new InterfaceClient(this.conn);
-            this.send({"type": "auth", "status": true});
+            message.respond({"type": "auth", "status": true});
             this.remove();
             return;
         }
 
         // DeviceClient
-        let service = ServiceManager.getService(data.id);
-        if (!service) return this.send({error: "Service not found"});
-        if (!service.config.isDeviceService) return this.send({error: "Service is not a deviceService"});
+        let service = ServiceManager.getService(message.id);
+        if (!service) return message.respond({error: "Service not found"});
+        if (!service.config.isDeviceService) return message.respond({error: "Service is not a deviceService"});
         
-        let allowed = service.authenticate(data.key);
-        if (!allowed) return this.send({error: "Invalid Key"});
+        let allowed = service.authenticate(message.key);
+        if (!allowed) return message.respond({error: "Invalid Key"});
 
         new DeviceClient(this.conn, this.service);
-        this.send({type: "auth", data: true});
+        message.respond({type: "auth", data: true});
         this.remove();
     }
 }

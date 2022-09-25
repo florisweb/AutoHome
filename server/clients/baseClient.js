@@ -1,4 +1,5 @@
-const E_InvalidJSON = Symbol('E_InvalidJSON');
+import { parseMessage } from './message.js';
+
 
 export let clients = [];
 export class BaseClient {
@@ -29,9 +30,9 @@ export class BaseClient {
         console.log('[Client disconnected] ' + this.id + ' Total: ' + clients.length);
     }
 
-    _onMessage(_buffer) {  
-        let message = parseJSON(_buffer);
-        if (message === E_InvalidJSON) return this.send({error: "Invalid request"});
+    _onMessage(_buffer) { 
+        let message = parseMessage(_buffer, this); 
+        if (message === false) return this.send({error: "Invalid request"});
         return message;
     }
 
@@ -48,9 +49,5 @@ export class BaseClient {
 
 
 let newId = () => {return Math.round(Math.random() * 100000000) + "" + Math.round(Math.random() * 100000000);}
-function parseJSON(_string) {
-    try {
-        return JSON.parse(_string);
-    } catch (e) {return E_InvalidJSON};
-}
+
 

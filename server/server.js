@@ -22,6 +22,3 @@ const interval = setInterval(function () {
     client.send(JSON.stringify({type: "heartbeat"}));
   });
 }, 10000);
-
-
-

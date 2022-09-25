@@ -34,7 +34,7 @@ export class InterfaceClient extends BaseClient {
             switch (message.type) 
             {
                 case "getServiceConditions": 
-                    this.send(ServiceManager.getServiceConditions());
+                    message.respond(ServiceManager.getServiceConditions());
             }
             return;
         }

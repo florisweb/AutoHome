@@ -8,10 +8,17 @@ const Server = new function() {
 		proxyKeyInputField: proxyKeyInputField,
 	}
 	const This = this;
-	const primaryWebServer = 'http://thuiswolk.local:8080';
-	const proxyWebServer = 'https://thuiswolk.ga';
-	const primaryUrl = 'ws://thuiswolk.local:8081/';
-	const proxyUrl = 'wss://thuiswolk.ga:8081/';
+	const primaryWebServer = 'http://localhost:8080';
+	// const primaryWebServer = 'http://thuiswolk.local:8080';
+	const proxyWebServer = 'http://217.105.6.47';
+	// const primaryUrl = 'ws://thuiswolk.local:8081/';
+	const primaryUrl = 'ws://localhost:8081/';
+	// const primaryUrl = 'ws://217.105.6.47:8081/';
+
+	// const proxyUrl = 'wss://thuiswolk.ga:8081/';
+	const proxyUrl = 'ws://217.105.6.47:8081/';
+
+
 	const connectionTimeoutLength 	= 5 * 1000;
 	const heartbeatFrequency 		= 10 * 1000;
 
@@ -37,10 +44,20 @@ const Server = new function() {
 	this.directConnect = function() {
 		let serverAuthenticated = false;
 		connectionAttempts++;
-		
+		console.log('direct connect');
 
-		let onOpen = () => {
-			Socket.send(JSON.stringify({id: "InterfaceClient", key: Auth.getKey()}));
+		let onOpen = async () => {
+			let message = new AuthMessage({id: "InterfaceClient", key: Auth.getKey()});
+			let response = await message.send();
+			if (response.type !== 'auth') return;
+
+			serverAuthenticated = response.status;
+			if (!serverAuthenticated) 
+			{
+				this.disconnect();
+				return this.requireAuthentication();
+			}			
+			closeLoadScreen();
 		}
 		let onError = (_error) => {
 			console.log('error', _error);
@@ -50,26 +67,8 @@ const Server = new function() {
 			setTimeout(() => {This.connectAccordingToMode()}, 1000 * 5);
 			console.log('close');
 		}
-		let onMessage = (_message) => {
-			console.log('onMessage', _message);
-			switch (_message.type)
-			{
-				case 'auth':
-					serverAuthenticated = _message.status;
 
-					if (!serverAuthenticated) 
-					{
-						This.disconnect();
-						return This.requireAuthentication();
-					}
-					
-					closeLoadScreen();
-				break;
-				default: handleSocketMessage(_message); break;
-			}
-		}
-
-		return connect(DIRECT, onOpen, onError, onClose, onMessage);
+		return connect(DIRECT, onOpen, onError, onClose, handleSocketMessage);
 	}
 
 
@@ -154,7 +153,7 @@ const Server = new function() {
 
 	function connect(_mode, _onOpen, _onError, _onClose, _onMessage) {
 		let serverUrl = _mode == PROXY ? proxyUrl : primaryUrl;
-		console.log("[Server] Starting to connect to ", serverUrl, _mode);
+		console.log("[Server] Starting to connect to ", serverUrl);
 
 		Socket = new WebSocket(serverUrl);
 		This.Socket = Socket;
@@ -192,8 +191,8 @@ const Server = new function() {
 	}
 
 	this.send = function(_json) {
-		if (!this.isConnected()) return;
-		Socket.send(JSON.stringify(_json));
+		if (!this.isConnected()) return false;
+		return Socket.send(JSON.stringify(_json));
 	}
 
 	this.setAuthenticationState = function(_authed) {
@@ -211,6 +210,7 @@ const Server = new function() {
 
 
 	function handleSocketMessage(_message) {
+		if (_message.isResponse) return RequestManager.onMessageReceive(_message);
 		console.log(_message);
 		let service = This.serviceListeners.find((_service) => {return _service.serviceId == _message.serviceId});
 		if (!service) return;
@@ -276,3 +276,9 @@ const Server = new function() {
 		return url == 'localhost:8080' || url == primaryWebServer.split('/')[2];
 	}
 }
+
+
+
+
+
+
