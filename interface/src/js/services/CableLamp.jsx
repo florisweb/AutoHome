@@ -265,9 +265,6 @@
 					this.programs = _event.data;
 					this.servicePage.updateContent();
 				break;
-				case "downTime":
-					MainContent.serviceConfigPage.updateDownTimePanel(_event.data);
-				break;
 			}
 		}
 

@@ -12,7 +12,7 @@ const RequestManager = new class {
 			error: 				errorer,
 		}
 		_request.requestId = requestWrapper.id;
-		if (Server.send(_request) === false) requestWrapper.error();
+		if (_request.send(_request) === false) requestWrapper.error();
 		this.#requests.push(requestWrapper);
 		requestWrapper.callbackPromise.then(
 			() => this.removeRequestById(requestWrapper.id), 
@@ -55,30 +55,36 @@ class Message {
 	type;
 	data;
 	serviceId;
+	#service;
 
 	isSend = false;
 
-	constructor({type, data, serviceId}) {
+	constructor({type, data, serviceId}, _service) {
 		this.type = type;
 		this.data = data;
 		this.serviceId = serviceId;
+		this.#service = _service;
 	}
 
 	send() {
 		if (this.isSend) return true;
-		if (Server.send(this) !== false) this.isSend = true;
+		let sender = this.#service && typeof this.#service.send === 'function' ? this.#service : Server;
+		if (sender.send(this) !== false) this.isSend = true;
 		return this.isSend;
 	}
-
 }
 
 class RequestMessage extends Message {
 	#requestWrapper;
 	requestId;
+	#requestRegistered;
 	constructor() {
 		super(...arguments);
 	}
 	send() {
+		if (this.#requestRegistered) return super.send();
+		this.#requestRegistered = true;
+
 		this.#requestWrapper = RequestManager.registerRequest(this);
 		return this.#requestWrapper.callbackPromise;
 	}

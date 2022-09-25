@@ -205,7 +205,7 @@ export function Subscriber({onEvent, handleRequest = () => {}}) {
         {
             case "getDownTime": 
                 let data = await this.service.downTimeTracker.getData();
-                return this.onEvent({type: "downTime", data: data});
+                return _message.respond(data);
             default: 
                 try {
                     return handleRequest(_message);

@@ -173,6 +173,7 @@ function MainContent_serviceConfigPage() {
 		pageRenderer: () => [],
 		onOpen: onOpen
 	});
+	
 	const This = this;
 	this.curService = false;
 
@@ -187,7 +188,9 @@ function MainContent_serviceConfigPage() {
 	let placeHolderButton 	= <img className='icon overviewIcon overviewButton' style='opacity: 0'></img>;
 
 	function renderPageContent(_service) {
-		_service.send({type: "getDownTime"});
+		let request = new RequestMessage({type: 'getDownTime'}, _service);
+		request.send().then(This.updateDownTimePanel);
+		
 		let pageContent = <div className='pageContent'>
 			<div className='pageOverview' style='margin-bottom: 50px'>
 				<div className='iconHolder'>

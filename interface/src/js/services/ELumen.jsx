@@ -147,9 +147,6 @@
 				case "data": 
 					this.servicePage.updateGraph(_event.data);
 				break;
-				case "downTime": 
-					MainContent.serviceConfigPage.updateDownTimePanel(_event.data);
-				break;
 			}
 		}
 	}
