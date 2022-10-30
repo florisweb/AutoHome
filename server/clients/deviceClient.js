@@ -12,7 +12,7 @@ export class DeviceClient extends BaseClient {
     constructor(_conn, _service) {
         super(_conn);
         this.service = _service;
-        this.service.setDevicesClient(this);
+        this.service.setDeviceClient(this);
         console.log('Bound DeviceClient ' + this.id + ' to service ' + this.service.id);
     }
 
@@ -23,10 +23,10 @@ export class DeviceClient extends BaseClient {
     }
     _onClose() {
         super._onClose();
-        if (this.service) this.service.setDevicesClient(false);
+        if (this.service) this.service.setDeviceClient(false);
     }
     _onPong() {
         super._onPong();
-        if (this.service) this.service.setDevicesClient(this);
+        if (this.service) this.service.setDeviceClient(this);
     }
 }

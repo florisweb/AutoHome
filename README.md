@@ -6,8 +6,74 @@ AutoHome is a collection of smart devices and projects that integrate and work w
 
 
 
+
 ServerDevice:
 - State
+
+
+
+<p3>Config-Layout</p3>
+/server/config.json
+{
+	name: "ThuisWolk"
+
+	enabledServices: [
+		...serviceIds
+	]
+
+
+	interface: {
+		signInWithFloriswebKey,
+		allowedUserIds: []
+	}
+}
+
+
+
+
+<p3>Service-Layout</p3>
+/server/services/ServiceId
+- /config.json
+- /interface
+	/interface.jsx -> exports {panel, page}
+- /server
+	/service.js -> export default: Service
+
+
+
+
+<p2>Service.config.json</p2>
+{
+	name: ""
+	isDeviceService: (bool) -> false, - Whether or not the services represents an external entity (for example, true: a lamp, false: )  
+	hasUI: (bool) -> false - enables the /interface directory
+
+	wants: [...serviceIds] -> []
+	requires: [...serviceIds] -> []
+
+
+	trackDownTime: (bool) -> false
+
+	subscriptions: [...serviceIds]
+
+	/* --- Custom Properties --- */
+
+
+	/* --- Homebridge Config --- for integration with the HomeBridgeService*/ 
+	HBConfig: { 
+
+	}
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

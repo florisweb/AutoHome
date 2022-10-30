@@ -21,7 +21,7 @@ export function FileManager(_path) {
                 let parsedContent = content;
                 try {
                     parsedContent = JSON.parse(content);
-                } catch (e) {console.log('invalid json content', e)};
+                } catch (e) {console.log('invalid json content', e, ActualPath)};
                 resolve(parsedContent);
             });
         });

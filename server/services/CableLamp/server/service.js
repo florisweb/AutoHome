@@ -1,4 +1,4 @@
-import { Subscriber, SubscriptionList, DeviceService, ServiceFileManager } from '../serviceLib.js';
+import { Subscriber, SubscriptionList, DeviceService, ServiceFileManager } from '../../../serviceLib.js';
 
 
 function CustomSubscriber(_config) {
@@ -52,55 +52,54 @@ function CustomSubscriber(_config) {
     }
 }
 
-export default function() {
-    const This = this;
-    DeviceService.call(this, {
-        id: 'CableLamp',
-        SubscriberTemplate: CustomSubscriber,
-    });
-    this.programManager = new function() {
-        let fm = new ServiceFileManager({path: "programs.json", defaultValue: []}, This);
+
+
+export default class extends DeviceService {
+
+    programManager = new (function(_service) {
+        let fm = new ServiceFileManager({path: "programs.json", defaultValue: []}, _service);
         this.getPrograms = async function() {
             return await fm.getContent();
         }
-    }
-    this.alarmManager = new function() {
-        let fm = new ServiceFileManager({path: "alarm.json", defaultValue: {programIndex: 0, trigger: "08:00"}}, This);
+    })(this);
+
+    alarmManager = new (function(_service) {
+        let fm = new ServiceFileManager({path: "alarm.json", defaultValue: {programIndex: 0, trigger: "08:00"}}, _service);
         this.getAlarm = async function() {
             return await fm.getContent();
         }
         this.setAlarm = async function(_data) {
             let data = {programIndex: _data.programIndex, trigger: _data.trigger};
             if (!data.trigger || !_data) data = {};
-            This.curState.alarm = data;
+            _service.curState.alarm = data;
             return await fm.writeContent(data);
         }
+    })(this);
+
+
+    constructor({id, config}) {
+        super(arguments[0], CustomSubscriber);
     }
 
-    this.setup = async function() {
+
+    async setup() {
         this.curState.alarm = await this.alarmManager.getAlarm();
     }
 
-
-    this.onWantedServiceLoad = function(service) {
-        let eventHandler = handleMovementTrackerEvent;
-        switch (service.id)
+    onMessage(_message) {
+        switch (_message.type)
         {
-            case 'MovementTracker': eventHandler = handleMovementTrackerEvent; break;
-            default: return;
+            case "sensorState": this.dataManager.addDataRow(_message.data); break;
         }
-        this.subscriptions.push(service.subscribe({onEvent: eventHandler}));
+        
+        this.pushEvent(_message);
     }
 
 
-    function handleMovementTrackerEvent(_event) {
-        if (_event.type != 'status') return;
-        if (_event.data.isAtHome) return;
-        This.send({type: 1, data: false}); // Turn the lamp off
-    }
 
 
-    this.onDeviceConnect = async () => {
+
+    async onDeviceConnect() {
         if (!this.curState.alarm || !this.curState.alarm.trigger) return;
         let program = (await this.programManager.getPrograms())[this.curState.alarm.programIndex];
         if (!program) return;
@@ -111,10 +110,6 @@ export default function() {
         this.send({type: 'prepareProgram', data: data});
     }
 }
-
-
-
-
 
 
 

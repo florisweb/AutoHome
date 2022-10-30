@@ -4,6 +4,6 @@
 **/dist/*
 interface/dist/*
 server/serviceConfig.json
-server/config.js
+server/config.json
 server/DBData/*
 proxyServer/config.json

@@ -1,25 +1,68 @@
+import { readdirSync } from 'fs'
 import { FileManager } from './DBManager.js';
+
+let ConfigFileManager = new FileManager("../config.json");
+const Config = await ConfigFileManager.getContent();
 let Services = [];
 
-export default new function() {
-    const This = this;
-    let fm = new FileManager("../serviceConfig.json");
-    this.config;
-    this.loadConfig = async function() {
-        this.config = await fm.getContent();
+
+
+export default new class {
+    getService(_id) {
+        return Services.find((s) => s.id == _id);
     }
 
-    this.loadServices = async function() {
-        await this.loadConfig();
+    getUIServices() {
+        return Services.filter(_service => _service.config.hasUI);
+    }
+
+
+    getServiceConditions() {
+        // let conditions = {};
+        // for (let serviceId in this.config.services)
+        // {
+        //     let service = this.getService(serviceId);
+        //     let condition = "unknown";
+        //     if (this.config.services[serviceId].disabled) condition = "disabled";
+        //     if (service && service.enabled) condition = "enabled";
+            
+        //     conditions[serviceId] = {
+        //         condition: condition,
+        //         customCondition: service && service.getCondition() ? service.getCondition() : false 
+        //     }
+        // }
+        // return conditions;
+    }
+
+    async #getInstalledServiceIdList() {
+        return readdirSync('./services', { withFileTypes: true })
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => dirent.name)
+    }
+
+
+
+
+
+
+
+    async loadServices() {
+        let enabledServiceIds = Config.server.enabledServices;
+        let installedServiceIds = await this.#getInstalledServiceIdList();
+        console.log('[ServiceManager]: Found ' + installedServiceIds.length + ' installed services.');
 
         let promises = [];
-        for (let id in this.config.services)
+        for (let id of enabledServiceIds)
         {
-            if (this.config.services[id].disabled) continue;
-            promises.push(import('./services/' + id + '.js').then((mod) => {
-                Services.push(new mod.default);
-            }));
+            if (!installedServiceIds.includes(id))
+            {
+                console.log('[ServiceManager]: Error: Service ' + id + ' could not be found.');
+                continue;
+            }
+
+            promises.push(this.#loadService(id));
         }
+
         await Promise.all(promises);
         
         let setupPromises = []
@@ -28,52 +71,45 @@ export default new function() {
 
 
         // Enable all services
-        for (let service of Services) await enableService(service);
-        console.log("[ServiceManager] Loaded " + Services.length + "/" + Object.keys(this.config.services).length + " services.");
+        for (let service of Services) await this.#enableService(service);
+        console.log("[ServiceManager]: Succesfully loaded " + Services.length + "/" + enabledServiceIds.length + " enabled services and " + Services.length + '/' + installedServiceIds.length + ' installed services.');
     }
 
-    this.loadServices();
-    this.getService = function(_id) {
-        return Services.find((s) => s.id == _id);
+
+    async #loadService(_serviceId) {
+        let FM = new FileManager("../services/" + _serviceId + "/config.json");
+        if (!(await FM.fileExists())) return console.log('[ServiceManager]: Error: ' + _serviceId + '\'s config.json-file was not found.');
+        let serviceConfig = await FM.getContent();
+
+        let FMJS = new FileManager("../services/" + _serviceId + "/server/service.js");
+        if (!(await FM.fileExists())) return console.log('[ServiceManager]: Error: ' + _serviceId + '\'s service.js-file was not found.');
+
+        await import('./services/' + _serviceId + '/server/service.js').then((mod) => {
+            Services.push(new mod.default({id: _serviceId, config: serviceConfig}, serviceConfig));
+        });
     }
 
-    this.getServiceConditions = function() {
-        let conditions = {};
-        for (let serviceId in this.config.services)
-        {
-            let service = this.getService(serviceId);
-            let condition = "unknown";
-            if (this.config.services[serviceId].disabled) condition = "disabled";
-            if (service && service.enabled) condition = "enabled";
-            
-            conditions[serviceId] = {
-                condition: condition,
-                customCondition: service && service.getCondition() ? service.getCondition() : false 
-            }
-        }
-        return conditions;
-    }
 
-    this.getUIServices = function() {
-        return Services.filter(_service => _service.config.hasUI);
-    }
 
-    async function enableService(_service, _curDepth = 0) {
+
+  
+
+    async #enableService(_service, _curDepth = 0) {
         if (_service.enabled) return;
         if (_curDepth > 100) return console.log('[ServiceManager] ERROR Invalid require-order: stackoverflow');
 
         for (let requiredServiceId of _service.requiredServices)
         {
-            let curService = This.getService(requiredServiceId);
+            let curService = this.getService(requiredServiceId);
             if (curService.enabled) continue;
-            await enableService(curService, _curDepth + 1);
+            await this.#enableService(curService, _curDepth + 1);
         }
 
 
         let requiredServices = {};
         for (let serviceId of _service.requiredServices)
         {
-            let service = This.getService(serviceId);
+            let service = this.getService(serviceId);
             if (!service.enabled) return;
             requiredServices[serviceId] = service;
         }
@@ -83,10 +119,10 @@ export default new function() {
         
         console.log("[ServiceManager] Enabled " + _service.id);
         await _service.enable();
-        resolveOnWantedServiceLoad(_service);
+        this.#resolveOnWantedServiceLoad(_service);
     }
 
-    async function resolveOnWantedServiceLoad(_service) {
+    async #resolveOnWantedServiceLoad(_service) {
         for (let service of Services)
         {
             if (!service.wantedServices.includes(_service.id)) continue;
@@ -94,7 +130,8 @@ export default new function() {
             service.onWantedServiceLoad(service);
         }
     }
+
+
+
+    constructor() {this.loadServices();}
 }
-
-
-

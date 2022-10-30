@@ -3,104 +3,134 @@ import Errors from './errors.js';
 import { FileManager } from './DBManager.js';
 
 
-export function Service({id, SubscriberTemplate = Subscriber}) {
-    console.log('[Service] Loaded ' + id);
-    this.subscribers    = [];
-    this.id             = id;
-    this.key            = ServiceManager.config.services[id].key;
-    this.config         = ServiceManager.config.services[id];
 
-    this.enabled            = false;
-    this.requiredServices   = this.config.requires ? this.config.requires : [];
-    this.wantedServices     = this.config.wants ? this.config.wants : [];
+class ServiceState {}
+class DeviceServiceState extends ServiceState {
+    deviceOnline = false;
+}
 
-    
-    this.curState       = {};
-    this.subscriptions  = new SubscriptionList([]);
 
-    this.setup = () => {};
-    this.enable = () => {};
-    this.getCondition = () => {};
-    this.authenticate = (_key) => {
-        if (!this.key) return true;
-        return this.key == _key;
+export class Service {
+    id;
+    config;
+    subscribers = [];
+    curState = new ServiceState();
+
+
+    // Working variables
+    #subscriberTemplate;
+    enabled = false;
+    requiredServices = [];
+    wantedServices = [];
+
+
+    constructor({id, config}, _subscriberTemplate = Subscriber) {
+        this.id = id;
+        this.#subscriberTemplate = _subscriberTemplate;
+
+        this.config = config;
+        this.requiredServices  = this.config.requires ? this.config.requires : [];
+        this.wantedServices    = this.config.wants ? this.config.wants : [];
     }
 
-    this.pushEvent = function(_event) {
+
+
+    pushEvent(_event) {
         for (let subscriber of this.subscribers) subscriber.onEvent(_event);
     }
 
-    this.pushCurState = function(_sub) {
+    pushCurState(_sub) {
         let event = {type: "curState", data: this.curState};
         if (!_sub) return this.pushEvent(event);
         _sub.onEvent(event);
     }
 
 
-    this.subscribe = function(_subscriber) {
-        let sub = new SubscriberTemplate(_subscriber);
+    subscribe(_subscriber) {
+        let sub = new this.#subscriberTemplate(_subscriber);
         sub.service = this;
         this.subscribers.push(sub);
         this.pushCurState(sub);
         return sub;
     }
 
-    this.onLoadRequiredServices = function(services) {};
-    this.onWantedServiceLoad = function(service) {};
+
+
+
+    // @overwrite
+    setup() {}
+    enable() {};
+    getCondition() {};
+
+
+    onLoadRequiredServices(services) {}; // Runs when all required services are loaded
+    onWantedServiceLoad(service) {}; // Runs every time a wanted service is loaded
 }
 
 
 
 
-export function DeviceService({id, onMessage}) {
-    const This = this;
-    Service.call(this, ...arguments);
-    if (!onMessage) onMessage = function() {This.pushEvent(...arguments)};
+export class DeviceService extends Service {
+    get isDeviceService() {return true};
+    #key;
 
-    this.downTimeTracker = new Service_downTimeTracker(this);
-    this.curState       = {deviceOnline: false};
+    
+    curState = new DeviceServiceState();
+    deviceClient = false;
+    downTimeTracker = new Service_downTimeTracker(this);
 
-    this.client         = false;
-    this.getCondition   = function() {return this.client ? 'online' : 'offline';}
-    this.setDevicesClient = (_deviceClient) => {
-        let isNewClient = this.client ? _deviceClient.id != this.client.id : true;
-        this.client = _deviceClient;
-        this.curState.deviceOnline = !!this.client;
+
+    constructor()
+    {
+        super(...arguments);
+        this.#key = this.config.key;
+    }
+
+
+    authenticate = (_key) => {
+        if (this.#key === undefined) return true;
+        return this.#key === _key;
+    }
+
+    setDeviceClient = (_deviceClient) => {
+        let isNewClient = this.deviceClient ? _deviceClient.id != this.deviceClient.id : true;
+        this.deviceClient = _deviceClient;
+        this.curState.deviceOnline = !!this.deviceClient;
 
         if (!isNewClient) return;
-        this.downTimeTracker.updateConnectionState(!!this.client);
+        this.downTimeTracker.updateConnectionState(!!this.deviceClient);
 
         this.pushEvent({
             type: "onlineStatusUpdate",
             data: this.curState.deviceOnline
         });
-        if (this.client) return this.onDeviceConnect();
+        
+        if (this.deviceClient) return this.onDeviceConnect();
         this.onDeviceDisconnect();
     }
 
-    this.onDeviceConnect = () => {};
-    this.onDeviceDisconnect = () => {};
+
+    send(_message) {
+        if (!this.deviceClient) return Errors.NotConnectedService;
+        this.deviceClient.send(JSON.stringify(_message));
+    }
 
 
-    this.onMessage = (_message) => {
-        switch (_message.type)
-        {
-            case "setStateByKey": 
-                this.curState[_message.stateKey] = _message.data;
-                this.pushCurState();
-            break;
-            default:
-                try {
-                    onMessage(_message);
-                } catch (e) {console.log(e)};
-            break;
-        }
-    }
-    this.send = function(_data) {
-        if (!this.client) return Errors.NotConnectedService;
-        this.client.send(JSON.stringify(_data));
-    }
+
+    // @Overwrite
+    getCondition = () => this.deviceClient ? 'online' : 'offline';
+    onDeviceConnect() {}
+    onDeviceDisconnect() {};
+    onMessage(_message) {return this.pushEvent(...arguments)}    
 }
+
+
+
+
+
+
+
+
 
 
 
@@ -125,6 +155,11 @@ export function ServiceFileManager({path, defaultValue = {}}, _service) {
         
     };
 }
+
+
+
+
+
 
 
 function Service_downTimeTracker(_parent) {
@@ -173,6 +208,9 @@ function Service_downTimeTracker(_parent) {
         return fm.writeContent(data);
     }
 }
+
+
+
 
 
 

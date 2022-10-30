@@ -1,6 +1,9 @@
 import * as crypto from "crypto";
 import ServiceManager from '../serviceManager.js';
-import Config from '../config.js';
+
+import { FileManager } from '../DBManager.js';
+const Config = await (new FileManager("../config.json")).getContent(); 
+
 
 import { BaseClient } from './baseClient.js';
 import { InterfaceClient } from './interfaceClient.js';
@@ -39,7 +42,7 @@ export class UnDifferentiatedClient extends BaseClient {
         // DeviceClient
         let service = ServiceManager.getService(message.id);
         if (!service) return message.respond({error: "Service not found"});
-        if (!service.config.isDeviceService) return message.respond({error: "Service is not a deviceService"});
+        if (!service.isDeviceService) return message.respond({error: "Service is not a deviceService"});
         
         let allowed = service.authenticate(message.key);
         if (!allowed) return message.respond({error: "Invalid Key"});
