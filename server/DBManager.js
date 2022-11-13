@@ -2,8 +2,13 @@ import fs from 'fs';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const __dirname = getCurDir();
 const dataStoragePath = __dirname + '/DBData';
+
+export function getCurDir() {
+    return dirname(fileURLToPath(import.meta.url));
+}
 
 const DBManager = new function() {
     this.FileManager = FileManager;

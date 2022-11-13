@@ -1,0 +1,2 @@
+
+a = require('./interface.js');

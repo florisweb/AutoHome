@@ -1,5 +1,5 @@
 
-const ServiceManager = new function() {
+export const ServiceManager = new function() {
 	this.services = [];
 	this.register = function(_service) {
 		this.services.push(_service);
@@ -8,6 +8,7 @@ const ServiceManager = new function() {
 		return this.services.find((_service) => _service.serviceId == _id);
 	}
 }
+
 
 
 function Service({serviceId, name, icon, homeScreenPanel, servicePage}) {

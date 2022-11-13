@@ -1,3 +1,5 @@
+import Auth from '../auth.js';
+
 const PROXY = Symbol();
 const DIRECT = Symbol();
 const Server = new function() {
@@ -8,15 +10,18 @@ const Server = new function() {
 		proxyKeyInputField: proxyKeyInputField,
 	}
 	const This = this;
-	const primaryWebServer = 'http://localhost:8080';
-	// const primaryWebServer = 'http://thuiswolk.local:8080';
-	const proxyWebServer = 'http://217.105.6.47';
+	// const primaryWebServer = 'http://localhost:8080';
+	const primaryWebServer = 'http://thuiswolk.local:8080';
+	const proxyWebServer = '10.7.0.4:8080';
+	// const proxyWebServer = 'http://217.105.6.47';
+	// const primaryUrl = 'ws://thuiswolk.local:8081/';
+	// const primaryUrl = 'ws://localhost:8081/';
+	// const primaryUrl = 'ws://thuiswolk.local:8081/';
 	// const primaryUrl = 'ws://thuiswolk.local:8081/';
 	const primaryUrl = 'ws://localhost:8081/';
-	// const primaryUrl = 'ws://217.105.6.47:8081/';
 
 	// const proxyUrl = 'wss://thuiswolk.ga:8081/';
-	const proxyUrl = 'ws://217.105.6.47:8081/';
+	const proxyUrl = 'ws://10.7.0.4:8081/';
 
 
 	const connectionTimeoutLength 	= 5 * 1000;
@@ -29,6 +34,7 @@ const Server = new function() {
 	this.mode = PROXY;
 	this.setup = function() {
 		this.mode = this.siteIsPrimaryServer() ? DIRECT : PROXY;
+		this.mode = DIRECT;
 
 		this.connectAccordingToMode();
 	}
@@ -44,7 +50,6 @@ const Server = new function() {
 	this.directConnect = function() {
 		let serverAuthenticated = false;
 		connectionAttempts++;
-		console.log('direct connect');
 
 		let onOpen = async () => {
 			let message = new AuthMessage({id: "InterfaceClient", key: Auth.getKey()});
@@ -64,8 +69,8 @@ const Server = new function() {
 			Server.showMessage(_error);
 		}
 		let onClose = () => {
-			setTimeout(() => {This.connectAccordingToMode()}, 1000 * 5);
 			console.log('close');
+			setTimeout(() => {This.connectAccordingToMode()}, 1000 * 5);
 		}
 
 		return connect(DIRECT, onOpen, onError, onClose, handleSocketMessage);
@@ -87,7 +92,6 @@ const Server = new function() {
 			}));
 		}
 		let onError = (_error) => {
-			console.log('error', _error);
 			Server.showMessage(_error);
 		}
 		let onClose = () => {
@@ -95,7 +99,6 @@ const Server = new function() {
 			console.log('close');
 		}
 		let onMessage = (_message) => {
-			console.log('onMessage', _message);
 			if (!proxyAuthenticated)
 			{
 				if (!_message.isProxyServerMessage) return;
@@ -211,7 +214,6 @@ const Server = new function() {
 
 	function handleSocketMessage(_message) {
 		if (_message.isResponse) return RequestManager.onMessageReceive(_message);
-		console.log(_message);
 		let service = This.serviceListeners.find((_service) => {return _service.serviceId == _message.serviceId});
 		if (!service) return;
 		service.onEvent(_message);

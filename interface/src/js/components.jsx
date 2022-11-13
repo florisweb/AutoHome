@@ -7,7 +7,7 @@ const Colors = [
   '#0fa',
 ];
 
-function DropDown({onChange, customClass = '', options = []} = {}) {
+export function DropDown({onChange, customClass = '', options = []} = {}) {
 	const This = this;
 	this.value = false;
 	this.options = options;
@@ -76,7 +76,7 @@ function DropDown({onChange, customClass = '', options = []} = {}) {
 
 
 
-function Button({onclick, text, customClass = '', boxy = false, filled = true}) {
+export function Button({onclick, text, customClass = '', boxy = false, filled = true}) {
 	const This = this;
 	this.html = {};
 	
@@ -91,7 +91,7 @@ function Button({onclick, text, customClass = '', boxy = false, filled = true}) 
 
 
 
-function InputField({placeholder = null, isTimeInput, onChange, onBlur}) {
+export function InputField({placeholder = null, isTimeInput, onChange, onBlur}) {
 	const This = this;
 	this.html = {};
 	
@@ -113,7 +113,7 @@ function InputField({placeholder = null, isTimeInput, onChange, onBlur}) {
 
 
 
-function Graph({xLabel = '', yLabel = '', yRange, xRange}) {
+export function Graph({xLabel = '', yLabel = '', yRange, xRange}) {
 	let canvas = <canvas></canvas>;
 	let ctx = canvas.getContext('2d');
 
@@ -349,7 +349,7 @@ function numberToTwoDigitString(_number) {
 
 
 
-function DownTimeGraph({} = {}) {
+export function DownTimeGraph({} = {}) {
 	const This = this;
 	const msPerDay = 60 * 60 * 24 * 1000;
 	let data = [];

@@ -52,7 +52,7 @@
 		}
 
 		this.setLampState = (_lampOn) => {
-			if (!this.html.lampStatus) return console.log('doesn\'t exist yet');
+			if (!this.html.lampStatus) return;
 			setTextToElement(this.html.lampStatus, _lampOn ? "Lamp On" : "Lamp Off");
 			this.html.lightBolbIcon.setAttribute('src', "images/lightBolb" + (_lampOn ? "On" : "Off") + ".png");
 		}
@@ -105,7 +105,7 @@
 
 			
 			this.setLampState = (_lampOn) => {
-				if (!this.html.lampStatus || !this.html.lightBolbIcon) return console.log('doesn\'t exist yet');
+				if (!this.html.lampStatus || !this.html.lightBolbIcon) return;
 				setTextToElement(this.html.lampStatus, _lampOn ? "Lamp On" : "Lamp Off");
 				this.html.lightBolbIcon.setAttribute('src', "images/lightBolb" + (_lampOn ? "On" : "Off") + ".png");
 			}
@@ -204,7 +204,7 @@
 		}
 
 		this.setLampState = (_lampOn) => {
-			if (!this.html.icon || !this.openState) return console.log('doesn\'t exist yet');
+			if (!this.html.icon || !this.openState) return;
 			this.html.icon.setAttribute('src', "images/lightBolb" + (_lampOn ? "On" : "Off") + ".png");
 			directControlPanel.setLampState(_lampOn);
 		}

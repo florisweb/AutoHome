@@ -1,5 +1,6 @@
+import { DownTimeGraph } from './components.jsx';
 
-function Panel({onRender, postRender, customClass = "", size = [1, 1]}) {
+export function Panel({onRender, postRender, customClass = "", size = [1, 1]}) {
 	const This = this;
 	this.html = {};
 	
@@ -16,7 +17,7 @@ function Panel({onRender, postRender, customClass = "", size = [1, 1]}) {
 	}
 }
 
-function HomePagePanel(_params = {onRender, customClass}) {
+export function HomePagePanel(_params = {onRender, customClass}) {
 	const This = this;
 	Panel.call(this, {..._params, postRender: postRender});
 
@@ -48,7 +49,7 @@ function HomePagePanel(_params = {onRender, customClass}) {
 }
 
 
-function GraphPanel(_params = {panelTitle, customClass: "", xLabel, yLabel}) {
+export function GraphPanel(_params = {panelTitle, customClass: "", xLabel, yLabel}) {
 	Panel.call(this, {
 		..._params,
 		onRender: onRender, 
@@ -71,7 +72,7 @@ function GraphPanel(_params = {panelTitle, customClass: "", xLabel, yLabel}) {
 
 
 
-function DownTimePanel(_params = {customClass: ''}) {
+export function DownTimePanel(_params = {customClass: ''}) {
 	Panel.call(this, {..._params, onRender: onRender, customClass: (_params.customClass ? _params.customClass : '') + " graphPanel downTimePanel"});
 
 	let downTimeGraph = new DownTimeGraph();

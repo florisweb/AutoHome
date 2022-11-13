@@ -1,10 +1,9 @@
 
-let GestureManager = new _GestureManager();
-function _GestureManager() {
+const GestureManager = new function() {
   const minDragDistanceSquared = Math.pow(40, 2);
+  
   function register(_item, _onMove = () => {}, _onGestureEnd = () => {}) {
     if (!_item) return false;
-
 
     let touchStart = 0
 
@@ -44,3 +43,4 @@ function _GestureManager() {
   }
 }
 
+export default GestureManager;

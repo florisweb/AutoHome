@@ -1,4 +1,4 @@
-const Auth = new function() {
+export default const Auth = new function() {
 	const keyIvSplitter = "&iv=";
 
 	this.getKey = function() {

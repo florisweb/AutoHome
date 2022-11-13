@@ -1,10 +1,12 @@
+
+
 import { readdirSync } from 'fs'
-import { FileManager } from './DBManager.js';
+import { FileManager, getCurDir } from './DBManager.js';
+const __dirname = getCurDir();
 
 let ConfigFileManager = new FileManager("../config.json");
 const Config = await ConfigFileManager.getContent();
 let Services = [];
-
 
 
 export default new class {
@@ -35,7 +37,7 @@ export default new class {
     }
 
     async #getInstalledServiceIdList() {
-        return readdirSync('./services', { withFileTypes: true })
+        return readdirSync(__dirname + '/services', { withFileTypes: true })
             .filter(dirent => dirent.isDirectory())
             .map(dirent => dirent.name)
     }

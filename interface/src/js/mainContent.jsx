@@ -1,26 +1,31 @@
+import GestureManager from './gestureManager.js';
+import { DownTimePanel } from './panel.jsx';
+import { ServiceManager } from './service.jsx';
 
-function _MainContent() {
+
+const MainContent = new function() {
 	const This = this;
 	const HTML = {
 		mainContent: mainContent
 	}
-	this.homePage 			= new MainContent_homePage();
-	this.servicePage 		= new MainContent_servicePage();
-	this.serviceConfigPage 	= new MainContent_serviceConfigPage();
+	
 	this.curPage;
 	
 	this.setup = function() {
+		this.homePage 			= new MainContent_homePage();
+		this.servicePage 		= new MainContent_servicePage();
+		this.serviceConfigPage 	= new MainContent_serviceConfigPage();
 		this.render();
 		this.homePage.open();
 	}
 	
 	this.render = function() {
-		mainContent.append(this.homePage.render());
-		mainContent.append(this.servicePage.render());
-		mainContent.append(this.serviceConfigPage.render());
+		HTML.mainContent.append(this.homePage.render());
+		HTML.mainContent.append(this.servicePage.render());
+		HTML.mainContent.append(this.serviceConfigPage.render());
 
 		let lastSwipe = new Date();
-		GestureManager.onSwipeRight(mainContent, function(_dx, _dy, _start) {
+		GestureManager.onSwipeRight(HTML.mainContent, function(_dx, _dy, _start) {
 			if (_start[0] > 150 || Math.abs(_dx) < 50) return;
 			if (new Date() - lastSwipe < 400) return;
 			lastSwipe = new Date();
@@ -52,16 +57,18 @@ function MainContent_page({pageRenderer, onOpen, onClose}) {
 		this.openState = true;
 		this.HTML.page.classList.remove('hide');
 		try {
+			if (typeof onOpen !== 'function') return;
 			return onOpen(...arguments);
-		} catch (e) {console.error("Error while opening page", e)};
+		} catch (e) {console.warn("Error while opening page", e)};
 	}
 
 	this.close = function() {
 		this.openState = false;
 		this.HTML.page.classList.add('hide');
 		try {
+			if (typeof onClose !== 'function') return;
 			return onClose(...arguments);
-		} catch (e) {console.error("Error while closing page", e)};
+		} catch (e) {console.warn("Error while closing page", e)};
 	}
 }
 
@@ -222,3 +229,5 @@ function MainContent_serviceConfigPage() {
 
 
 
+
+export default MainContent;

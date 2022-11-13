@@ -1,16 +1,17 @@
+// import { panel } from './_services/CableLamp/interface.js';
+import MainContent from './mainContent.jsx';
 
-let MainContent;
+
 const App = new function() {
 	this.setup = function() {
-		MainContent = new _MainContent();
 		MainContent.setup();
-		Server.setup();
+		// Server.setup();
 	}
 }
-App.setup();
 
 
-function createElement(tagName, attrs = {}, ...children) {
+window.App = App;
+window.createElement = function(tagName, attrs = {}, ...children) {
   const elem = Object.assign(document.createElement(tagName), attrs);
   for (const child of children) {
     if (Array.isArray(child)) elem.append(...child)
@@ -19,3 +20,7 @@ function createElement(tagName, attrs = {}, ...children) {
 	if (attrs && attrs.ref) attrs.ref(elem);
   return elem
 }
+
+
+App.setup();
+export default App;
