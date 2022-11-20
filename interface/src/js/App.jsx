@@ -1,17 +1,18 @@
-// import { panel } from './_services/CableLamp/interface.js';
 import MainContent from './mainContent.jsx';
-
+import Server from './server/server.js';
 
 const App = new function() {
 	this.setup = function() {
 		console.log('App.setup');
 		MainContent.setup();
-		// Server.setup();
+		Server.setup();
 	}
 }
 
 
+window.Server = Server;
 window.App = App;
+
 window.createElement = function(tagName, attrs = {}, ...children) {
   const elem = Object.assign(document.createElement(tagName), attrs);
   for (const child of children) {

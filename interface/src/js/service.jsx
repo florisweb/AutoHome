@@ -1,3 +1,4 @@
+import Server from './server/server.js';
 
 export const ServiceManager = new function() {
 	this.services = [];

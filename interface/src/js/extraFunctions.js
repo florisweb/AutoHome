@@ -6,7 +6,7 @@ function $(_string) {
 
 
 
-function newId() {return Math.round(Math.random() * 100000000) + "" + Math.round(Math.random() * 100000000);}
+export function newId() {return Math.round(Math.random() * 100000000) + "" + Math.round(Math.random() * 100000000);}
 
 function setTextToElement(element, text) {
   element.innerHTML = "";

@@ -1,3 +1,5 @@
+import { newId } from '../extraFunctions.js';
+import Server from './server.js';
 
 const RequestManager = new class {
 	#requests = [];
@@ -49,9 +51,10 @@ const RequestManager = new class {
 	}
 }
 
+export default RequestManager;
 
 
-class Message {
+export class Message {
 	type;
 	data;
 	serviceId;
@@ -74,7 +77,7 @@ class Message {
 	}
 }
 
-class RequestMessage extends Message {
+export class RequestMessage extends Message {
 	#requestWrapper;
 	requestId;
 	#requestRegistered;
@@ -90,7 +93,7 @@ class RequestMessage extends Message {
 	}
 }
 
-class AuthMessage extends RequestMessage {
+export class AuthMessage extends RequestMessage {
 	id;
 	key;
 	constructor({id, key}) {
@@ -101,7 +104,7 @@ class AuthMessage extends RequestMessage {
 }
 
 
-class PushMessage extends Message {
+export class PushMessage extends Message {
 	
 }
 

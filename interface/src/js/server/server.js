@@ -1,7 +1,11 @@
 import Auth from '../auth.js';
+import { AuthMessage } from './message.js';
+import RequestManager from './message.js';
 
 const PROXY = Symbol();
 const DIRECT = Symbol();
+
+
 const Server = new function() {
 	const HTML = {
 		loadingScreen: logoBackground,
@@ -33,6 +37,7 @@ const Server = new function() {
 
 	this.mode = PROXY;
 	this.setup = function() {
+		console.warn('Server.setup...')
 		this.mode = this.siteIsPrimaryServer() ? DIRECT : PROXY;
 		this.mode = DIRECT;
 
@@ -50,7 +55,6 @@ const Server = new function() {
 	this.directConnect = function() {
 		let serverAuthenticated = false;
 		connectionAttempts++;
-
 		let onOpen = async () => {
 			let message = new AuthMessage({id: "InterfaceClient", key: Auth.getKey()});
 			let response = await message.send();
@@ -96,7 +100,6 @@ const Server = new function() {
 		}
 		let onClose = () => {
 			setTimeout(() => {This.connectAccordingToMode()}, 1000 * 5);
-			console.log('close');
 		}
 		let onMessage = (_message) => {
 			if (!proxyAuthenticated)
@@ -176,10 +179,12 @@ const Server = new function() {
 		}
 
 		Socket.onerror = function(_e) {
+			console.log('onError');
 			_onError(_e);
 		}
 		
 		Socket.onclose = function() {
+			console.log('onClose');
 			_onClose();
 		}
 	}
@@ -284,3 +289,4 @@ const Server = new function() {
 
 
 
+export default Server;

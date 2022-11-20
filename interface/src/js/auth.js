@@ -1,4 +1,4 @@
-export default const Auth = new function() {
+const Auth = new function() {
 	const keyIvSplitter = "&iv=";
 
 	this.getKey = function() {
@@ -23,3 +23,5 @@ export default const Auth = new function() {
 	this.setProxyKey = function(_key) {localStorage.proxyKey = _key}
 	this.getProxyKey = function() {return localStorage.proxyKey}
 }
+
+export default Auth;
