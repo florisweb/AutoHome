@@ -10,18 +10,6 @@ import ServiceManager from '../server/serviceManager.js';
 const ServiceDirectory = getCurDir() + '/../server/services/';
 const ServiceOutputDir = getCurDir() + '/src/js/_services/';
 
-await fse.emptyDir(ServiceOutputDir);
-await wait(10);
-
-
-
-let services = ServiceManager.getUIServices().map((service) => service.id);
-for (let serviceId of services) {
-	let curDir = ServiceDirectory + serviceId + '/interface';
-	symlink(curDir, ServiceOutputDir + serviceId);
-}
-
-
 
 
 function wait(_dt) {
@@ -43,7 +31,23 @@ function symlink(_sourceLocation, _targetLocation) {
 }
 
 
+const linkBuilder = {
+	build: async function() {
+		await fse.emptyDir(ServiceOutputDir);
+		await wait(50);
 
-function getCurDir() {
+		let services = ServiceManager.getUIServices().map((service) => service.id);
+		for (let serviceId of services) {
+			let curDir = ServiceDirectory + serviceId + '/interface';
+			symlink(curDir, ServiceOutputDir + serviceId);
+		}
+	}
+}
+
+
+export default linkBuilder;
+
+
+export function getCurDir() {
     return dirname(fileURLToPath(import.meta.url));
 }

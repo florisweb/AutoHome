@@ -4,6 +4,7 @@ import MainContent from './mainContent.jsx';
 
 const App = new function() {
 	this.setup = function() {
+		console.log('App.setup');
 		MainContent.setup();
 		// Server.setup();
 	}

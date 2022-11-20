@@ -1,12 +1,18 @@
-const path = require('path');
+import path from 'path';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-module.exports = {
+function getCurDir() {
+    return dirname(fileURLToPath(import.meta.url));
+}
+
+export default {
   entry: './src/js/App.jsx',
   // mode: "production",
   mode: "development",
   output: {
     filename: 'main_min.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(getCurDir(), 'dist'),
   },
   resolve: {
     extensions: ['', '.js', '.jsx']

@@ -1,5 +1,6 @@
 **/*.DS_Store
 **/node_modules/*
+interface/js/_services
 **/package-lock.json
 **/dist/*
 interface/dist/*
