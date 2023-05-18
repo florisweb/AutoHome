@@ -1,4 +1,7 @@
 import Server from './server/server.js';
+import ServiceIncludes from './_services/includer.js';
+console.log(ServiceIncludes);
+
 
 export const ServiceManager = new function() {
 	this.services = [];

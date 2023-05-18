@@ -36,11 +36,25 @@ const linkBuilder = {
 		await fse.emptyDir(ServiceOutputDir);
 		await wait(50);
 
+		let includeFileContent = '';
+
 		let services = ServiceManager.getUIServices().map((service) => service.id);
 		for (let serviceId of services) {
 			let curDir = ServiceDirectory + serviceId + '/interface';
 			symlink(curDir, ServiceOutputDir + serviceId);
+
+			includeFileContent += 'import ' + serviceId + ' from "./' + serviceId + '/interface.jsx";\n';
 		}
+		includeFileContent += 'let ServiceIncludes = {'
+			+ services.map((id) => id + ': ' + id).join(',') + 
+		'};';
+		includeFileContent += 'export default ServiceIncludes;';
+
+		fs.writeFile('src/js/_services/includer.js', includeFileContent, err => {
+		  if (err) {
+		    console.error(err);
+		  }
+		});
 	}
 }
 
