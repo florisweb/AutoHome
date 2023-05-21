@@ -1,4 +1,4 @@
-import { DownTimeGraph } from './components.jsx';
+import { DownTimeGraph, Graph } from './components.jsx';
 
 
 export class Panel {
@@ -36,7 +36,7 @@ export class HomePagePanel extends Panel {
 	render() {
 		let html = super.render();
 		html.addEventListener('click', () => {
-			if (!this.service.servicePage) return;
+			if (!this.service.page) return;
 			MainContent.servicePage.open(this.service);
 		});
 		return html;
@@ -65,8 +65,8 @@ export class GraphPanel extends Panel {
 	#graph;
 	#title;
 	#customClass;
-	constructor(_params = {panelTitle, customClass: "", xLabel, yLabel}) {
-		super(_params);
+	constructor({panelTitle, customClass, xLabel, yLabel}) {
+		super(arguments[0]);
 		this.#customClass = customClass;
 		this.#title = panelTitle;
 		this.#graph = new Graph(...arguments);

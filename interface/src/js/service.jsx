@@ -1,8 +1,13 @@
 import Server from './server/server.js';
 import { Page, PageHeader} from './page.jsx';
 
-export const ServiceManager = new function() {
+const ServiceManager = new function() {
 	this.services = [];
+
+	this.setup = function() {
+		for (let service of this.services) service.setup();
+	}
+
 	this.register = function(_service) {
 		this.services.push(_service);
 	}
@@ -10,11 +15,8 @@ export const ServiceManager = new function() {
 		return this.services.find((_service) => _service.serviceId == _id);
 	}
 }
-window.ServiceManager = ServiceManager;
 
-
-
-
+export default ServiceManager;
 
 
 
@@ -24,15 +26,20 @@ export class Service {
 	page;
 	panel;
 
-	constructor({id, name, pageContructor, panelConstructor}) {
+	#args;
+
+	constructor({id, name, pageConstructor, panelConstructor}) {
 		this.id = id;
 		this.name = name;
 
-		if (pageContructor) this.page = new pageContructor(this);
-		if (panelConstructor) this.panel = new panelConstructor(this);
-
-		Server.registerServiceListener(this);
+		this.#args = arguments[0];
 		ServiceManager.register(this);
+	}
+
+	setup() {
+		if (this.#args.pageConstructor) this.page = new this.#args.pageConstructor(this);
+		if (this.#args.panelConstructor) this.panel = new this.#args.panelConstructor(this);
+		Server.registerServiceListener(this);
 	}
 	
 
@@ -68,9 +75,9 @@ export class ServicePage extends Page {
 		};
 	}
 
-	// renderContent() {
-	// 	return [
-	// 		this.header.render()
-	// 	]
-	// }
+	renderContent() {
+		return [
+			this.header.render()
+		]
+	}
 } 

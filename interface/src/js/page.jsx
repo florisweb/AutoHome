@@ -1,4 +1,4 @@
-import { setTextToElement } from './extraFunctions.js';
+import { setTextToElement, appendContent } from './extraFunctions.js';
 import MainContent from './mainContent.jsx';
 
 
@@ -33,9 +33,7 @@ export class Page {
 
 		if (!this.#config.renderContentOnOpen) return;
 		this.html.pageContent.innerHTML = '';
-		let children = this.renderContent();
-		if (typeof children !== 'object') return this.html.pageContent.append(children);
-		for (let child of children) this.html.pageContent.append(child);
+		appendContent(this.html.pageContent, this.renderContent());		
 	}
 
 	close() {

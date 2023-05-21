@@ -3,7 +3,7 @@ import { Service } from '../../service.jsx';
 import panelConstructor from './panel.jsx';
 import pageConstructor from './page.jsx';
 
-export default new class InterfaceService extends Service {
+export default new class extends Service {
 	state = {
 		humidty: 0,
 		temperature: 0,

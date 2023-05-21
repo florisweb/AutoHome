@@ -1,17 +1,19 @@
 import MainContent from './mainContent.jsx';
 import Server from './server/server.js';
+import ServiceManager from './service.jsx';
 
 import ServiceIncludes from './_services/includer.js'; // Only import this so the service-code gets run and it can register itself at the ServiceManager
 
 const App = new function() {
 	this.setup = function() {
 		console.log('App.setup');
+		ServiceManager.setup();
 		MainContent.setup();
 		Server.setup();
 	}
 }
 
-
+window.ServiceManager = ServiceManager;
 window.Server = Server;
 window.App = App;
 window.MainContent = MainContent;

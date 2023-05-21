@@ -4,7 +4,10 @@ function $(_string) {
 }
 
 
-
+export function appendContent(_html, _children) {
+  if (typeof _children !== 'object') return _html.append(_children);
+  for (let child of _children) _html.append(child);
+}
 
 export function newId() {return Math.round(Math.random() * 100000000) + "" + Math.round(Math.random() * 100000000);}
 

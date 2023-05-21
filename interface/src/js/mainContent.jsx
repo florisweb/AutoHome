@@ -1,6 +1,7 @@
+import { appendContent } from './extraFunctions.js';
 import GestureManager from './gestureManager.js';
 import { DownTimePanel } from './panel.jsx';
-import { ServiceManager } from './service.jsx';
+import ServiceManager from './service.jsx';
 import { Page, PageHeader } from './page.jsx' ;
 
 import { RequestMessage } from './server/message.js';
@@ -71,14 +72,15 @@ class MainContent_servicePage extends Page {
 		super();
 
 	}
-	open() {
-		this.#renderPageContent();
+	open(_service) {
+		console.log(_service);
+		this.#renderPageContent(_service.page);
 		return super.open();
 	}
 
 	#renderPageContent(_servicePage) {
 		this.html.page.innerHTML = '';
-		this.html.page.append(_servicePage.render());
+		appendContent(this.html.page, _servicePage.renderContent());
 	}
 }
 
