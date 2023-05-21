@@ -8,7 +8,7 @@ function $(_string) {
 
 export function newId() {return Math.round(Math.random() * 100000000) + "" + Math.round(Math.random() * 100000000);}
 
-function setTextToElement(element, text) {
+export function setTextToElement(element, text) {
   element.innerHTML = "";
   let a = document.createElement('a');
   a.text = text;

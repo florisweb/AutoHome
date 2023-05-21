@@ -1,6 +1,6 @@
 import Server from './server/server.js';
 import ServiceIncludes from './_services/includer.js';
-console.log(ServiceIncludes);
+import { Page, PageHeader} from './page.jsx';
 
 
 export const ServiceManager = new function() {
@@ -15,56 +15,58 @@ export const ServiceManager = new function() {
 
 
 
-function Service({serviceId, name, icon, homeScreenPanel, servicePage}) {
-	this.serviceId 			= serviceId;
-	this.name			 	= name;
-	this.serviceIcon		= icon;
+export class Service {
+	id;
+	name;
+	page;
+	panel;
 
-	this.homeScreenPanel 	= homeScreenPanel;
-	this.servicePage 		= servicePage;
-	if (this.homeScreenPanel) 	this.homeScreenPanel.service = this;
-	if (this.servicePage) 		this.servicePage.service = this;
+	constructor({id, name, pageContructor, panelConstructor}) {
+		this.id = id;
+		this.name = name;
 
-	Server.registerServiceListener(this);
-	ServiceManager.register(this);
+		if (pageContructor) this.page = new pageContructor(this);
+		if (panelConstructor) this.panel = new panelConstructor(this);
 
-	this.getIconSrc = function() {console.warn('[Service] No icon for service', this.serviceId, 'yet.')}
+		Server.registerServiceListener(this);
+		ServiceManager.register(this);
+	}
+	
 
-	this.onEvent = () => {console.log("Service " + this.serviceId + " doesn't have it's onEvent handler set yet.", ...arguments)};
-	this.send = (_json) => {
+	// Functional Aspects
+	onEvent() {
+		console.log("Service " + this.serviceId + " doesn't have it's onEvent handler set yet.", ...arguments)
+	};
+	send(_json) {
 		_json.serviceId = this.serviceId;
 		return Server.send(_json);
 	};
 
-	this.identify = () => {
+	identify() {
 		this.send({type: "identify"});
 	}
 }
 
 
-function ServicePage(_params = {headerConfig: {}, serviceInfo: {}}) {
-	const This = this;
-	this.html = {};
-	this.openState = true; // TODO
-	this.serviceInfo = _params.serviceInfo;
 
-	PageWithHeader.call(this, {
-		..._params,
-		title: _params.serviceInfo.name,
-		headerConfig: {
-			..._params.headerConfig,
-			pageIconSrc: _params.serviceInfo.icon,
-			rightButtonSrc: 'images/hamburgerIcon.png',
-			pageIconInBox: true,
-		},
-	});
+export class ServicePage extends Page {
+	header;
 
-	this.HTML.rightButton.onclick = function() {
-		MainContent.serviceConfigPage.open(ServiceManager.getService(This.serviceInfo.serviceId));
-	};
-	this.HTML.leftButton.onclick = function() {
-		MainContent.homePage.open();
-	};
+	constructor({headerConfig}, _service) {
+		// super({});
 
-	this.render = this.renderPageContent;
+		this.header = new PageHeader(headerConfig);
+		this.header.html.rightButton.onclick = function() {
+			MainContent.serviceConfigPage.open(_service);
+		};
+		this.header.html.leftButton.onclick = function() {
+			MainContent.homePage.open();
+		};
+	}
+
+	// renderContent() {
+	// 	return [
+	// 		this.header.render()
+	// 	]
+	// }
 } 

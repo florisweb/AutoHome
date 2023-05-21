@@ -1,6 +1,9 @@
 import GestureManager from './gestureManager.js';
 import { DownTimePanel } from './panel.jsx';
 import { ServiceManager } from './service.jsx';
+import { Page, PageHeader } from './page.jsx' ;
+
+import { RequestMessage } from './server/message.js';
 
 
 const MainContent = new function() {
@@ -34,111 +37,21 @@ const MainContent = new function() {
 		});
 	}
 }
+export default MainContent;
 
 
-function MainContent_page({pageRenderer, onOpen, onClose}) {
-	this.HTML = {};
-	this.openState = false;
-	this.render = function() {
-		this.HTML.page = <div className='page hide'>	
-						{this.renderPageContent()}
-					</div>;
-		return this.HTML.page;
-	}
-	this.renderPageContent = function() {
-		return <div className='pageContent'>
-			{pageRenderer()}
-		</div>;
+
+class MainContent_homePage extends Page {
+	header;
+	constructor() {
+		super();
+		this.header = new PageHeader({
+			pageIconSrc: 'images/logoInverted.png', 
+		});
+		this.header.title = 'ThuisWolk';
 	}
 
-	this.open = function() {
-		if (MainContent.curPage) MainContent.curPage.close();
-		MainContent.curPage = this;
-		this.openState = true;
-		this.HTML.page.classList.remove('hide');
-		try {
-			if (typeof onOpen !== 'function') return;
-			return onOpen(...arguments);
-		} catch (e) {console.warn("Error while opening page", e)};
-	}
-
-	this.close = function() {
-		this.openState = false;
-		this.HTML.page.classList.add('hide');
-		try {
-			if (typeof onClose !== 'function') return;
-			return onClose(...arguments);
-		} catch (e) {console.warn("Error while closing page", e)};
-	}
-}
-
-function PageWithHeader({
-		pageRenderer, 
-		title, 
-		headerConfig = {},
-		onOpen, 
-		onClose
-	}) {
-	headerConfig = {
-		pageIconSrc: 'images/logoInverted.png', 
-		pageIconInBox: true, 
-		leftButtonSrc: 'images/backIcon.png', 
-		rightButtonSrc: '',
-		...headerConfig,
-	};
-
-	const This = this;
-	MainContent_page.call(this, {
-		...arguments[0],
-		pageRenderer: render
-	});
-
-	this.HTML.pageIcon = <img src={headerConfig.pageIconSrc} className={'icon overviewIcon ' + (headerConfig.pageIconInBox ? 'whiteBackgroundBox' : '')}></img>;
-	this.HTML.leftButton = <img src={headerConfig.leftButtonSrc} className='icon overviewIcon overviewButton'></img>;
-	this.HTML.rightButton = <img src={headerConfig.rightButtonSrc} className='icon overviewIcon overviewButton'></img>;
-	if (!headerConfig.leftButtonSrc) this.HTML.leftButton.classList.add('hide');
-	if (!headerConfig.rightButtonSrc) this.HTML.rightButton.classList.add('hide');
-
-
-	function render() {
-		This.HTML.pageTitle = <div className='text title'>{title}</div>;
-		This.HTML.pageOverview = <div className='pageOverview' style='margin-bottom: 50px'>
-			<div className='iconHolder'>
-				<div>{This.HTML.leftButton}</div>
-				{This.HTML.pageIcon}
-				<div>{This.HTML.rightButton}</div>
-			</div>
-			{This.HTML.pageTitle}
-		</div>;
-
-		return [
-			This.HTML.pageOverview,
-			<div className='panelBoxHolder'>
-				{pageRenderer()}
-			</div>
-		];
-	}
-}
-
-
-
-
-
-
-
-function MainContent_homePage() {
-	PageWithHeader.call(this, {
-		pageRenderer: render,
-		title: "ThuisWolk",
-		headerConfig: {
-			pageIconSrc: 'images/logoInverted.png',
-			leftButtonSrc: false,
-			pageIconInBox: false,
-		}
-	});
-
-
-	function render() {
+	renderContent() {
 		let servicePanels = [];
 		for (let service of ServiceManager.services)
 		{
@@ -146,88 +59,99 @@ function MainContent_homePage() {
 			servicePanels.push(service.homeScreenPanel.render());
 		}
 
-		return <div className='PanelBox'>{servicePanels}</div>;
+		return [
+			this.header.render(),
+			<div className='PanelBox'>{servicePanels}</div>
+		];
 	}
 }
 
-function MainContent_servicePage() {
-	MainContent_page.call(this, {
-		pageRenderer: () => <div>Loading...</div>,
-		onOpen: onOpen
-	});
-	const This = this;
+class MainContent_servicePage extends Page {
+	constructor() {
+		super();
 
-	function onOpen(_service) {
-		renderPageContent(_service.servicePage);
+	}
+	open() {
+		this.#renderPageContent();
+		return super.open();
 	}
 
-	function renderPageContent(_servicePage) {
-		This.HTML.page.innerHTML = '';
-		This.HTML.page.append(_servicePage.render());
+	#renderPageContent(_servicePage) {
+		this.html.page.innerHTML = '';
+		this.html.page.append(_servicePage.render());
 	}
 }
 
 
-function MainContent_serviceConfigPage() {
-	PageWithHeader.call(this, {
-		pageRenderer: () => [],
-		headerConfig: {
-			pageIconInBox: false,
-		}
-	});
 
-	MainContent_page.call(this, {
-		pageRenderer: () => [],
-		onOpen: onOpen
-	});
-	
-	const This = this;
-	this.curService = false;
 
-	function onOpen(_service) {
-		This.curService = _service;
-		renderPageContent(_service);
+class MainContent_serviceConfigPage extends Page {
+	curService;
+	downTimePanel;
+
+	constructor() {
+		super();
+		this.header = new PageHeader({
+			pageIconSrc: 'images/lightBolbOff.png', 
+			leftButtonSrc: 'images/backIcon.png', 
+			rightButtonSrc: '',
+		});
+		this.header.html.leftButton.addEventListener('click', () => MainContent.homePage.open());
+
+		this.downTimePanel = new DownTimePanel({size: [2, 3]});
+
+		// let placeHolderButton 	= <img className='icon overviewIcon overviewButton' style='opacity: 0'></img>;
 	}
 
-	let downTimePanel 		= new DownTimePanel({size: [2, 3]})
-	let backButton 			= <img src='images/backIcon.png' className='icon overviewIcon overviewButton' onclick={() => {MainContent.homePage.open()}}></img>;
-	let icon 				= <img src='images/lightBolbOff.png' className='icon overviewIcon whiteBackgroundBox' onclick={() => {CableLamp.toggleLight()}}></img>;
-	let placeHolderButton 	= <img className='icon overviewIcon overviewButton' style='opacity: 0'></img>;
+	open(_service) {
+		this.curService = _service;
+		this.header.title = _service.name;
+		this.renderPageContent(_service);
 
-	function renderPageContent(_service) {
-		let request = new RequestMessage({type: 'getDownTime'}, _service);
-		request.send().then(This.updateDownTimePanel);
-		
-		let pageContent = <div className='pageContent'>
-			<div className='pageOverview' style='margin-bottom: 50px'>
-				<div className='iconHolder'>
-					<div>{backButton}</div>
-					{icon}
-					<div>{placeHolderButton}</div>
-				</div>
-				<div className='text title'>{_service.name}</div>
-			</div>
+		return super.open();
+	}
+
+	renderContent() {
+		let request = new RequestMessage({type: 'getDownTime'}, this.curService);
+		request.send().then(this.updateDownTimePanel);
+		return [
+			this.header.render(),
 			<div className='panelBoxHolder'>
 				<div className='PanelBox'>
-					{downTimePanel.render()}
+					{ this.downTimePanel.render() }
 				</div>
 			</div>
-		</div>;
-		backButton.onclick = () => {
-			MainContent.servicePage.open(_service);
-		}
-
-		This.HTML.page.innerHTML = '';
-		This.HTML.page.append(pageContent);
+		];
 	}
+	// renderPageContent(_service) {
+	// 	let pageContent = <div className='pageContent'>
+	// 		<div className='pageOverview' style='margin-bottom: 50px'>
+	// 			<div className='iconHolder'>
+	// 				<div>{backButton}</div>
+	// 				{icon}
+	// 				<div>{placeHolderButton}</div>
+	// 			</div>
+	// 			<div className='text title'>{_service.name}</div>
+	// 		</div>
+	// 		<div className='panelBoxHolder'>
+	// 			<div className='PanelBox'>
+	// 				{downTimePanel.render()}
+	// 			</div>
+	// 		</div>
+	// 	</div>;
+	// 	backButton.onclick = () => {
+	// 		MainContent.servicePage.open(_service);
+	// 	}
+
+	// 	This.HTML.page.innerHTML = '';
+	// 	This.HTML.page.append(pageContent);
+	// }
 
 
-	this.updateDownTimePanel = function(_data) {
-		downTimePanel.setData(_data);
-	}
+	// this.updateDownTimePanel = function(_data) {
+	// 	downTimePanel.setData(_data);
+	// }
 }
 
 
 
-
-export default MainContent;

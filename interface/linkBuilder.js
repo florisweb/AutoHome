@@ -41,7 +41,8 @@ const linkBuilder = {
 		let services = ServiceManager.getUIServices().map((service) => service.id);
 		for (let serviceId of services) {
 			let curDir = ServiceDirectory + serviceId + '/interface';
-			symlink(curDir, ServiceOutputDir + serviceId);
+			// symlink(curDir, ServiceOutputDir + serviceId);
+			fse.copySync(curDir, ServiceOutputDir + serviceId, {overwrite: true, recursive: true});
 
 			includeFileContent += 'import ' + serviceId + ' from "./' + serviceId + '/interface.jsx";\n';
 		}
