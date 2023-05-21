@@ -66,7 +66,11 @@ export class ServicePage extends Page {
 		super();
 		this.service = _service;
 
-		this.header = new PageHeader(headerConfig);
+
+		this.header = new PageHeader({
+			...headerConfig,
+			rightButtonSrc: 'images/hamburgerIcon.png',
+		});
 		this.header.html.rightButton.onclick = function() {
 			MainContent.serviceConfigPage.open(_service);
 		};
@@ -81,3 +85,10 @@ export class ServicePage extends Page {
 		]
 	}
 } 
+
+
+
+
+
+
+

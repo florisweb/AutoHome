@@ -1,1 +1,2 @@
-export const page = 2;
+let page = 2;
+export default page;

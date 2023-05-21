@@ -56,6 +56,9 @@ export class PageHeader {
 	set title(_newTitle) {
 		setTextToElement(this.html.pageTitle, _newTitle);
 	}
+	set pageIconSrc(_src) {
+		this.html.pageIcon.setAttribute('src', _src);
+	}
 
 	constructor(_config = {leftButtonSrc, pageIconSrc, rightButtonSrc, pageIconInBox}) {
 		Object.assign(this.#config, _config);

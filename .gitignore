@@ -4,6 +4,7 @@ interface/js/_services
 **/package-lock.json
 **/dist/*
 interface/dist/*
+interface/src/js/_services/*
 server/serviceConfig.json
 server/config.json
 server/DBData/*

@@ -47,7 +47,9 @@ class MainContent_homePage extends Page {
 	constructor() {
 		super({renderContentOnOpen: true});
 		this.header = new PageHeader({
+			pageIconInBox: false,
 			pageIconSrc: 'images/logoInverted.png', 
+			leftButtonSrc: false,
 		});
 		this.header.title = 'ThuisWolk';
 	}
@@ -70,8 +72,8 @@ class MainContent_homePage extends Page {
 class MainContent_servicePage extends Page {
 	constructor() {
 		super();
-
 	}
+	
 	open(_service) {
 		console.log(_service);
 		this.#renderPageContent(_service.page);
@@ -107,6 +109,7 @@ class MainContent_serviceConfigPage extends Page {
 
 	open(_service) {
 		this.curService = _service;
+		console.log(_service, window.h = this.header);
 		this.header.title = _service.name;
 		this.renderPageContent(_service);
 

@@ -5,7 +5,7 @@ export class Panel {
 	html = {};
 	#size = [1, 1];
 	constructor({size}) {
-		this.size = size;
+		this.#size = size;
 	}	
 	
 	render() {
