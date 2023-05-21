@@ -28,8 +28,9 @@ export class Panel {
 export class HomePagePanel extends Panel {
 	service; 
 	#isOnline = false;
-	constructor() {
+	constructor(_args, _service) {
 		super(...arguments);
+		this.service = _service;
 	}
 
 	render() {

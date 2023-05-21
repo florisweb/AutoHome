@@ -4,19 +4,21 @@ import MainContent from './mainContent.jsx';
 
 export class Page {
 	html = {}
+	#config = {};
 
 	get openState() {
 		return !this.html.page.classList.contains('hide');
 	}
-	constructor() {
-
+	constructor(_config = {renderContentOnOpen: false}) {
+		this.#config = _config;
 	}
 
 	render() {
-		this.html.page = <div className='page hide'>	
-			<div className='pageContent'>
+		this.html.pageContent = <div className='pageContent'>
 				{this.renderContent()}
-			</div>
+		</div>;
+		this.html.page = <div className='page hide'>	
+			{this.html.pageContent}
 		</div>;
 		return this.html.page;
 	}
@@ -28,6 +30,12 @@ export class Page {
 		if (MainContent.curPage) MainContent.curPage.close();
 		MainContent.curPage = this;
 		this.html.page.classList.remove('hide');
+
+		if (!this.#config.renderContentOnOpen) return;
+		this.html.pageContent.innerHTML = '';
+		let children = this.renderContent();
+		if (typeof children !== 'object') return this.html.pageContent.append(children);
+		for (let child of children) this.html.pageContent.append(child);
 	}
 
 	close() {

@@ -44,7 +44,7 @@ export default MainContent;
 class MainContent_homePage extends Page {
 	header;
 	constructor() {
-		super();
+		super({renderContentOnOpen: true});
 		this.header = new PageHeader({
 			pageIconSrc: 'images/logoInverted.png', 
 		});
@@ -55,8 +55,8 @@ class MainContent_homePage extends Page {
 		let servicePanels = [];
 		for (let service of ServiceManager.services)
 		{
-			if (!service.homeScreenPanel) continue;
-			servicePanels.push(service.homeScreenPanel.render());
+			if (!service.panel) continue;
+			servicePanels.push(service.panel.render());
 		}
 
 		return [
@@ -112,8 +112,9 @@ class MainContent_serviceConfigPage extends Page {
 	}
 
 	renderContent() {
+		if (!this.curService) return [];
 		let request = new RequestMessage({type: 'getDownTime'}, this.curService);
-		request.send().then(this.updateDownTimePanel);
+		request.send().then((_data) => this.updateDownTimePanel(_data));
 		return [
 			this.header.render(),
 			<div className='panelBoxHolder'>
@@ -148,9 +149,10 @@ class MainContent_serviceConfigPage extends Page {
 	// }
 
 
-	// this.updateDownTimePanel = function(_data) {
-	// 	downTimePanel.setData(_data);
-	// }
+	updateDownTimePanel(_data) {
+		console.log(_data);
+		this.downTimePanel.setData(_data);
+	}
 }
 
 

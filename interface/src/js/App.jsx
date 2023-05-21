@@ -1,6 +1,8 @@
 import MainContent from './mainContent.jsx';
 import Server from './server/server.js';
 
+import ServiceIncludes from './_services/includer.js'; // Only import this so the service-code gets run and it can register itself at the ServiceManager
+
 const App = new function() {
 	this.setup = function() {
 		console.log('App.setup');
@@ -12,6 +14,7 @@ const App = new function() {
 
 window.Server = Server;
 window.App = App;
+window.MainContent = MainContent;
 
 window.createElement = function(tagName, attrs = {}, ...children) {
   const elem = Object.assign(document.createElement(tagName), attrs);

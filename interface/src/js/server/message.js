@@ -14,12 +14,13 @@ const RequestManager = new class {
 			error: 				errorer,
 		}
 		_request.requestId = requestWrapper.id;
-		if (_request.send(_request) === false) requestWrapper.error();
 		this.#requests.push(requestWrapper);
 		requestWrapper.callbackPromise.then(
 			() => this.removeRequestById(requestWrapper.id), 
 			() => this.removeRequestById(requestWrapper.id)
 		);
+
+		if (_request.send() === false) requestWrapper.error();
 		return requestWrapper;
 	}
 

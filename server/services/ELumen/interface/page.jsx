@@ -1,12 +1,12 @@
 import { ServicePage } from '../../service.jsx';
 
 export default class extends ServicePage {
-    constructor() {
+    constructor(_service) {
         super({
             headerConfig: {
                 pageIconInBox: true,    
             }
-        })
+        }, _service);
 
         // this.moisturePanel = new function() {
         //     GraphPanel.call(this, {

@@ -39,7 +39,6 @@ const Server = new class {
 		this.Socket = new WebSocket(this.socketServerURL);
 
 		this.Socket.onmessage = (_event) => { 
-			console.log('onMessage', this);
 			let message = JSON.parse(_event.data);
 			switch (message.type)
 			{

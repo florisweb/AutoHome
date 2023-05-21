@@ -1,7 +1,5 @@
 import Server from './server/server.js';
-import ServiceIncludes from './_services/includer.js';
 import { Page, PageHeader} from './page.jsx';
-
 
 export const ServiceManager = new function() {
 	this.services = [];
@@ -12,6 +10,11 @@ export const ServiceManager = new function() {
 		return this.services.find((_service) => _service.serviceId == _id);
 	}
 }
+window.ServiceManager = ServiceManager;
+
+
+
+
 
 
 
@@ -50,10 +53,11 @@ export class Service {
 
 
 export class ServicePage extends Page {
+	service;
 	header;
-
 	constructor({headerConfig}, _service) {
-		// super({});
+		super();
+		this.service = _service;
 
 		this.header = new PageHeader(headerConfig);
 		this.header.html.rightButton.onclick = function() {

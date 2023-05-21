@@ -1,10 +1,9 @@
 import { Service } from '../../service.jsx';
 
 import panelConstructor from './panel.jsx';
-// import pageConstructor from './page.jsx';
+import pageConstructor from './page.jsx';
 
-
-export default new class extends Service {
+export default new class InterfaceService extends Service {
 	state = {
 		humidty: 0,
 		temperature: 0,
@@ -15,7 +14,7 @@ export default new class extends Service {
 			id: 'ELumen',
 			name: 'eLumen',
 			panelConstructor: panelConstructor,
-			// pageConstructor: pageConstructor,
+			pageConstructor: pageConstructor,
 		});
 	}
 
