@@ -38,9 +38,6 @@ export default class extends ServicePage {
         ];
     }
 
-    updateData() {
-
-    }
     
     updateGraph(_data) {
         this.#updateMoistureGraph(_data);

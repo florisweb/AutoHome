@@ -4,7 +4,7 @@ import { DownTimeGraph, Graph } from './components.jsx';
 export class Panel {
 	html = {};
 	#size = [1, 1];
-	constructor({size}) {
+	constructor({size} = {size: [1, 1]}) {
 		this.#size = size;
 	}	
 	

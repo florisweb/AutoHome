@@ -1,3 +1,5 @@
+import { setTextToElement } from './extraFunctions.js';
+
 const Colors = [
   '#f00',
   '#0f0',
