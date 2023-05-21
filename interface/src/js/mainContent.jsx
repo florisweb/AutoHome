@@ -75,7 +75,6 @@ class MainContent_servicePage extends Page {
 	}
 	
 	open(_service) {
-		console.log(_service);
 		this.#renderPageContent(_service.page);
 		return super.open();
 	}
@@ -94,24 +93,21 @@ class MainContent_serviceConfigPage extends Page {
 	downTimePanel;
 
 	constructor() {
-		super();
+		super({renderContentOnOpen: true});
 		this.header = new PageHeader({
 			pageIconSrc: 'images/lightBolbOff.png', 
 			leftButtonSrc: 'images/backIcon.png', 
-			rightButtonSrc: '',
+			rightButtonSrc: false,
 		});
-		this.header.html.leftButton.addEventListener('click', () => MainContent.homePage.open());
+		this.header.html.leftButton.addEventListener('click', () => MainContent.servicePage.open(this.curService));
 
 		this.downTimePanel = new DownTimePanel({size: [2, 3]});
-
-		// let placeHolderButton 	= <img className='icon overviewIcon overviewButton' style='opacity: 0'></img>;
 	}
 
 	open(_service) {
 		this.curService = _service;
-		console.log(_service, window.h = this.header);
 		this.header.title = _service.name;
-		this.renderPageContent(_service);
+		this.header.pageIconSrc = _service.iconSrc;
 
 		return super.open();
 	}
@@ -129,33 +125,8 @@ class MainContent_serviceConfigPage extends Page {
 			</div>
 		];
 	}
-	// renderPageContent(_service) {
-	// 	let pageContent = <div className='pageContent'>
-	// 		<div className='pageOverview' style='margin-bottom: 50px'>
-	// 			<div className='iconHolder'>
-	// 				<div>{backButton}</div>
-	// 				{icon}
-	// 				<div>{placeHolderButton}</div>
-	// 			</div>
-	// 			<div className='text title'>{_service.name}</div>
-	// 		</div>
-	// 		<div className='panelBoxHolder'>
-	// 			<div className='PanelBox'>
-	// 				{downTimePanel.render()}
-	// 			</div>
-	// 		</div>
-	// 	</div>;
-	// 	backButton.onclick = () => {
-	// 		MainContent.servicePage.open(_service);
-	// 	}
-
-	// 	This.HTML.page.innerHTML = '';
-	// 	This.HTML.page.append(pageContent);
-	// }
-
 
 	updateDownTimePanel(_data) {
-		console.log(_data);
 		this.downTimePanel.setData(_data);
 	}
 }

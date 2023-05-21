@@ -3,11 +3,7 @@ import { GraphPanel } from '../../panel.jsx';
 
 export default class extends ServicePage {
     constructor(_service) {
-        super({
-            headerConfig: {
-                pageIconInBox: true,    
-            }
-        }, _service);
+        super({headerConfig: {}}, _service);
 
         this.moisturePanel = new GraphPanel({
             panelTitle: "Moisture", 

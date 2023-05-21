@@ -12,7 +12,8 @@ export default new class extends Service {
 	constructor() {
 		super({
 			id: 'ELumen',
-			name: 'eLumen',
+			name: 'ELumen',
+			iconSrc: 'images/eLumenIcon.png',
 			panelConstructor: panelConstructor,
 			pageConstructor: pageConstructor,
 		});

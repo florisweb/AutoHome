@@ -25,12 +25,14 @@ export class Service {
 	name;
 	page;
 	panel;
+	iconSrc;
 
 	#args;
 
-	constructor({id, name, pageConstructor, panelConstructor}) {
+	constructor({id, name, pageConstructor, panelConstructor, iconSrc}) {
 		this.id = id;
 		this.name = name;
+		this.iconSrc = iconSrc;
 
 		this.#args = arguments[0];
 		ServiceManager.register(this);
@@ -68,9 +70,11 @@ export class ServicePage extends Page {
 
 
 		this.header = new PageHeader({
+			pageIconSrc: _service.iconSrc,
 			...headerConfig,
 			rightButtonSrc: 'images/hamburgerIcon.png',
 		});
+		this.header.title = _service.name;
 		this.header.html.rightButton.onclick = function() {
 			MainContent.serviceConfigPage.open(_service);
 		};
