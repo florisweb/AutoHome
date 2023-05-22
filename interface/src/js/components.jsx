@@ -1,4 +1,5 @@
 import { setTextToElement } from './extraFunctions.js';
+import Time from './time.js';
 
 const Colors = [
   '#f00',
