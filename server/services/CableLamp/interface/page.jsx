@@ -42,7 +42,6 @@ export default class extends ServicePage {
 			this.html.self
 		]
 	}
-
 		
 
 	setLampState(_lampOn) {
@@ -58,7 +57,7 @@ export default class extends ServicePage {
 		this.programPanel.dropDown.setOptions(options);
 	}
 
-	updateContent = function() {
+	updateContent() {
 		this.setLampState(this.service.state.lampOn);
 		this.updatePrograms();
 		this.alarmPanel.setAlarmData(this.service.state.alarm);

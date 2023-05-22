@@ -24,11 +24,11 @@ export default new class extends Service {
 		{
 			case "curState": 
 				this.state = _event.data;
-				this.homeScreenPanel.updateData();
-				this.servicePage.updateData();
+				this.panel.updateData();
+				this.page.updateData();
 			break;
 			case "data": 
-				this.servicePage.updateGraph(_event.data);
+				this.page.updateGraph(_event.data);
 			break;
 		}
 	}

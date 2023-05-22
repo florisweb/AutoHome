@@ -38,6 +38,9 @@ export default class extends ServicePage {
         ];
     }
 
+    updateData() {
+        console.log('TODO', ...arguments);
+    }
     
     updateGraph(_data) {
         this.#updateMoistureGraph(_data);

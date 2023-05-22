@@ -29,23 +29,23 @@ export default new class extends Service {
 		{
 			case "onlineStatusUpdate": 
 				this.state.deviceOnline = _event.data;
-				this.homeScreenPanel.setOnlineState(this.state.deviceOnline);
+				this.panel.setOnlineState(this.state.deviceOnline);
 			break;
 			case "curState": 
 				this.state = _event.data;
-				this.servicePage.updateContent();
-				this.homeScreenPanel.setLampState(this.state.lampOn);
-				this.homeScreenPanel.setOnlineState(this.state.deviceOnline);
-				this.homeScreenPanel.setPreparedProgramIndicator(this.state.alarm);
+				this.page.updateContent();
+				this.panel.setLampState(this.state.lampOn);
+				this.panel.setOnlineState(this.state.deviceOnline);
+				this.panel.setPreparedProgramIndicator(this.state.alarm);
 			break;
 			case "lampStatus": 
 				this.state.lampOn = _event.data;
-				this.homeScreenPanel.setLampState(this.state.lampOn); 
-				this.servicePage.setLampState(this.state.lampOn);
+				this.panel.setLampState(this.state.lampOn); 
+				this.page.setLampState(this.state.lampOn);
 			break;
 			case "programs": 
 				this.programs = _event.data;
-				this.servicePage.updateContent();
+				this.page.updateContent();
 			break;
 		}
 	}
