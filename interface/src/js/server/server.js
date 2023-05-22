@@ -34,10 +34,8 @@ const Server = new class {
 
 	connect() {
 		let serverAuthenticated = false;
-		// connectionAttempts++;
 
 		this.Socket = new WebSocket(this.socketServerURL);
-
 		this.Socket.onmessage = (_event) => { 
 			let message = JSON.parse(_event.data);
 			switch (message.type)
@@ -45,7 +43,7 @@ const Server = new class {
 				case 'heartbeat': lastHeartbeat = new Date(); break;
 				default: 
 					if (message.isResponse) return RequestManager.onMessageReceive(message);
-					let service = this.#serviceListeners.find((_service) => {return _service.serviceId == message.serviceId});
+					let service = this.#serviceListeners.find((_service) => {return _service.id == message.serviceId});
 					if (!service) return;
 					service.onEvent(message);
 				break;
@@ -53,7 +51,6 @@ const Server = new class {
 		};
 
 		this.Socket.onopen = async () => {
-			// connectionAttempts = 0;
 			let message = new AuthMessage({id: "InterfaceClient", key: Auth.getKey()});
 			let response = await message.send();
 			if (response.type !== 'auth') return;
@@ -67,8 +64,8 @@ const Server = new class {
 			this.#closeLoadScreen();
 		}
 
-		this.Socket.onerror = function(_e) {
-			console.log('onError');
+		this.Socket.onerror = function(_error) {
+			console.log('onError', _error);
 			Server.showMessage(_error);
 		}
 		

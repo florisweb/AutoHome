@@ -12,7 +12,7 @@ const ServiceManager = new function() {
 		this.services.push(_service);
 	}
 	this.getService = function(_id) {
-		return this.services.find((_service) => _service.serviceId == _id);
+		return this.services.find((_service) => _service.id == _id);
 	}
 }
 
@@ -47,10 +47,10 @@ export class Service {
 
 	// Functional Aspects
 	onEvent() {
-		console.log("Service " + this.serviceId + " doesn't have it's onEvent handler set yet.", ...arguments)
+		console.log("Service " + this.id + " doesn't have it's onEvent handler set yet.", ...arguments)
 	};
 	send(_json) {
-		_json.serviceId = this.serviceId;
+		_json.serviceId = this.id;
 		return Server.send(_json);
 	};
 
