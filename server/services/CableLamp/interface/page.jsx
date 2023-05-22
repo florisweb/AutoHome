@@ -52,7 +52,7 @@ export default class extends ServicePage {
 
 	updatePrograms() {
 		let options = this.service.programs.map((_program, _index) => {_program.value = _program; _program.value.index = _index; return _program});
-		let alarmOptions = [...options, {name: 'No Alarm', value: {index: false, program: []}}];
+		let alarmOptions = [...options, {name: 'No Alarm', value: {index: false, program: [], trigger: ''}}];
 		this.alarmPanel.dropDown.setOptions(alarmOptions);
 		this.programPanel.dropDown.setOptions(options);
 	}
@@ -117,8 +117,8 @@ class AlarmPanel extends Panel {
 		super();
 		this.#parent = _parent;
 		this.html.icon = <img className='panelIcon' src='images/timerIcon.png'></img>;
-		this.dropDown = new DropDown({onChange: this.#updateAlarm});
-		this.triggerInputField = new InputField({isTimeInput: true, onBlur: this.#updateAlarm});
+		this.dropDown = new DropDown({onChange: () => this.#updateAlarm()});
+		this.triggerInputField = new InputField({isTimeInput: true, onBlur: () => this.#updateAlarm()});
 	}
 
 	render() {
@@ -148,7 +148,7 @@ class AlarmPanel extends Panel {
 	}
 	setAlarmData(_alarm) {
 		if (!this.triggerInputField.html.self || !_alarm) return;
-		this.triggerInputField.html.self.value = _alarm.trigger;
+		this.triggerInputField.html.self.value = _alarm.trigger ? _alarm.trigger : '00:00';
 		if (this.dropDown.options.length <= _alarm.programIndex) return;
 		
 		let programIndex = _alarm.programIndex;
@@ -163,15 +163,14 @@ class ProgramPanel extends Panel {
 		super();
 		this.#parent = _parent;
 
-
 		this.html.icon = <img className='panelIcon' src='images/executeIcon.png'></img>;
 		this.dropDown = new DropDown();
 		this.runButton = new Button({
 			text: "Run",
 			boxy: true,
 			onclick: (_e) => {
-				if (!CurPanel.dropDown.value) return;
-				This.service.send({type: "executeGivenProgram", data: CurPanel.dropDown.value.program});
+				if (!this.dropDown.value) return;
+				this.#parent.service.send({type: "executeGivenProgram", data: this.dropDown.value.program});
 				_e.stopPropagation();
 			}
 		});
