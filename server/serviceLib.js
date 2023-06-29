@@ -1,6 +1,7 @@
 import ServiceManager from './serviceManager.js';
 import Errors from './errors.js';
 import { FileManager } from './DBManager.js';
+import { ServiceLogger } from './logger.js';
 
 
 
@@ -13,6 +14,7 @@ class DeviceServiceState extends ServiceState {
 export class Service {
     id;
     config;
+    logger;
     subscribers = [];
     curState = new ServiceState();
 
@@ -28,9 +30,10 @@ export class Service {
         this.id = id;
         this.#subscriberTemplate = _subscriberTemplate;
 
-        this.config = config;
-        this.requiredServices  = this.config.requires ? this.config.requires : [];
-        this.wantedServices    = this.config.wants ? this.config.wants : [];
+        this.config             = config;
+        this.requiredServices   = this.config.requires ? this.config.requires : [];
+        this.wantedServices     = this.config.wants ? this.config.wants : [];
+        this.logger             = new ServiceLogger(this);
     }
 
 
@@ -112,7 +115,7 @@ export class DeviceService extends Service {
 
     send(_message) {
         if (!this.deviceClient) return Errors.NotConnectedService;
-        this.deviceClient.send(JSON.stringify(_message));
+        this.deviceClient.send(_message.stringify());
     }
 
 

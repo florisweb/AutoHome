@@ -3,11 +3,14 @@ import ServiceManager from './serviceManager.js';
 import { clients } from './clients/baseClient.js';
 import { UnDifferentiatedClient } from './clients/unDifferentiatedClient.js';
 
+import Logger from './logger.js';
+
 import { WebSocketServer } from 'ws';
 
 const PORT = 8081;
 const wss = new WebSocketServer({ port: PORT });
 console.log("The WebSocket server is running on port " + PORT);
+Logger.log("The WebSocket server is running on port " + PORT, null, 'SYSTEM');
 
 wss.on("connection", _conn => {
   new UnDifferentiatedClient(_conn);
@@ -19,6 +22,6 @@ const interval = setInterval(function () {
     if (client.isAlive === false) return client.conn.terminate();
     client.isAlive = false;
     client.conn.ping();
-    client.send(JSON.stringify({type: "heartbeat"}));
+    client.send({type: "heartbeat"});
   });
 }, 10000);

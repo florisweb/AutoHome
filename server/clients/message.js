@@ -22,6 +22,15 @@ class Message {
         this.serviceId = serviceId;
         this._client = _client;
     }
+
+    stringify() {
+        let messsage = {
+            data: this.data,
+            type: this.type,
+            serviceId: this.serviceId
+        }
+        return JSON.stringify(messsage);
+    }
 }
 
 
@@ -41,6 +50,18 @@ class RequestMessage extends Message {
             response: _response
         });
     }
+
+
+    stringify() {
+        let messsage = {
+            data: this.data,
+            type: this.type,
+            serviceId: this.serviceId,
+            requestId: this.requestId,
+            isRequestMessage: true,
+        }
+        return JSON.stringify(messsage);
+    }
 }
 
 class AuthMessage extends RequestMessage {
@@ -51,6 +72,16 @@ class AuthMessage extends RequestMessage {
         super(...arguments);
         this.id = id;
         this.key = key;
+    }
+
+    stringify() {
+        let messsage = {
+            id: this.id,
+            key: this.key,
+            requestId: this.requestId,
+            isRequestMessage: true,
+        }
+        return JSON.stringify(messsage);
     }
 }
 

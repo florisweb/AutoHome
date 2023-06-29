@@ -1,4 +1,5 @@
 import { parseMessage } from './message.js';
+import Logger from '../logger.js';
 
 
 export let clients = [];
@@ -11,7 +12,7 @@ export class BaseClient {
     constructor(_conn) {
         this.conn = _conn;
         clients.push(this);
-        console.log('[Client Connected] Total: ' + clients.length);
+        // Logger.log('[Client Connected] Total: ' + clients.length, null, 'CLIENT');
 
         this.conn.on('pong',    () => {if (!this.isDead) this._onPong()});
         this.conn.on('close',   () => {if (!this.isDead) this._onClose()});
@@ -27,7 +28,7 @@ export class BaseClient {
     _onClose() {
         clients = clients.filter((client) => client.id != this.id);
         this.isDead = true;
-        console.log('[Client disconnected] ' + this.id + ' Total: ' + clients.length);
+        // Logger.log('[Client disconnected] ' + this.id + ' Total: ' + clients.length, null, 'CLIENT');
     }
 
     _onMessage(_buffer) { 
@@ -44,7 +45,6 @@ export class BaseClient {
         this._onClose();
     }
 }
-
 
 
 

@@ -1,0 +1,33 @@
+
+import { HomePagePanel } from '../../panel.jsx';
+import { setTextToElement } from '../../extraFunctions.js';
+
+export default class extends HomePagePanel {
+    constructor(_service) {
+        super({
+            size: [1, 1],
+        }, _service)
+    }
+    render() {
+        let html = super.render();
+        html.className += ' LogInterface hasIcon';
+        return html;
+    }
+
+    renderContent() {
+        let icon = <img className='panelIcon' src='images/eLumenIcon.png'></img>;
+        this.html.state = <div className='text subText waterPercentage'>x logs</div>;
+        this.html.icon = icon;
+        this.service.getLogs();
+
+        return [
+            icon,
+            this.html.state,
+            <div className='text panelTitle'>{this.service.name}</div>,
+        ];
+    }
+
+    async updateData(_data = []) {
+        setTextToElement(this.html.state, _data.length + ' logs');
+    }
+}

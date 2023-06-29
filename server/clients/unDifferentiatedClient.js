@@ -46,8 +46,7 @@ export class UnDifferentiatedClient extends BaseClient {
         
         let allowed = service.authenticate(message.key);
         if (!allowed) return message.respond({error: "Invalid Key"});
-
-        new DeviceClient(this.conn, this.service);
+        new DeviceClient(this.conn, service);
         message.respond({type: "auth", data: true});
         this.remove();
     }

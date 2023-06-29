@@ -17,6 +17,7 @@ const Server = new class {
 	Socket;
 	authenticated = false;
 
+	#lastHeartbeat = new Date();
 
 	#serviceListeners = [];
 	registerServiceListener = (_service) => {this.#serviceListeners.push(_service)}
@@ -40,7 +41,7 @@ const Server = new class {
 			let message = JSON.parse(_event.data);
 			switch (message.type)
 			{
-				case 'heartbeat': lastHeartbeat = new Date(); break;
+				case 'heartbeat': this.#lastHeartbeat = new Date(); break;
 				default: 
 					if (message.isResponse) return RequestManager.onMessageReceive(message);
 					let service = this.#serviceListeners.find((_service) => {return _service.id == message.serviceId});
