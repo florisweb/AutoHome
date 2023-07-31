@@ -3,11 +3,11 @@
 
 #mainContent .page {
     position: absolute;
-    left:  0;
-    top:  0;
-    padding:  10px;
-    width:  calc(100% - 10px * 2);
-    height: calc(100% - 10px * 2);
+    left: 0;
+    top: 0;
+    padding: 10px;
+    width:  100%;
+    height: 100%;
     
     overflow-x: hidden;
     overflow-y: visible;
