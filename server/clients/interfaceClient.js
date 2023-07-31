@@ -1,4 +1,3 @@
-
 import ServiceManager from '../serviceManager.js';
 import { SubscriptionList } from '../serviceLib.js';
 import { BaseClient } from './baseClient.js';
@@ -20,7 +19,6 @@ export class InterfaceClient extends BaseClient {
                 }
             }))
         );
-        console.log('Upgraded to InterfaceClient ' + this.id);
     }
 
 

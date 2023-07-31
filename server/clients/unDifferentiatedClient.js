@@ -1,3 +1,4 @@
+import Logger from '../logger.js';
 import * as crypto from "crypto";
 import ServiceManager from '../serviceManager.js';
 
@@ -27,7 +28,7 @@ export class UnDifferentiatedClient extends BaseClient {
         {
             if (!authenticateInterfaceClient(message.key))
             {
-                console.log('[Invalid key] InterfaceClient ' + this.id + " tried to connect with an invalid key.");
+                Logger.log('InterfaceClient ' + this.id + " tried to connect with an invalid key.", null, 'CONNECTOR');
                 message.respond({"type": "auth", "status": false, "error": "Invalid Key"});
                 this.conn.close();
                 return;

@@ -1,5 +1,4 @@
-
-
+import Logger from './logger.js';
 import { readdirSync } from 'fs'
 import { FileManager, getCurDir } from './DBManager.js';
 const __dirname = getCurDir();
@@ -51,14 +50,14 @@ export default new class {
     async loadServices() {
         let enabledServiceIds = Config.server.enabledServices;
         let installedServiceIds = await this.#getInstalledServiceIdList();
-        console.log('[ServiceManager]: Found ' + installedServiceIds.length + ' installed services.');
+        Logger.log('Found ' + installedServiceIds.length + ' installed services.', null, 'SERVICES');
 
         let promises = [];
         for (let id of enabledServiceIds)
         {
             if (!installedServiceIds.includes(id))
             {
-                console.log('[ServiceManager]: Error: Service ' + id + ' could not be found.');
+                Logger.log('Error: Service ' + id + ' could not be found.', null, 'SERVICES');
                 continue;
             }
 
@@ -74,17 +73,17 @@ export default new class {
 
         // Enable all services
         for (let service of Services) await this.#enableService(service);
-        console.log("[ServiceManager]: Succesfully loaded " + Services.length + "/" + enabledServiceIds.length + " enabled services and " + Services.length + '/' + installedServiceIds.length + ' installed services.');
+        Logger.log("Succesfully loaded " + Services.length + "/" + enabledServiceIds.length + " enabled services and " + Services.length + '/' + installedServiceIds.length + ' installed services.', null, 'SERVICES');
     }
 
 
     async #loadService(_serviceId) {
         let FM = new FileManager("../services/" + _serviceId + "/config.json");
-        if (!(await FM.fileExists())) return console.log('[ServiceManager]: Error: ' + _serviceId + '\'s config.json-file was not found.');
+        if (!(await FM.fileExists())) return Logger.log('Error: ' + _serviceId + '\'s config.json-file was not found.', null, 'SERVICES');
         let serviceConfig = await FM.getContent();
 
         let FMJS = new FileManager("../services/" + _serviceId + "/server/service.js");
-        if (!(await FM.fileExists())) return console.log('[ServiceManager]: Error: ' + _serviceId + '\'s service.js-file was not found.');
+        if (!(await FM.fileExists())) return Logger.log('Error: ' + _serviceId + '\'s service.js-file was not found.', null, 'SERVICES');
 
         await import('./services/' + _serviceId + '/server/service.js').then((mod) => {
             Services.push(new mod.default({id: _serviceId, config: serviceConfig}, serviceConfig));
@@ -98,7 +97,7 @@ export default new class {
 
     async #enableService(_service, _curDepth = 0) {
         if (_service.enabled) return;
-        if (_curDepth > 100) return console.log('[ServiceManager] ERROR Invalid require-order: stackoverflow');
+        if (_curDepth > 100) return Logger.log('Error: Invalid require-order: stackoverflow', null, 'SERVICES');
 
         for (let requiredServiceId of _service.requiredServices)
         {
@@ -119,7 +118,7 @@ export default new class {
         _service.onLoadRequiredServices(requiredServices);
         _service.enabled = true;
         
-        console.log("[ServiceManager] Enabled " + _service.id);
+        Logger.log("Enabled " + _service.id, null, 'SERVICES');
         await _service.enable();
         this.#resolveOnWantedServiceLoad(_service);
     }
@@ -128,7 +127,7 @@ export default new class {
         for (let service of Services)
         {
             if (!service.wantedServices.includes(_service.id)) continue;
-            console.log("[ServiceManager] Loaded wanted service " + _service.id + " of " + service.id + ".");
+            Logger.log("Loaded wanted service " + _service.id + " of " + service.id + ".", null, 'SERVICES');
             service.onWantedServiceLoad(service);
         }
     }

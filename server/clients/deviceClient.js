@@ -1,5 +1,7 @@
+import Logger from '../logger.js';
 import ServiceManager from '../serviceManager.js';
 import { BaseClient } from './baseClient.js';
+
 
 
 
@@ -13,7 +15,7 @@ export class DeviceClient extends BaseClient {
         super(_conn);
         this.service = _service;
         this.service.setDeviceClient(this);
-        console.log('Bound DeviceClient ' + this.id + ' to service ' + this.service.id);
+        Logger.log('Bound DeviceClient ' + this.id + " to service " + this.service.id, null, 'CONNECTOR');
     }
 
     _onMessage(_buffer) {    
