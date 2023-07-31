@@ -6,8 +6,6 @@ function CustomSubscriber(_config) {
     Subscriber.call(this, {..._config, handleRequest: handleRequest});
 
     async function handleRequest(_message) {
-        console.log('ELumensubscriber.handleRequest', _message);
-
         // Server intercepted messages
         switch (_message.type)
         {
@@ -42,7 +40,6 @@ export default function() {
 
 
     function onMessage(_message) {
-        console.log('ELumen.onMessage', _message);
         switch (_message.type)
         {
             case "sensorState": This.dataManager.addDataRow(_message.data); break;

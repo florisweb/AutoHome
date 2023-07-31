@@ -11,6 +11,7 @@ export function parseMessage(_string, _client) {
 
 
 class Message {
+    isMessage = true;
     type;
     data;
     serviceId;

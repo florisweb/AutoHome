@@ -241,8 +241,8 @@ export function Subscriber({onEvent, handleRequest = () => {}}) {
     this.service = false;
     this.onEvent = (_data) => {return onEvent(_data)}; // Given by client
 
-    this.handleRequest = async (_message) => { // Given by service
-        switch (_message.type )
+    this.handleRequest = async(_message) => { // Given by service
+        switch (_message.type)
         {
             case "getDownTime": 
                 let data = await this.service.downTimeTracker.getData();
