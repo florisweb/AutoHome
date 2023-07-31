@@ -37,7 +37,7 @@ class LogPanel extends Panel {
         });
     }
     renderContent() {
-        this.html.holder = <div></div>;
+        this.html.holder = <div className='logHolder'></div>;
         this.#updateContent();
         return this.html.holder;
     }
@@ -47,6 +47,7 @@ class LogPanel extends Panel {
     }
 
     #updateContent() {
+        if (!this.html.holder) return;
         this.html.holder.innerHTML = '';
         for (let log of this.#curData)
         {   
@@ -55,9 +56,9 @@ class LogPanel extends Panel {
     }
     #renderLogLine(_log) {
         let tagHolder = <div className='tagHolder'>{_log.tag}</div>;
-        let r = (_log.tag.charCodeAt(0) - 65) * 4 + 50;
-        let g = (_log.tag.charCodeAt(1) - 65) * 4 + 50;
-        let b = (_log.tag.charCodeAt(2) - 65) * 4 + 50;
+        let r = (_log.tag.charCodeAt(0) - 65) * 6 + 50;
+        let g = (_log.tag.charCodeAt(1) - 65) * 6 + 50;
+        let b = (_log.tag.charCodeAt(2) - 65) * 6 + 50;
         let color = 'rgb(' + (isNaN(r) ? 200 : r) + ',' + (isNaN(g) ? 200 : g) + ',' + (isNaN(b) ? 200 : b) + ')';
         tagHolder.style.background = color;
 
@@ -67,7 +68,7 @@ class LogPanel extends Panel {
             date: _log.date,
         };
         let content = _log.content ? '(' + JSON.stringify(newContent) + ')' : '';
-        
+
         return <div className='logLine'>
             {tagHolder}
             <div className='messageHolder'>{_log.message}</div>

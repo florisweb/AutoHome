@@ -12,7 +12,6 @@ function CustomSubscriber(_config) {
         switch (_message.type)
         {
             case "getLogs": 
-                console.log('get logs', await This.service.getLogs());
                 return This.onEvent({type: "data", data: await This.service.getLogs()});
         }
         // Default messages

@@ -4,10 +4,7 @@ import panelConstructor from './panel.jsx';
 import pageConstructor from './page.jsx';
 
 export default new class extends Service {
-	state = {
-		humidty: 0,
-		temperature: 0,
-	};
+	state = {};
 
 	constructor() {
 		super({
@@ -19,11 +16,10 @@ export default new class extends Service {
 		});
 	}
 
-	onEvent(_event){
+	onEvent(_event) {
 		switch (_event.type)
 		{
 			case "data": 
-				console.warn('data.logs:', _event.data);
 				this.panel.updateData(_event.data);
 				this.page.updateData(_event.data);
 			break;

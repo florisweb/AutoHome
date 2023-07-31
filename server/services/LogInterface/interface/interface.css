@@ -1,4 +1,14 @@
 
+
+.logHolder {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    padding: 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
 .logLine {
     position: relative;
     width: 100%;

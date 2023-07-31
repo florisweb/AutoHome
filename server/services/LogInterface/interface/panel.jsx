@@ -18,7 +18,13 @@ export default class extends HomePagePanel {
         let icon = <img className='panelIcon' src='images/eLumenIcon.png'></img>;
         this.html.state = <div className='text subText waterPercentage'>x logs</div>;
         this.html.icon = icon;
-        this.service.getLogs();
+
+        let sendForLogs = () => {
+            this.service.getLogs().then((_result) => {
+                if (_result === false) setTimeout(() => sendForLogs(), 100);
+            });
+        }
+        sendForLogs();
 
         return [
             icon,
