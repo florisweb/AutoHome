@@ -70,7 +70,7 @@
 
 #mainContent .page .pageOverview .icon.overviewIcon.whiteBackgroundBox {
     width: 60vw;
-    max-width: 60px;
+    max-width: 90px;
     background: #fff;
     padding: 20px;
     border-radius: 10px;
@@ -88,8 +88,8 @@
 
 #mainContent .page .pageOverview .iconHolder .overviewIcon.overviewButton {
     position: relative;
-    width: calc(60vw - 10px * 2);
-    max-width: calc(60px - 10px * 2);
+    width: 60vw;
+    max-width: 60px;
     height: auto;
 
     padding: 30px 10px;

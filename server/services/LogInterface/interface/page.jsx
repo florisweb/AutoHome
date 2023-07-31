@@ -47,7 +47,36 @@ class LogPanel extends Panel {
     }
 
     #updateContent() {
-        this.html.holder.innerHTML = this.#curData.map((row) => '[' + row.tag + ']: ' + row.message + ' (' + JSON.stringify(row.content) + ')').join('<br><br>');
+        this.html.holder.innerHTML = '';
+        for (let log of this.#curData)
+        {   
+            this.html.holder.append(this.#renderLogLine(log));
+        }
+    }
+    #renderLogLine(_log) {
+        let tagHolder = <div className='tagHolder'>{_log.tag}</div>;
+        let r = (_log.tag.charCodeAt(0) - 65) * 4 + 50;
+        let g = (_log.tag.charCodeAt(1) - 65) * 4 + 50;
+        let b = (_log.tag.charCodeAt(2) - 65) * 4 + 50;
+        let color = 'rgb(' + (isNaN(r) ? 200 : r) + ',' + (isNaN(g) ? 200 : g) + ',' + (isNaN(b) ? 200 : b) + ')';
+        tagHolder.style.background = color;
+
+
+        let newContent = {
+            ..._log.content,
+            date: _log.date,
+        };
+        let content = _log.content ? '(' + JSON.stringify(newContent) + ')' : '';
+        
+        return <div className='logLine'>
+            {tagHolder}
+            <div className='messageHolder'>{_log.message}</div>
+            <div className='contentHolder'>{content}</div>
+        </div>;
     }
 }
+
+
+
+
 

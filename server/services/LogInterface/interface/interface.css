@@ -1,0 +1,57 @@
+
+.logLine {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 30px;
+    margin-bottom: 10px;
+
+    display: flex;
+}
+.logLine > div {
+/*    flex: 1;*/
+}
+
+.logLine .tagHolder {
+    position: relative;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-right: 10px;
+
+    font-size: 12px;
+    height: 30px;
+    width: auto;
+    line-height: 20px;
+    text-transform: uppercase;
+}
+
+.logLine .messageHolder {
+    position: relative;
+    padding-top: 5px;
+    
+    height: auto;
+    min-height: 30px;
+    
+    line-height: 20px;
+    text-overflow: wrap;
+    white-space: normal;
+    
+    font-size: 12px;
+    margin-right: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.logLine .contentHolder {
+    position: relative;
+    padding-top: 5px;
+    
+    height: auto;
+    min-height: 30px;
+    
+    line-height: 20px;
+    text-overflow: wrap;
+    white-space: normal;
+    
+    border: 1px solid #eee;
+    font-size: 12px;
+}

@@ -18,6 +18,10 @@ body {
   background: #6496FF;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 
 
 #logoBackground {
