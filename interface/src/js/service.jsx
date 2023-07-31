@@ -68,14 +68,15 @@ export class ServicePage extends Page {
 		super();
 		this.service = _service;
 
-
-		this.header = new PageHeader({
+		let config = {
 			pageIconSrc: _service.iconSrc,
 			...headerConfig,
-			rightButtonSrc: 'images/hamburgerIcon.png',
-		});
+		};
+		if (config.rightButtonSrc === undefined) config.rightButtonSrc = 'images/hamburgerIcon.png';
+		this.header = new PageHeader(config);
 		this.header.title = _service.name;
-		this.header.html.rightButton.onclick = function() {
+		
+		if (config.rightButtonSrc) this.header.html.rightButton.onclick = function() {
 			MainContent.serviceConfigPage.open(_service);
 		};
 		this.header.html.leftButton.onclick = function() {

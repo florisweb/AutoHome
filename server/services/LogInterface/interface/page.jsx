@@ -3,7 +3,9 @@ import { Panel } from '../../panel.jsx';
 
 export default class extends ServicePage {
     constructor(_service) {
-        super({headerConfig: {}}, _service);
+        super({headerConfig: {
+            rightButtonSrc: false,
+        }}, _service);
 
         this.logPanel = new LogPanel();
     }
