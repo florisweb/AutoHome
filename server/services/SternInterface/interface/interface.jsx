@@ -23,10 +23,6 @@ export default new class extends Service {
 	onEvent(_event){
 		switch (_event.type)
 		{
-			case "onlineStatusUpdate": 
-				this.state.deviceOnline = _event.data;
-				this.panel.setOnlineState(this.state.deviceOnline);
-			break;
 			case "curState": 
 				this.state = _event.data;
 				this.panel.updateData();

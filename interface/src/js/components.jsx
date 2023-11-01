@@ -92,6 +92,45 @@ export function Button({onclick, text, customClass = '', boxy = false, filled = 
 }
 
 
+export class Slider {
+	#HTML = {}
+	#min = 0;
+	#max = 0;
+	get value() {
+		return this.#HTML.slider.value;
+	}
+	set value(_value) {
+		this.#HTML.slider.value = _value;
+		let perc = (this.value - this.#min) / (this.#max - this.#min);
+		this.#HTML.visualSlider.style.width = perc * 100 + '%';
+		this.#HTML.self.content = Math.round(perc * 100) + '%';
+	}
+
+	constructor({min = 0, max = 0, onInput, customClass}) {
+		this.#min = min;
+		this.#max = max;
+
+		let className = 'UISliderHolder ' + customClass ?? '';
+		this.#HTML.visualSlider = <div className='visualSlider'></div>
+		
+		this.#HTML.slider = <input type='range' min={min} max={max}></input>;
+		this.#HTML.slider.addEventListener('input', () => {
+			this.value = this.#HTML.slider.value;
+			try {
+				onInput(this.value);
+			} catch (e) {};
+		});
+
+		this.#HTML.self = <div className={className}>
+			{this.#HTML.slider}
+			{this.#HTML.visualSlider}
+		</div>;
+	}
+	render() {
+		return this.#HTML.self;
+	}
+}
+
 
 
 export function InputField({placeholder = null, isTimeInput, onChange, onBlur}) {

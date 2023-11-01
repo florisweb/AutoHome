@@ -5,9 +5,16 @@ import { ServiceLogger } from './logger.js';
 
 
 
-class ServiceState {}
-class DeviceServiceState extends ServiceState {
+export class ServiceState {
+    constructor(_params = {}) {
+        for (let key in _params) this[key] = _params[key];
+    }
+}
+export class DeviceServiceState extends ServiceState {
     deviceOnline = false;
+    constructor() {
+        super(...arguments);
+    }
 }
 
 
@@ -101,11 +108,7 @@ export class DeviceService extends Service {
 
         if (!isNewClient) return;
         this.downTimeTracker.updateConnectionState(!!this.deviceClient);
-
-        this.pushEvent({
-            type: "onlineStatusUpdate",
-            data: this.curState.deviceOnline
-        });
+        this.pushCurState();
         
         if (this.deviceClient) return this.onDeviceConnect();
         this.onDeviceDisconnect();

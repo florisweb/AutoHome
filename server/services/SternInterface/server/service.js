@@ -1,4 +1,4 @@
-import { Subscriber, SubscriptionList, Service } from '../../../serviceLib.js';
+import { Subscriber, SubscriptionList, Service, DeviceServiceState } from '../../../serviceLib.js';
 
 
 function CustomSubscriber(_config) {
@@ -11,16 +11,30 @@ function CustomSubscriber(_config) {
     }
 }
 
-export default class extends Service {
+export default class extends Service {    
     constructor({id, config}) {
         super(arguments[0], CustomSubscriber);
     }
+    curState = new DeviceServiceState({
+        sternIntensity: 20,
+    });
+
+
 
     onLoadRequiredServices(_services) {
         let cableLamp = _services.CableLamp.subscribe({
             onEvent: (_event) => {
-                if (_event.type !== 'sternIntensity') return;
-                this.pushEvent(_event);
+                switch (_event.type) 
+                {
+                    case 'sternIntensity': 
+                        this.curState.sternIntensity = _event.data;
+                        this.pushEvent(_event);
+                    break;
+                    case 'curState':
+                        this.curState.deviceOnline = _event.data.deviceOnline;
+                        this.pushCurState();
+                    break;
+                }
             }
         });
         this.subscriptions = new SubscriptionList([cableLamp]);
