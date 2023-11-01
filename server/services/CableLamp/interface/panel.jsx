@@ -7,7 +7,7 @@ import { Button } from '../../components.jsx';
 export default class extends HomePagePanel {
     constructor(_service) {
         super({
-            size: [1, 2],
+            size: [1, 1],
         }, _service)
     }
     render() {

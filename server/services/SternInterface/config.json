@@ -1,0 +1,4 @@
+{
+    "hasUI": true,
+    "requires": ["CableLamp"]
+}

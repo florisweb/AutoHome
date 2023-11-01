@@ -26,7 +26,6 @@ export class InterfaceClient extends BaseClient {
         let message = super._onMessage(_buffer);
         if (!message) return;
 
-        console.log('interfaceclient request', this.id, message);
         if (message.serviceId == "serviceManager")
         {
             switch (message.type) 

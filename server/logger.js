@@ -9,6 +9,7 @@ const Logger = new class {
     }
 
     log(message, content, tag = false) {
+        console.log('[LOGGER]', tag, message, content);
         return this.logLine(new LogLine({
             tag: tag,
             message: message,
@@ -29,7 +30,7 @@ const Logger = new class {
     async getLogs() {
         return new Promise(async (resolve) => {
             this.#fm.getContent().then((_logs) => {
-                if (!_logs) return resolve([]);
+                if (!_logs || !Array.isArray(_logs)) return resolve([]);
                 resolve(_logs.map((log) => new LogLine(log)));
             }, () => resolve([]));
         });

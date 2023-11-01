@@ -29,7 +29,6 @@ export class Service {
     constructor({id, config}, _subscriberTemplate = Subscriber) {
         this.id = id;
         this.#subscriberTemplate = _subscriberTemplate;
-
         this.config             = config;
         this.requiredServices   = this.config.requires ? this.config.requires : [];
         this.wantedServices     = this.config.wants ? this.config.wants : [];
@@ -115,9 +114,8 @@ export class DeviceService extends Service {
 
     send(_message) {
         if (!this.deviceClient) return Errors.NotConnectedService;
-        this.deviceClient.send(_message.stringify());
+        this.deviceClient.send(_message);
     }
-
 
 
     // @Overwrite
