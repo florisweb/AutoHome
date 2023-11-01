@@ -22,11 +22,12 @@ export default class extends HomePagePanel {
 			text: "Toggle",
 			onclick: (_e) => {
 				this.service.setIntensity(this.service.state.sternIntensity > 0 ? 0 : 100);
+				this.#setIntensityUI(this.service.state.sternIntensity > 0 ? 0 : 100);
 				_e.stopPropagation();
 			}
 		});
 
-		this.html.lightBolbIcon = <img className='panelIcon' src='images/lightBolbOn.png'></img>;
+		this.html.lightBolbIcon = <img className='panelIcon' src='images/sternOn.png'></img>;
 		let onlineIndicator = this.renderOnlineIndicator();
 		this.updateData();
 
@@ -40,10 +41,15 @@ export default class extends HomePagePanel {
 			</div>
 		];
     }
+    #setIntensityUI(_intensity) {
+    	let src = _intensity > 0 ? 'images/sternOn.png' : 'images/sternOff.png';
+    	this.html.lightBolbIcon.setAttribute('src', src);
+    	setTextToElement(this.html.subText, 'Intensity: ' + (_intensity ?? '-') + '%');
+    }
 
     updateData() {
         this.setOnlineState(this.service.state.deviceOnline);
-        setTextToElement(this.html.subText, this.service.state.sternIntensity + '%');
+        this.#setIntensityUI(this.service.state.sternIntensity);
     }
 }
 
