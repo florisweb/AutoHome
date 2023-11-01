@@ -38,6 +38,7 @@ export class BaseClient {
     }
 
     send(_obj) {
+        if (typeof _obj === 'string') return this.conn.send(_obj);
         if (_obj.isMessage) return this.conn.send(_obj.stringify());
         this.conn.send(JSON.stringify(_obj));
     }
