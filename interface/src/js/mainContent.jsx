@@ -74,7 +74,11 @@ class MainContent_homePage extends Page {
 class MainContent_systemPage extends Page {
 	header;
 	constructor() {
-		super({renderContentOnOpen: true});
+		super({
+			renderContentOnOpen: true,
+			customClass: 'systemPage'
+		});
+		
 		this.header = new PageHeader({
 			pageIconInBox: false,
 			pageIconSrc: 'images/settingsIcon.png', 
@@ -101,9 +105,12 @@ class MainContent_systemPage extends Page {
 
 		return [
 			this.header.render(),
+			<div className='header'>System Services</div>,
 			<div className='PanelBox'>{systemServicePanels}</div>,
-			<hr></hr>,
-			<div className='PanelBox'>{servicePanels}</div>
+			<div className='header'>Enabled Services</div>,
+			<div className='PanelBox'>{servicePanels}</div>,
+			<div className='header'>Available Services</div>,
+			<div className='PanelBox'></div>
 		];
 	}
 }

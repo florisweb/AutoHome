@@ -9,7 +9,7 @@ export class Page {
 	get openState() {
 		return !this.html.page.classList.contains('hide');
 	}
-	constructor(_config = {renderContentOnOpen: false}) {
+	constructor(_config = {renderContentOnOpen: false, customClass: ''}) {
 		this.#config = _config;
 	}
 
@@ -17,14 +17,13 @@ export class Page {
 		this.html.pageContent = <div className='pageContent'>
 				{this.renderContent()}
 		</div>;
-		this.html.page = <div className='page hide'>	
+		this.html.page = <div className={'page hide ' + this.#config.customClass ?? ''}>	
 			{this.html.pageContent}
 		</div>;
 		return this.html.page;
 	}
 
 	renderContent() {}
-
 
 	open() {
 		if (MainContent.curPage) MainContent.curPage.close();
