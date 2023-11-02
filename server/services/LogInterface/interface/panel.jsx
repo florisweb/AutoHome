@@ -1,8 +1,8 @@
 
-import { HomePagePanel } from '../../panel.jsx';
+import { SystemServicePagePanel } from '../../panel.jsx';
 import { setTextToElement } from '../../extraFunctions.js';
 
-export default class extends HomePagePanel {
+export default class extends SystemServicePagePanel {
     constructor(_service) {
         super({
             size: [1, 1],

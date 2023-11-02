@@ -1,35 +1,34 @@
 import { appendContent } from './extraFunctions.js';
 import GestureManager from './gestureManager.js';
-import { DownTimePanel } from './panel.jsx';
+import { DownTimePanel, SystemPagePanel } from './panel.jsx';
 import ServiceManager from './service.jsx';
 import { Page, PageHeader } from './page.jsx' ;
 
 import { RequestMessage } from './server/message.js';
 
 
-const MainContent = new function() {
-	const This = this;
-	const HTML = {
+const MainContent = new class {
+	#HTML = {
 		mainContent: mainContent
 	}
-	
-	this.curPage;
-	
-	this.setup = function() {
+	curPage;
+	#pages = [];
+	setup() {
 		this.homePage 			= new MainContent_homePage();
 		this.servicePage 		= new MainContent_servicePage();
 		this.serviceConfigPage 	= new MainContent_serviceConfigPage();
+		this.systemPage 		= new MainContent_systemPage();
+		this.#pages = [this.homePage, this.servicePage, this.serviceConfigPage, this.systemPage];
+
 		this.render();
 		this.homePage.open();
 	}
 	
-	this.render = function() {
-		HTML.mainContent.append(this.homePage.render());
-		HTML.mainContent.append(this.servicePage.render());
-		HTML.mainContent.append(this.serviceConfigPage.render());
+	render() {
+		for (let page of this.#pages) this.#HTML.mainContent.append(page.render());
 
 		let lastSwipe = new Date();
-		GestureManager.onSwipeRight(HTML.mainContent, function(_dx, _dy, _start) {
+		GestureManager.onSwipeRight(this.#HTML.mainContent, function(_dx, _dy, _start) {
 			if (_start[0] > 150 || Math.abs(_dx) < 50) return;
 			if (new Date() - lastSwipe < 400) return;
 			lastSwipe = new Date();
@@ -48,9 +47,11 @@ class MainContent_homePage extends Page {
 		super({renderContentOnOpen: true});
 		this.header = new PageHeader({
 			pageIconInBox: false,
-			pageIconSrc: 'images/logoInverted.png', 
 			leftButtonSrc: false,
+			pageIconSrc: 'images/logoInverted.png', 
+			rightButtonSrc: 'images/settingsIcon.png',
 		});
+		this.header.html.rightButton.addEventListener('click', () => MainContent.systemPage.open());
 		this.header.title = 'ThuisWolk';
 	}
 
@@ -58,7 +59,7 @@ class MainContent_homePage extends Page {
 		let servicePanels = [];
 		for (let service of ServiceManager.services)
 		{
-			if (!service.panel) continue;
+			if (!service.panel || service.panel.isSystemPagePanel) continue;
 			servicePanels.push(service.panel.render());
 		}
 
@@ -68,6 +69,46 @@ class MainContent_homePage extends Page {
 		];
 	}
 }
+
+
+class MainContent_systemPage extends Page {
+	header;
+	constructor() {
+		super({renderContentOnOpen: true});
+		this.header = new PageHeader({
+			pageIconInBox: false,
+			pageIconSrc: 'images/settingsIcon.png', 
+		});
+		this.header.html.leftButton.addEventListener('click', () => MainContent.homePage.open());
+		this.header.title = 'System';
+	}
+
+	renderContent() {
+		let systemServicePanels = [];
+		for (let service of ServiceManager.services)
+		{
+			if (!service.panel || !service.panel.isSystemPagePanel) continue;
+			systemServicePanels.push(service.panel.render());
+		}
+
+		let servicePanels = [];
+		for (let service of ServiceManager.services)
+		{
+			if (service.panel && service.panel.isSystemPagePanel) continue;
+			let panel = new SystemPagePanel({}, service);
+			servicePanels.push(panel.render());
+		}
+
+		return [
+			this.header.render(),
+			<div className='PanelBox'>{systemServicePanels}</div>,
+			<hr></hr>,
+			<div className='PanelBox'>{servicePanels}</div>
+		];
+	}
+}
+
+
 
 class MainContent_servicePage extends Page {
 	constructor() {
@@ -99,7 +140,7 @@ class MainContent_serviceConfigPage extends Page {
 			leftButtonSrc: 'images/backIcon.png', 
 			rightButtonSrc: false,
 		});
-		this.header.html.leftButton.addEventListener('click', () => MainContent.servicePage.open(this.curService));
+		this.header.html.leftButton.addEventListener('click', () => MainContent.systemPage.open());
 
 		this.downTimePanel = new DownTimePanel({size: [2, 3]});
 	}

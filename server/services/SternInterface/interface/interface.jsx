@@ -8,14 +8,14 @@ export default new class extends Service {
 	};
 
 	get iconSrc() {
-		return this.sternIntensity > 0 ? 'images/lightBolbOn.png' : 'images/lightBolbOff.png';
+		return this.sternIntensity > 0 ? 'images/sternOn.png' : 'images/sternOff.png';
 	}
 
 	constructor() {
 		super({
 			id: 'SternInterface',
 			name: 'Stern',
-			iconSrc: 'images/lightBolbOn.png',
+			iconSrc: 'images/sternOn.png',
 			panelConstructor: panelConstructor,
 		});
 	}

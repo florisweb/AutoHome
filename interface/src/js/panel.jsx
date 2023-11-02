@@ -23,8 +23,6 @@ export class Panel {
 
 
 
-
-
 export class HomePagePanel extends Panel {
 	service; 
 	#isOnline = false;
@@ -57,6 +55,57 @@ export class HomePagePanel extends Panel {
 		this.html.onlineIndicator.classList.add("online");
 	}
 }
+
+export class SystemServicePagePanel extends Panel {
+	isSystemPagePanel = true;
+	service; 
+	#isOnline = false;
+	constructor(_args, _service) {
+		super(...arguments);
+		this.service = _service;
+	}
+
+	render() {
+		let html = super.render();
+		html.addEventListener('click', () => {
+			if (!this.service.page) return;
+			MainContent.servicePage.open(this.service);
+		});
+		return html;
+	}
+}
+
+
+export class SystemPagePanel extends Panel {
+	service; 
+	constructor(_args, _service) {
+		super({size: [1, 1], ..._args}, _service);
+		this.service = _service;
+	}
+
+	render() {
+		let html = super.render();
+		html.className += ' hasIcon';
+		html.addEventListener('click', () => MainContent.serviceConfigPage.open(this.service));
+		return html;
+	}
+
+	renderContent() {
+       	this.html.subText = <div className='text subText'>Subtext</div>;
+		this.html.icon = <img className='panelIcon' src={this.service.iconSrc}></img>;
+		return [
+			this.html.icon,
+			<div className='text panelTitle'>{this.service.name}</div>,
+			this.html.subText
+		];
+    }
+}
+
+
+
+
+
+
 
 
 
