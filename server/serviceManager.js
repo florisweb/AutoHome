@@ -4,7 +4,7 @@ import { FileManager, getCurDir } from './DBManager.js';
 const __dirname = getCurDir();
 
 let ConfigFileManager = new FileManager("../config.json");
-const Config = await ConfigFileManager.getContent();
+const Config = await ConfigFileManager.getContent(true);
 let Services = [];
 
 
@@ -80,7 +80,7 @@ export default new class {
     async #loadService(_serviceId) {
         let FM = new FileManager("../services/" + _serviceId + "/config.json");
         if (!(await FM.fileExists())) return Logger.log('Error: ' + _serviceId + '\'s config.json-file was not found.', null, 'SERVICES');
-        let serviceConfig = await FM.getContent();
+        let serviceConfig = await FM.getContent(true);
 
         let FMJS = new FileManager("../services/" + _serviceId + "/server/service.js");
         if (!(await FM.fileExists())) return Logger.log('Error: ' + _serviceId + '\'s service.js-file was not found.', null, 'SERVICES');

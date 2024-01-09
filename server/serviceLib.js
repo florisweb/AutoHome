@@ -141,9 +141,9 @@ export class DeviceService extends Service {
 
 export function ServiceFileManager({path, defaultValue = {}}, _service) {
     let fm = new FileManager(_service.id + "_" + path);
-    this.getContent = () => {
+    this.getContent = (_isJSON) => {
         return new Promise((resolve) => {
-            fm.getContent().then((_result) => {
+            fm.getContent(_isJSON).then((_result) => {
                 if (typeof _result != 'object') return resolve(defaultValue);
                 resolve(_result);
             }, () => resolve(defaultValue));

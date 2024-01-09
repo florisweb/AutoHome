@@ -22,28 +22,23 @@ function CustomSubscriber(_config) {
 
 
 export default class extends DeviceService {
-    dataManager = new (function(_service) {
-        let fm = new ServiceFileManager({path: "data.json", defaultValue: []}, _service);
-        this.addDataRow = async function(_data) {
-            let data = await fm.getContent(true);
-            data.push({time: Date.now(), data: _data});
-            return fm.writeContent(data);
-        }
-        this.getData = function() {
-            return fm.getContent(true);
-        }
-    })(this);
+    // dataManager = new (function(_service) {
+    //     let fm = new ServiceFileManager({path: "data.json", defaultValue: []}, _service);
+    //     this.addDataRow = async function(_data) {
+    //         let data = await fm.getContent();
+    //         data.push({time: Date.now(), data: _data});
+    //         return fm.writeContent(data);
+    //     }
+    //     this.getData = function() {
+    //         return fm.getContent();
+    //     }
+    // })(this);
 
     constructor({id, config}) {
         super(arguments[0], CustomSubscriber);
     }
 
     onMessage(_message) {
-        switch (_message.type)
-        {
-            case "sensorState": this.dataManager.addDataRow(_message.data); break;
-        }
-        
         this.pushEvent(_message);
     }
 }

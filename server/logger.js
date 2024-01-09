@@ -29,7 +29,7 @@ const Logger = new class {
     }
     async getLogs() {
         return new Promise(async (resolve) => {
-            this.#fm.getContent().then((_logs) => {
+            this.#fm.getContent(true).then((_logs) => {
                 if (!_logs || !Array.isArray(_logs)) return resolve([]);
                 resolve(_logs.map((log) => new LogLine(log)));
             }, () => resolve([]));

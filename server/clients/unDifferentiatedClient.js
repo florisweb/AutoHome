@@ -3,7 +3,7 @@ import * as crypto from "crypto";
 import ServiceManager from '../serviceManager.js';
 
 import { FileManager } from '../DBManager.js';
-const Config = await (new FileManager("../config.json")).getContent(); 
+const Config = await (new FileManager("../config.json")).getContent(true); 
 
 
 import { BaseClient } from './baseClient.js';

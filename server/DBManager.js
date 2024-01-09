@@ -19,14 +19,15 @@ export function FileManager(_path) {
     const Path = _path;
     let ActualPath = dataStoragePath + '/' + Path;
 
-    this.getContent = async function() {
+    this.getContent = async function(_isJSON = true) {
         return new Promise((resolve, error) => {
             fs.readFile(ActualPath, (err, content) => {
                 if (err) return error(err);
                 let parsedContent = content;
+                if (!_isJSON) return resolve(content);
                 try {
                     parsedContent = JSON.parse(content);
-                } catch (e) {console.log('Invalid json content: ', e, ActualPath)};
+                } catch (e) {console.log('[FileManager]: Invalid json content: (' + ActualPath + ')', e, ActualPath)};
                 resolve(parsedContent);
             });
         });
@@ -38,13 +39,18 @@ export function FileManager(_path) {
         });
     }
 
+    let writingPromise;
     this.writeContent = async function(_contentObj) {
-        return new Promise((resolve, error) => {
+        while (writingPromise) await writingPromise;
+
+        writingPromise = new Promise((resolve, error) => {
             let string = JSON.stringify(_contentObj);
             fs.writeFile(ActualPath, string, (err) => {
-              if (err) return error(err);
-              resolve(true);
+                writingPromise = false;
+                if (err) return error(err);
+                resolve(true);
             });
         });
+        return writingPromise;
     }
 }
