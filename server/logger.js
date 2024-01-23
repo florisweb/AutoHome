@@ -63,14 +63,21 @@ export class ServiceLogger {
 
 class LogLine {
     tag = false;
-    date;
+    dateTime;
     content = [];
     message = '';
 
-    constructor({tag = false, date, message = '', content = []}) {
-        // this.date = date ? date : new Date();
+    get date() {
+        return new Date(this.dateTime);
+    }
+
+    constructor({tag = false, dateTime, message = '', content = []}) {
+        this.dateTime = dateTime || new Date().getTime();
         this.tag = tag;
         this.message = message;
         this.content = content;
     }
 }
+
+
+

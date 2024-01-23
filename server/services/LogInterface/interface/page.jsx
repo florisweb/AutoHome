@@ -65,16 +65,13 @@ class LogPanel extends Panel {
         tagHolder.style.background = color;
 
 
-        let newContent = {
-            ..._log.content,
-            date: _log.date,
-        };
-        let content = _log.content ? '(' + JSON.stringify(newContent) + ')' : '';
+        let date = new Date(_log.dateTime);
+        let dateString = '[' + date.toString() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds() + '] - ';
 
-        return <div className='logLine'>
+        return <div className={'logLine ' + (_log.content ? 'hasContent' : '')}>
             {tagHolder}
-            <div className='messageHolder'>{_log.message}</div>
-            <div className='contentHolder'>{content}</div>
+            <div className='messageHolder'>{dateString + _log.message}</div>
+            <div className='contentHolder'>{JSON.stringify(_log.content)}</div>
         </div>;
     }
 }
