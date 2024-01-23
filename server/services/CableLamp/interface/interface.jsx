@@ -1,10 +1,10 @@
 import { Service } from '../../service.jsx';
-
 import panelConstructor from './panel.jsx';
 
 export default new class extends Service {
 	state = {
-		lampOn: false
+		lampOn: false,
+		sternIntensity: 0,
 	};
 
 	get iconSrc() {
@@ -25,12 +25,7 @@ export default new class extends Service {
 		{
 			case "curState": 
 				this.state = _event.data;
-				this.panel.setLampState(this.state.lampOn);
-				this.panel.setOnlineState(this.state.deviceOnline);
-			break;
-			case "lampStatus": 
-				this.state.lampOn = _event.data;
-				this.panel.setLampState(this.state.lampOn); 
+				this.panel.updateData();
 			break;
 		}
 	}
@@ -42,5 +37,9 @@ export default new class extends Service {
 
 	setLampState(_lampOn) {
 		return this.send({type: "setLampState", data: _lampOn})
+	}
+
+	setSternIntensity(_intensity) {
+		return this.send({type: 'setSternIntensity', data: _intensity})
 	}
 }

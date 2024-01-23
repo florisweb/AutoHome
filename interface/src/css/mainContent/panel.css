@@ -1,7 +1,3 @@
-:root {
-    --componentWidth: 25%;
-    --componentHeight: 100px;
-}
 
 .PanelBox {
     position: relative;
@@ -189,6 +185,24 @@
     pointer-events: none;
 }
 
+
+.Panel:has(> .Panel) {
+    display: block;
+    background: rgba(255, 255, 255, .4);
+/*    padding: 10px;*/
+    padding: 0;
+    box-shadow: none;
+}
+.Panel > .Panel {
+    margin: 0px;
+    width: 100%;
+}
+.Panel > .Panel:not(:first-child) {
+    margin-top: 10px;
+}
+
+
+
 .Panel .panelIcon {
     grid-area: icon;
     width: 100%;
@@ -285,9 +299,15 @@
 
 
 
+:root {
+    --componentWidth: 25vw;
+    --componentHeight: 100px;
+}
+
+
 @media screen and (max-width: 1200px) {
     :root {
-        --componentWidth: 33.3%;
+        --componentWidth: 33.3vw;
         --componentHeight: 100px;
     }
 }
@@ -295,7 +315,7 @@
 
 @media screen and (max-width: 800px) {
     :root {
-        --componentWidth: 50%;
+        --componentWidth: 50vw;
         --componentHeight: 100px;
     }
 }
@@ -303,7 +323,7 @@
 
 @media screen and (max-width: 500px) {
     :root {
-        --componentWidth: 100%;
+        --componentWidth: 100vw;
         --componentHeight: 100px;
     }
 }

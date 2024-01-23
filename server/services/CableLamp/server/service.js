@@ -1,4 +1,4 @@
-import { Subscriber, SubscriptionList, DeviceService, ServiceFileManager } from '../../../serviceLib.js';
+import { Subscriber, SubscriptionList, DeviceService, DeviceServiceState } from '../../../serviceLib.js';
 
 
 function CustomSubscriber(_config) {
@@ -13,12 +13,25 @@ export default class extends DeviceService {
     constructor({id, config}) {
         super(arguments[0], CustomSubscriber);
     }
+    curState = new DeviceServiceState({
+        lampOn: false,
+        sternIntensity: 0,
+    });
+
 
     async setup() {
     }
 
     onMessage(_message) {
-        this.pushEvent(_message);
+        switch (_message.type) {
+            case 'sternIntensity': 
+                this.curState.sternIntensity = _message.data;
+            break;
+            case 'lampStatus':
+                this.curState.lampOn = _message.data;
+            break;
+        }
+        this.pushCurState();
     }
 
     async onDeviceConnect() {
