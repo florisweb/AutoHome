@@ -10,7 +10,7 @@ export default class extends HomePagePanel {
     render() {
         let html = super.render();
         html.className += ' hasIcon';
-        html.addEventListener('click', () => window.location.replace('/x'));
+        html.addEventListener('click', () => window.location.replace('/LocTracker'));
         return html;
     }
 

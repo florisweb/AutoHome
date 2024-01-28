@@ -144,7 +144,7 @@ export function ServiceFileManager({path, defaultValue = {}}, _service) {
     this.getContent = (_isJSON) => {
         return new Promise((resolve) => {
             fm.getContent(_isJSON).then((_result) => {
-                if (typeof _result != 'object') return resolve(defaultValue);
+                if (typeof _result != 'object' || _result instanceof Buffer) return resolve(defaultValue);
                 resolve(_result);
             }, () => resolve(defaultValue));
         });
