@@ -30,4 +30,9 @@ function miscellanious() {
 }
 
 
-export default gulp.series(javascript, css, images, miscellanious);
+function wrapper() {
+  let out = gulp.series(javascript, css, images, miscellanious);
+  setTimeout(() => process.exit(), 2000);
+  return out;
+}
+export default wrapper()
