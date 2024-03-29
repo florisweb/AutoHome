@@ -178,7 +178,11 @@ export function Graph({xLabel = '', yLabel = '', yRange, xRange}) {
 	this.setData = function(_lines) {
 		lines = _lines;
 		if (!yRange) yRange = calcRange(lines, 1);
-		if (!xRange) xRange = calcRange(lines, 0);
+		let calcedXRange = calcRange(lines, 0);
+		if (!xRange)
+		{
+			xRange = calcedXRange;
+		} else xRange = [Math.max(xRange[0], calcedXRange[0]), Math.min(xRange[1], calcedXRange[1])]
 		
 		dy = yRange[1] - yRange[0];
 		dx = xRange[1] - xRange[0];

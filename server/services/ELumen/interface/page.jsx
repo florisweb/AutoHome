@@ -14,20 +14,27 @@ export default class extends ServicePage {
             yRange: [0, 100]
         });
 
-        this.waterVolumePanel = new GraphPanel({
-            panelTitle: "Water Volume", 
+        // this.waterVolumePanel = new GraphPanel({
+        //     panelTitle: "Water Volume", 
+        //     size: [2, 3],
+        //     xLabel: "Time", 
+        //     yLabel: "WaterVolume (%)", 
+        //     xRange: [Date.now() / 1000 -  60 * 60 * 24 * 5, Date.now() / 1000],
+        //     yRange: [0, 100]
+        // });
+        this.temperaturePanel = new GraphPanel({
+            panelTitle: "Temperature", 
             size: [2, 3],
             xLabel: "Time", 
-            yLabel: "WaterVolume (%)", 
+            yLabel: "Temperature (*C)", 
             xRange: [Date.now() / 1000 -  60 * 60 * 24 * 5, Date.now() / 1000],
-            yRange: [0, 100]
         });
     }
 
     renderContent() {
         this.html.self = <div className='PanelBox'>
             {this.moisturePanel.render()}
-            {this.waterVolumePanel.render()}
+            {this.temperaturePanel.render()}
         </div>;
 
         this.service.send({type: 'getData'});
@@ -44,7 +51,8 @@ export default class extends ServicePage {
     
     updateGraph(_data) {
         this.#updateMoistureGraph(_data);
-        this.#updateWaterVolumeGraph(_data);
+        // this.#updateWaterVolumeGraph(_data);
+        this.#updateTemperatureGraph(_data);
     }
 
     #updateMoistureGraph(_data) {
@@ -58,11 +66,7 @@ export default class extends ServicePage {
             ]);
             lines[1].push([
                 time,
-                row.data.moisture1
-            ]);
-            lines[2].push([
-                time,
-                row.data.moisture2
+                row.data.moisture
             ]);
         }
 
@@ -81,6 +85,19 @@ export default class extends ServicePage {
         }
 
         this.waterVolumePanel.setData(lines);
+    }
+    #updateTemperatureGraph(_data) {
+        let lines = [[]];
+        for (let row of _data)
+        {
+            let time = row.time / 1000;
+            lines[0].push([
+                time,
+                row.data.temperature
+            ]);
+        }
+
+        this.temperaturePanel.setData(lines);
     }
 }
 
