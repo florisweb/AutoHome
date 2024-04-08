@@ -306,7 +306,7 @@ export function Graph({xLabel = '', yLabel = '', yRange, xRange}) {
 
 		const sInDay = 24 * 60 * 60
 		if (!xAxisTagIsDate || stepSize > sInDay) return;
-		for (let d = Math.floor(xRange[0] / sInDay); d < Math.floor(xRange[1] / sInDay) + 1; d++)
+		for (let d = Math.ceil(xRange[0] / sInDay); d < Math.floor(xRange[1] / sInDay) + 1; d++)
 		{
 			let xLoc = indexToXLoc(d * sInDay, ctx);
 			ctx.strokeStyle = axisColor;
