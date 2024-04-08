@@ -10,7 +10,7 @@ export default class extends ServicePage {
             size: [2, 3],
             xLabel: "Time", 
             yLabel: "Moisture (%)", 
-            xRange: [Date.now() / 1000 -  60 * 60 * 24 * 5, Date.now() / 1000],
+            xRange: [Date.now() / 1000 - 60 * 60 * 24 * 3, Date.now() / 1000],
             yRange: [0, 100]
         });
         console.warn(window.t = this.moisturePanel)
@@ -29,7 +29,7 @@ export default class extends ServicePage {
             size: [2, 3],
             xLabel: "Time", 
             yLabel: "Temperature (*C)", 
-            xRange: [Date.now() / 1000 -  60 * 60 * 24 * 5, Date.now() / 1000],
+            xRange: [Date.now() / 1000 - 60 * 60 * 24 * 3, Date.now() / 1000],
         });
 
         this.temperaturePanel.updateLegend(['Temperature'])

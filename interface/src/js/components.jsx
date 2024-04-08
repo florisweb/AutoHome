@@ -216,7 +216,7 @@ export function Graph({xLabel = '', yLabel = '', yRange, xRange}) {
 	const axisColor = '#999';
 	const subAxisColor = '#ddd';
 	const numberColor = '#666';
-	const minXLabelRoom = 30; //px
+	const minXLabelRoom = 40; //px
 	const minYLabelRoom = 20; //px
 
 
@@ -302,6 +302,21 @@ export function Graph({xLabel = '', yLabel = '', yRange, xRange}) {
 		  ctx.fillText(getXLabelText(x, stepSize), xLoc, y + xLabelMargin * .5);
 		  ctx.fill();
 		}
+
+
+		const sInDay = 24 * 60 * 60
+		if (!xAxisTagIsDate || stepSize > sInDay) return;
+		for (let d = Math.floor(xRange[0] / sInDay); d < Math.floor(xRange[1] / sInDay) + 1; d++)
+		{
+			let xLoc = indexToXLoc(d * sInDay, ctx);
+			ctx.strokeStyle = axisColor;
+			ctx.beginPath();
+		  ctx.moveTo(xLoc, 0);
+		  ctx.lineTo(xLoc, ctx.canvas.height - xLabelMargin);
+		  
+		  ctx.closePath();
+		  ctx.stroke();
+		}
 	}
 
 	function getXLabelText(_index, _stepSize) {
@@ -361,7 +376,7 @@ export function Graph({xLabel = '', yLabel = '', yRange, xRange}) {
 
 	function getStepSize(_maxSteps, _delta, _isDateIndex = false) {
 		let stepOptions = [.1, .2, .5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000];
-		if (_isDateIndex) stepOptions = [1, 5, 10, 30, 60, 120, 360, 720, 1440, 2880, 7200, 10080, 20160];
+		if (_isDateIndex) stepOptions = [1, 5, 10, 30, 60, 120, 360, 720, 1440, 2880, 7200, 10080, 20160, 28800, 43200, 72000, 144000];
 
 		for (let i = 0; i < stepOptions.length; i++)
 		{
