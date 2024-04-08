@@ -309,7 +309,7 @@ export function Graph({xLabel = '', yLabel = '', yRange, xRange}) {
 		let date = new Date();
 		date.setTime(_index * 1000);
 		if (_stepSize < 60 * 60) return numberToTwoDigitString(date.getHours()) + ":" + numberToTwoDigitString(date.getMinutes());
-		if (_stepSize < 60 * 60 * 24) return date.getHours() + "h";
+		if (_stepSize < 60 * 60 * 24) return (date.getHours() < 10 ? '0' : '') + date.getHours() + ":00";
 		return numberToTwoDigitString(date.getDate()) + "-" + numberToTwoDigitString(date.getMonth() + 1);
 	}
 
