@@ -52,6 +52,7 @@ const RequestManager = new class {
 	}
 }
 
+
 export default RequestManager;
 
 
@@ -93,6 +94,8 @@ export class RequestMessage extends Message {
 		return this.#requestWrapper.callbackPromise;
 	}
 }
+
+window.RequestMessage = RequestMessage;
 
 export class AuthMessage extends RequestMessage {
 	id;

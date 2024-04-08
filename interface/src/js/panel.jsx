@@ -131,6 +131,9 @@ export class GraphPanel extends Panel {
 	setData(_lines) {
 		this.#graph.setData(_lines);
 	}
+	updateLegend() {
+		return this.#graph.updateLegend(...arguments)
+	}
 
 	renderContent() {
 		return [

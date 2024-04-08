@@ -106,6 +106,37 @@
   width: 100%;
   height: calc(100% - 20px);
 }
+.GraphHolder .legendHolder {
+	position: absolute;
+	display: flex;
+	top: -35px;
+	right: 0;
+	margin-right: 10px;
+	padding: 5px;
+	border-radius: 2px;
+
+	background: #fff;
+}
+
+.GraphHolder .legendHolder .label {
+	display: flex;
+	height: 20px;
+	margin-left: 5px;
+}
+.GraphHolder .legendHolder .label .indicator {
+	position: relative;
+	width: 8px;
+	aspect-ratio: 1;
+	border-radius: 100%;
+	margin: 6px;
+}
+.GraphHolder .legendHolder .label .labelTitle {
+	position: relative;
+	color: #444;
+	font-size: 12px;
+	line-height: 20px;
+}
+
 
 
 .GraphHolder .AxisText {

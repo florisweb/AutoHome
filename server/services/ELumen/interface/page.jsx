@@ -13,6 +13,8 @@ export default class extends ServicePage {
             xRange: [Date.now() / 1000 -  60 * 60 * 24 * 5, Date.now() / 1000],
             yRange: [0, 100]
         });
+        console.warn(window.t = this.moisturePanel)
+        this.moisturePanel.updateLegend(['Humidity', 'Moisture'])
 
         // this.waterVolumePanel = new GraphPanel({
         //     panelTitle: "Water Volume", 
@@ -29,6 +31,8 @@ export default class extends ServicePage {
             yLabel: "Temperature (*C)", 
             xRange: [Date.now() / 1000 -  60 * 60 * 24 * 5, Date.now() / 1000],
         });
+
+        this.temperaturePanel.updateLegend(['Temperature'])
     }
 
     renderContent() {

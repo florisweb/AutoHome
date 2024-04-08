@@ -285,6 +285,9 @@
     grid-template-rows: 30px auto;
     grid-row-gap: 10px
 }
+.Panel.graphPanel .panelTitle {
+    margin-top: -10px;
+}
 
 .Panel.graphPanel .GraphHolder {
     margin:  -20px -20px;

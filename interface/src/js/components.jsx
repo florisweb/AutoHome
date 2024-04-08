@@ -157,6 +157,7 @@ export function InputField({placeholder = null, isTimeInput, onChange, onBlur}) 
 
 export function Graph({xLabel = '', yLabel = '', yRange, xRange}) {
 	let canvas = <canvas></canvas>;
+	let legend = <div className='legendHolder'></div>
 	let ctx = canvas.getContext('2d');
 
 	this.render = function() {
@@ -166,7 +167,23 @@ export function Graph({xLabel = '', yLabel = '', yRange, xRange}) {
 	        <div className='AxisText yAxisTag'>{yLabel}</div>
 	      </div>
 	      {canvas}
+	      {legend}
 	    </div>;
+	}
+
+
+
+	this.updateLegend = function(_labels = []) {
+		legend.innerHTML = '';
+
+		for (let i = 0; i < _labels.length; i++) 
+		{
+			let label = <div className='label'>
+				<div className='indicator' style={`background-color: ${Colors[i]}`}></div>
+				<div className='labelTitle'>{_labels[i]}</div>
+			</div>;
+			legend.append(label)
+		}
 	}
 
 
