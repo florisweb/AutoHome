@@ -12,21 +12,26 @@ function CustomSubscriber(_config) {
     Subscriber.call(this, {..._config, handleRequest: handleRequest});
 
     async function handleRequest(_message) {
-        console.log('ELumensubscriber.handleRequest', _message);
+        console.log('LocVisualizer.handleRequest', _message, This.service);
 
-        // Server intercepted messages
+        if (!_message.isRequestMessage) return;
         switch (_message.type)
         {
-            case "getData": 
-                return This.onEvent({type: "data", data: await This.service.dataManager.getData()});
+            case "getLocalisationFactor": 
+                return _message.respond({
+                    type: 'localisationFactor',
+                    data: await This.service.getLocalisationFactor()
+                })
         }
-        // Default messages
-        return This.service.send(_message);
     }
 }
 
 
 export default class extends Service {
+    #tileWidth = .009;
+    #tileHeight = 0.015;
+
+
     dataManager = new (function(_service) {
         let fm = new ServiceFileManager({path: "data.json", defaultValue: []}, _service);
         this.addDataPoint = async function({lat, long}) {
@@ -64,28 +69,102 @@ export default class extends Service {
             let data = await this.dataManager.getData();
             _response.send(data);
         });
-
-        WebServer.registerEndPoint('/LocTracker/API/upload', async (_request, _response) => {
-            if (_request.method !== 'POST') return _response.sendStatus(400);
-            try {
-                let data = {
-                    lat: parseFloat(_request.body.lat),
-                    long: parseFloat(_request.body.long),
-                }
-                if (isNaN(data.lat) || isNaN(data.long)) return _response.sendStatus(400);
-                this.dataManager.addDataPoint(data);
-            } catch (e) {
-                return _response.sendStatus(400);
-            }
-
-            _response.sendStatus(200);
-        });
     }
 
     onMessage(_message) {
         this.pushEvent(_message);
     }
+
+
+    onLoadRequiredServices({ShortCutAPI}) {
+        if (!ShortCutAPI) return console.error(`${this.serviceId}: Error while loading, ShortCutAPI not found`);
+        ShortCutAPI.subscribe({
+            acceptorService: this,
+            onEvent: (_data) => {
+                try {
+                    let data = {
+                        lat: parseFloat(_data.lat),
+                        long: parseFloat(_data.long),
+                    }
+                    if (isNaN(data.lat) || isNaN(data.long)) return _response.sendStatus(400);
+                    this.dataManager.addDataPoint(data);
+                } catch (e) {
+            }
+        }})
+    }
+
+
+    async getLocalisationFactor() {
+        let dataPoints = await this.dataManager.getData();
+        let points = dataPoints.filter((_p) => new Date() - new Date(_p.date) < 1000 * 60 * 60 * 24 * 7);
+        let topPointCount = Math.ceil(points.length * .5);
+        
+        let tiles = this.#convertDataToTiles(points);
+        tiles.sort((a, b) => a.counts < b.counts);
+        
+        let pointCount = 0;
+        for (let i = 0; i < tiles.length; i++)
+        {
+          if (pointCount + tiles[i].counts > topPointCount) 
+          {
+            let fraction = (topPointCount - pointCount) / tiles[i].counts;
+            return i + fraction;
+          }
+          pointCount += tiles[i].counts;
+        }
+        return tiles.length;
+    }
+
+
+
+    #convertDataToTiles(_data) {
+        let tileList = [];
+        
+        for (let point of _data)
+        {
+            let lat = Math.floor(point.lat / this.tileWidth) * this.tileWidth;
+            let long = Math.floor(point.long / this.tileHeight) * this.tileHeight;
+            let foundTile = tileList.find((tile) => tile.lat === lat && tile.long === long);
+
+            if (!foundTile)
+            {
+                tileList.push(new Tile({long: long, lat: lat}));
+            } else foundTile.counts++;
+        }
+
+        return tileList;
+    }
+
+    #tileListToGrid(_list) {
+        let tileGrid = [];
+        for (let tile of _list) 
+        {
+            let lat = Math.floor(point.lat / this.tileWidth) * this.tileWidth;
+            let long = Math.floor(point.long / this.tileHeight) * this.tileHeight;
+            if (!tileGrid[long]) tileGrid[long] = [];
+            if (tileGrid[long][lat]) {
+                console.log('error tile already found')
+                continue;
+            }
+            tileGrid[long][lat] = tile;
+        }
+
+        return tileGrid;
+    }
 }
+
+
+
+class Tile {
+  long;
+  lat;
+  counts = 1;
+  constructor({long, lat}) {
+    this.long = long;
+    this.lat = lat;
+  }
+}
+
 
 
 
