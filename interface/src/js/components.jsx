@@ -103,7 +103,7 @@ export class Slider {
 		this.#HTML.slider.value = _value;
 		let perc = (this.value - this.#min) / (this.#max - this.#min);
 		this.#HTML.visualSlider.style.width = perc * 100 + '%';
-		this.#HTML.self.content = Math.round(perc * 100) + '%';
+		this.#HTML.self.style.setProperty('--percentageText', `'` + Math.round(perc * 100) + `%'`);
 	}
 
 	constructor({min = 0, max = 0, onInput, customClass}) {

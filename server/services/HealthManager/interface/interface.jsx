@@ -20,6 +20,9 @@ export default new class extends Service {
 			case "data": 
 				this.panel.updateData(_event.data);
 			break;
+			case "curState":
+				this.getData()
+			break;
 		}
 	}
 

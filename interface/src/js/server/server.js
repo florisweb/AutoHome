@@ -77,8 +77,6 @@ const Server = new class {
 	}
 
 
-
-
 	showMessage(_message) {
 		console.info("[SERVER: show user]", _message);
 	}
@@ -94,9 +92,6 @@ const Server = new class {
 		if (!this.connected) return false;
 		return this.Socket.send(JSON.stringify(_json));
 	}
-
-
-
 
 	requireAuthentication() {
 		this.#openLoadScreen();

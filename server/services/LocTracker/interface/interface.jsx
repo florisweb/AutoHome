@@ -11,9 +11,14 @@ export default new class extends Service {
 			panelConstructor: panelConstructor,
 		});
 	}
-
-	onEvent(_event){}
-
+onEvent(_event) {
+		switch (_event.type)
+		{
+			case "curState":
+				this.getNewTilesInLast4Weeks()
+			break;
+		}
+	}
 	async getNewTilesInLast4Weeks() {
 		let request = new RequestMessage({type: 'getNewTilesInLast4Weeks'}, this);
 		let response = await request.send();
