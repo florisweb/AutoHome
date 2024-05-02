@@ -1,5 +1,6 @@
 
 import { HomePagePanel } from '../../panel.jsx';
+import { setTextToElement } from '../../extraFunctions.js';
 
 export default class extends HomePagePanel {
     constructor(_service) {
@@ -16,13 +17,17 @@ export default class extends HomePagePanel {
 
     renderContent() {
         let icon = <img className='panelIcon' src='images/eLumenIcon.png'></img>;
-        let state = <div className='text subText waterPercentage'>&#128167;x new tiles in last month</div>;
+        this.html.state = <div className='text subText waterPercentage'>? new tiles in the last 4 weeks</div>;
         this.html.icon = icon;
 
         return [
             icon,
-            state,
+            this.html.state,
             <div className='text panelTitle'>{this.service.name}</div>,
         ];
+    }
+
+    updateData(_newTileCount) {
+        setTextToElement(this.html.state, _newTileCount + ' new tiles in the last 4 weeks')
     }
 }

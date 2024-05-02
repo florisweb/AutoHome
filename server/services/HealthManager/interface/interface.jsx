@@ -1,7 +1,6 @@
 import { Service } from '../../service.jsx';
 
 import panelConstructor from './panel.jsx';
-import pageConstructor from './page.jsx';
 
 export default new class extends Service {
 	state = {};
@@ -20,7 +19,6 @@ export default new class extends Service {
 		{
 			case "data": 
 				this.panel.updateData(_event.data);
-				this.page.updateData(_event.data);
 			break;
 		}
 	}
@@ -29,7 +27,6 @@ export default new class extends Service {
 		let request = new RequestMessage({type: 'getData'}, this);
 		let response = await request.send();
 		this.panel.updateData(response.data);
-		this.page.updateData(response.data);
 		return response.data;
 	}
 }

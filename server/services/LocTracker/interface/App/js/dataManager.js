@@ -109,7 +109,6 @@ class DataPoint {
   lat;
   long;
   date;
-  dateString = '';
 
   constructor({lat, long, date}) {
     this.lat = lat;

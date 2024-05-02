@@ -22,6 +22,11 @@ function CustomSubscriber(_config) {
                     type: 'localisationFactor',
                     data: await This.service.getLocalisationFactor()
                 })
+            case "getNewTilesInLast4Weeks": 
+                return _message.respond({
+                    type: 'getNewTilesInLast4Weeks',
+                    data: await This.service.getNewTilesInLast4Weeks()
+                })
         }
     }
 }
@@ -115,6 +120,15 @@ export default class extends Service {
         return tiles.length;
     }
 
+    async getNewTilesInLast4Weeks() {
+        let dataPoints = await this.dataManager.getData();
+        let totalTileCount = this.#convertDataToTiles(dataPoints).length
+        
+        let points = dataPoints.filter((_p) => (new Date() - new Date(_p.date)) / 1000 / 60 / 60 / 24 > 7 * 4);
+        return totalTileCount - this.#convertDataToTiles(points).length;
+    }
+
+
 
 
     #convertDataToTiles(_data) {
@@ -122,8 +136,8 @@ export default class extends Service {
         
         for (let point of _data)
         {
-            let lat = Math.floor(point.lat / this.tileWidth) * this.tileWidth;
-            let long = Math.floor(point.long / this.tileHeight) * this.tileHeight;
+            let lat = Math.floor(point.lat / this.#tileWidth) * this.#tileWidth;
+            let long = Math.floor(point.long / this.#tileHeight) * this.#tileHeight;
             let foundTile = tileList.find((tile) => tile.lat === lat && tile.long === long);
 
             if (!foundTile)
@@ -139,8 +153,8 @@ export default class extends Service {
         let tileGrid = [];
         for (let tile of _list) 
         {
-            let lat = Math.floor(point.lat / this.tileWidth) * this.tileWidth;
-            let long = Math.floor(point.long / this.tileHeight) * this.tileHeight;
+            let lat = Math.floor(point.lat / this.#tileWidth) * this.#tileWidth;
+            let long = Math.floor(point.long / this.#tileHeight) * this.#tileHeight;
             if (!tileGrid[long]) tileGrid[long] = [];
             if (tileGrid[long][lat]) {
                 console.log('error tile already found')
