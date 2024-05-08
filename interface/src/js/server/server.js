@@ -13,10 +13,10 @@ const Server = new class {
 		authButton: signInWithFloriswebButton,
 	}
 
-	// socketServerURL = 'ws://' + window.location.hostname + ':8081';
-	socketServerURL = 'ws://thuiswolk.local:8081';
+	socketServerURL = 'ws://' + window.location.hostname + ':8081';
 	Socket;
 	authenticated = false;
+
 
 	#lastHeartbeat = new Date();
 
@@ -58,6 +58,7 @@ const Server = new class {
 			if (response.type !== 'auth') return;
 
 			serverAuthenticated = response.status;
+			this.authenticated = serverAuthenticated;
 			if (!serverAuthenticated) 
 			{
 				this.disconnect();
@@ -73,7 +74,11 @@ const Server = new class {
 		
 		this.Socket.onclose = () => {
 			console.log('onClose');
-			this.#openLoadScreen();
+			
+			if (!this.authenticated)
+			{
+				this.requireAuthentication();
+			} else this.#openLoadScreen();
 			setTimeout(() => this.connect(), 1000 * 5);
 		}
 	}
