@@ -78,25 +78,35 @@ export class SystemServicePagePanel extends Panel {
 
 export class SystemPagePanel extends Panel {
 	service; 
-	constructor(_args, _service) {
+	condition = {};
+	constructor(_args, _service, _condition) {
 		super({size: [1, 1], ..._args}, _service);
 		this.service = _service;
+		this.condition = _condition
 	}
 
 	render() {
 		let html = super.render();
-		html.className += ' hasIcon';
-		html.addEventListener('click', () => MainContent.serviceConfigPage.open(this.service));
+		html.className += ' hasIcon systemPagePanel';
+		if (this.condition.error) html.classList.add('error');
+		html.addEventListener('click', (_e) => {
+			if (_e.target.classList.contains('button') || !this.condition.enabled) return;
+			MainContent.serviceConfigPage.open(this.service)
+		});
 		return html;
 	}
 
 	renderContent() {
-       	this.html.subText = <div className='text subText'>Subtext</div>;
+       	this.html.subText = <div className='text subText'>{this.condition.state + (this.condition.error ? ' - ' + this.condition.error : '')}</div>;
 		this.html.icon = <img className='panelIcon' src={this.service.iconSrc}></img>;
+		this.html.enableButton = <div className='button bDefault bBoxy filled' onclick={() => {
+			MainContent.systemPage.setServiceEnableState(this.service.id, !this.condition.enabled)
+		}}>{this.condition.enabled ? 'Disable' : 'Enable'}</div>
 		return [
 			this.html.icon,
 			<div className='text panelTitle'>{this.service.name}</div>,
-			this.html.subText
+			this.html.subText,
+			this.html.enableButton
 		];
     }
 }

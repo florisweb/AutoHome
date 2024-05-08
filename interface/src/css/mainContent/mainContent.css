@@ -10,7 +10,7 @@
 
 
 
-#mainContent .page.systemPage .pageContent > .header {
+#mainContent .page.systemPage .pageContent .dynamicContentHolder > .header {
     margin-top: 20px;
 
     color: rgba(255, 255, 255, .8);

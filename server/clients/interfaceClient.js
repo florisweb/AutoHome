@@ -22,16 +22,21 @@ export class InterfaceClient extends BaseClient {
     }
 
 
-    _onMessage(_buffer) {
+    async _onMessage(_buffer) {
         let message = super._onMessage(_buffer);
         if (!message) return;
 
-        if (message.serviceId == "serviceManager")
+        if (message.serviceId == "serviceManager" && message.isRequestMessage)
         {
             switch (message.type) 
             {
                 case "getServiceConditions": 
-                    message.respond(ServiceManager.getServiceConditions());
+                    message.respond(await ServiceManager.getServiceConditions());
+                    break;
+                case "setServiceEnableState":
+                    console.log('??message', message)
+                    message.respond(await ServiceManager.setServiceEnableState(message.data.serviceId, message.data.enable));
+                    break;
             }
             return;
         }

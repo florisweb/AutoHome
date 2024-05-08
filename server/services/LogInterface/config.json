@@ -1,3 +1,4 @@
 {
-    "hasUI": true
+    "hasUI": true,
+    "isSystemService": true
 }

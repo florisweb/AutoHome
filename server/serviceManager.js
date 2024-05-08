@@ -1,3 +1,4 @@
+import child_process from 'child_process';
 import Logger from './logger.js';
 import { readdirSync } from 'fs'
 import { FileManager, getCurDir } from './DBManager.js';
@@ -18,21 +19,63 @@ export default new class {
     }
 
 
-    getServiceConditions() {
-        // let conditions = {};
-        // for (let serviceId in this.config.services)
-        // {
-        //     let service = this.getService(serviceId);
-        //     let condition = "unknown";
-        //     if (this.config.services[serviceId].disabled) condition = "disabled";
-        //     if (service && service.enabled) condition = "enabled";
-            
-        //     conditions[serviceId] = {
-        //         condition: condition,
-        //         customCondition: service && service.getCondition() ? service.getCondition() : false 
-        //     }
-        // }
-        // return conditions;
+    async setServiceEnableState(_serviceId, _enable) {
+        let installedServices = await this.#getInstalledServiceIdList();
+        if (!installedServices.includes(_serviceId) && _enable) return 'E_serviceNotInstalled';
+        if (!_enable)
+        {
+            let index = Config.server.enabledServices.findIndex((serviceId) => serviceId === _serviceId);
+            if (index === -1) return 'E_serviceAlreadyDisabled';
+            Config.server.enabledServices.splice(index, 1);
+        } else Config.server.enabledServices.push(_serviceId);
+        await ConfigFileManager.writeContent(Config);
+        this.#restartServer();
+        return "Restarting";
+    }
+
+    #restartServer() {
+        console.log("Restarting... PID: " + process.pid);
+        setTimeout(function () {
+            process.on("exit", function () {
+                child_process.spawn(process.argv.shift(), process.argv, {
+                    cwd: process.cwd(),
+                    detached: true,
+                    stdio: "inherit"
+                });
+            });
+            process.exit();
+        }, 5000);
+    }
+
+    async getServiceConditions() {
+        let enabledServiceIds = Config.server.enabledServices;
+        let installedServiceIds = await this.#getInstalledServiceIdList();
+        
+        let conditions = {};
+        for (let id of installedServiceIds)
+        {
+            conditions[id] = {state: 'Installed', error: false}
+            // Check for install-issues
+            // TODO: create a system that automatically rebuilds when the config has changed
+        }
+
+        for (let id of enabledServiceIds)
+        {
+            if (!conditions[id]) conditions[id] = {state: '', error: 'enabledServiceNotInstalled'}
+            conditions[id].state = 'EnabledInConfig';
+            conditions[id].enabled = true;
+        }
+
+        for (let service of Services)
+        {
+            conditions[service.id].state = 'NotLoaded';
+            if (service.enabled) conditions[service.id].state = "Loaded";
+            conditions[service.id].hasUI = service.config.hasUI;
+            conditions[service.id].isDeviceService = service.isDeviceService;
+            conditions[service.id].isSystemService = service.config.isSystemService;
+        }
+
+        return conditions;
     }
 
     async #getInstalledServiceIdList() {
@@ -102,6 +145,7 @@ export default new class {
         for (let requiredServiceId of _service.requiredServices)
         {
             let curService = this.getService(requiredServiceId);
+            if (!curService) return Logger.log(`Error: Required service not found (${requiredServiceId} on ${_service.id})`, null, 'SERVICES');
             if (curService.enabled) continue;
             await this.#enableService(curService, _curDepth + 1);
         }
@@ -134,5 +178,5 @@ export default new class {
 
 
 
-    constructor() {this.loadServices();}
+    constructor() {this.loadServices()}
 }

@@ -17,7 +17,7 @@ class Message {
     serviceId;
     _client;
 
-    constructor({type, data, serviceId, requestId}, _client) {
+    constructor({type, data, serviceId}, _client) {
         this.type = type;
         this.data = data;
         this.serviceId = serviceId;

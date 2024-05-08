@@ -302,6 +302,32 @@
 
 
 
+
+
+
+
+.Panel.systemPagePanel {
+    grid-template-areas:    'icon title button'
+                            'icon subText button';
+    grid-template-columns: 40px auto 65px;
+}
+.Panel.systemPagePanel .button {
+    grid-area: button;
+    padding: 7px 0 !important;
+    height: 30px;
+    margin: 5px 0;
+    text-align: center;
+}
+
+.Panel.systemPagePanel.error {
+    border: 5px solid #f00;
+    background: #fdd;
+}
+
+
+
+
+
 :root {
     --componentWidth: 25vw;
     --componentHeight: 100px;

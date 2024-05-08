@@ -73,6 +73,7 @@ class MainContent_homePage extends Page {
 
 class MainContent_systemPage extends Page {
 	header;
+	#HTML = {}
 	constructor() {
 		super({
 			renderContentOnOpen: true,
@@ -88,30 +89,67 @@ class MainContent_systemPage extends Page {
 	}
 
 	renderContent() {
-		let systemServicePanels = [];
-		for (let service of ServiceManager.services)
-		{
-			if (!service.panel || !service.panel.isSystemPagePanel) continue;
-			systemServicePanels.push(service.panel.render());
-		}
-
-		let servicePanels = [];
-		for (let service of ServiceManager.services)
-		{
-			if (service.panel && service.panel.isSystemPagePanel) continue;
-			let panel = new SystemPagePanel({}, service);
-			servicePanels.push(panel.render());
-		}
-
+		this.#HTML.pageContent = <div className='dynamicContentHolder'></div>;
+		this.#updateContent()
 		return [
 			this.header.render(),
+			this.#HTML.pageContent
+		];
+	}
+
+	async setServiceEnableState(_serviceId, _enable) {
+		console.log('setServiceEnableState');
+		let result = await ServiceManager.setEnableState(_serviceId, _enable);
+		if (result !== 'Restarting') return alert(result);
+		Server.disconnect();
+		let refreshPageInterval;
+		refreshPageInterval = setInterval(() => {
+			if (!Server.connected) return;
+			MainContent.systemPage.open();
+			clearInterval(refreshPageInterval)		
+		}, 1000)
+	}
+
+	async #updateContent() {
+		let config = await ServiceManager.getServiceConditions();
+
+		let systemServicePanels = [];
+		let enabledServicePanels = [];
+		let availableServicePanels = [];
+
+		for (let serviceId in config)
+		{
+			let serviceCondition = config[serviceId];
+			let service = ServiceManager.getService(serviceId);	
+			if (!service) service = {iconSrc: '', name: serviceId, id: serviceId} // Only installed, no actual frontend-service available
+
+			if (serviceCondition.enabled)
+			{
+				if (serviceCondition.isSystemService && service.panel && service.panel.isSystemPagePanel) 
+				{
+					systemServicePanels.push(service.panel.render());
+					continue;
+				} 
+				let panel = new SystemPagePanel({}, service, serviceCondition);
+				enabledServicePanels.push(panel.render());
+				continue;
+			}
+
+			let panel = new SystemPagePanel({}, service, serviceCondition);
+			availableServicePanels.push(panel.render());
+		}
+
+		let items = [
 			<div className='header'>System Services</div>,
 			<div className='PanelBox'>{systemServicePanels}</div>,
 			<div className='header'>Enabled Services</div>,
-			<div className='PanelBox'>{servicePanels}</div>,
+			<div className='PanelBox'>{enabledServicePanels}</div>,
 			<div className='header'>Available Services</div>,
-			<div className='PanelBox'></div>
+			<div className='PanelBox'>{availableServicePanels}</div>
 		];
+
+		this.#HTML.pageContent.innerHTML = '';
+		for (let item of items) this.#HTML.pageContent.append(item);
 	}
 }
 

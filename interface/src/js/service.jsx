@@ -1,7 +1,9 @@
 import Server from './server/server.js';
 import { Page, PageHeader} from './page.jsx';
+import { RequestMessage } from './server/message.js';
 
 const ServiceManager = new function() {
+	const ServiceId = 'serviceManager';
 	this.services = [];
 
 	this.setup = function() {
@@ -13,6 +15,16 @@ const ServiceManager = new function() {
 	}
 	this.getService = function(_id) {
 		return this.services.find((_service) => _service.id == _id);
+	}
+
+	this.getServiceConditions = function() {
+		let message = new RequestMessage({serviceId: ServiceId, type: 'getServiceConditions'})
+		return message.send();
+	}
+
+	this.setEnableState = function(_serviceId, _enable) {
+		let message = new RequestMessage({serviceId: ServiceId, type: 'setServiceEnableState', data: {serviceId: _serviceId, enable: _enable}})
+		return message.send();
 	}
 }
 
