@@ -24,6 +24,7 @@ export class Service {
     logger;
     subscribers = [];
     curState = new ServiceState();
+    condition = {};
 
 
     // Working variables
@@ -245,7 +246,8 @@ export function Subscriber({onEvent, handleRequest = () => {}}) {
     this.handleRequest = async(_message) => { // Given by service
         switch (_message.type)
         {
-            case "getDownTime": 
+            case "getDownTime":
+                if (!this.service.isDeviceService) return _message.respond("E_notDeviceService");
                 let data = await this.service.downTimeTracker.getData();
                 return _message.respond(data);
             default: 

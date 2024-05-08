@@ -73,6 +73,7 @@ export default new class {
             conditions[service.id].hasUI = service.config.hasUI;
             conditions[service.id].isDeviceService = service.isDeviceService;
             conditions[service.id].isSystemService = service.config.isSystemService;
+            if (service.condition.loadError) conditions[service.id].error = service.condition.loadError;
         }
 
         return conditions;
@@ -145,7 +146,10 @@ export default new class {
         for (let requiredServiceId of _service.requiredServices)
         {
             let curService = this.getService(requiredServiceId);
-            if (!curService) return Logger.log(`Error: Required service not found (${requiredServiceId} on ${_service.id})`, null, 'SERVICES');
+            if (!curService) {
+                _service.condition.loadError = `Required service not found: ${requiredServiceId}`;
+                return Logger.log(`Error: Required service not found (${requiredServiceId} on ${_service.id})`, null, 'SERVICES');
+            }
             if (curService.enabled) continue;
             await this.#enableService(curService, _curDepth + 1);
         }

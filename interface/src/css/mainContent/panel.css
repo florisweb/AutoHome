@@ -320,8 +320,20 @@
 }
 
 .Panel.systemPagePanel.error {
-    border: 5px solid #f00;
-    background: #fdd;
+    border: 3px solid rgb(247, 100, 100);
+    background: #fcd;
+    grid-template-rows: 15px 40px;
+}
+
+.Panel.systemPagePanel.error .panelTitle {
+    margin-top: -15px;
+}
+.Panel.systemPagePanel.error .subText {
+    overflow: auto;
+}
+.Panel.systemPagePanel.error .button {
+    background: rgb(247, 100, 100);
+    border-color: rgb(247, 100, 100);
 }
 
 

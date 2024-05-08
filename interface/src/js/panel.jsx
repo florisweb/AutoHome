@@ -90,7 +90,7 @@ export class SystemPagePanel extends Panel {
 		html.className += ' hasIcon systemPagePanel';
 		if (this.condition.error) html.classList.add('error');
 		html.addEventListener('click', (_e) => {
-			if (_e.target.classList.contains('button') || !this.condition.enabled) return;
+			if (_e.target.classList.contains('button') || !this.condition.enabled || !this.condition.isDeviceService) return;
 			MainContent.serviceConfigPage.open(this.service)
 		});
 		return html;
