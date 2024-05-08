@@ -227,9 +227,9 @@ export function Graph({xLabel = '', yLabel = '', yRange, xRange}) {
 		ctx.canvas.width = ctx.canvas.offsetWidth * scalar;
 		ctx.canvas.height = ctx.canvas.offsetHeight * scalar;
 
+		if (!yRange || !xRange) return;
 		drawXAxis();
 		drawYAxis();
-
 		if (!lines[0]) return;
 		if (typeof lines[0] != 'object') return drawLine(lines);
 		for (let i = 0; i < lines.length; i++)
