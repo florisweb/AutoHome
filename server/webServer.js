@@ -1,17 +1,28 @@
 import express from 'express';
 import { URL } from 'url';
 import fs from 'fs';
+import https from 'https';
+import { fileURLToPath } from 'url';
+import path from 'path';
+const __dirname = path.dirname(fileURLToPath(new URL(import.meta.url)));
+
+
 
 const Logger = console;
 const Express = express();
 Express.use(express.json());
 const Endpoints = [];
 
+
 const WebServer = new class {
     PORT = process.env.port || 8080;
     server;
     constructor() {
-        this.server = Express.listen(this.PORT, () => {Logger.log('[!] Server started on port ' + this.PORT)});
+        this.server = https.createServer({
+            key: fs.readFileSync(__dirname + "/certificates/key.pem"),
+            cert: fs.readFileSync(__dirname + "/certificates/cert.pem")
+        }, Express).listen(this.PORT, () => {Logger.log('[!] Server started on port ' + this.PORT)});
+        // this.server = Express.listen(this.PORT, () => {Logger.log('[!] Server started on port ' + this.PORT)});
         Express.get('/*', this.handleRequest);
         Express.post('/*', this.handleRequest);
     }

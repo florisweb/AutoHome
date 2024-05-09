@@ -8,4 +8,5 @@ interface/src/js/_services/*
 server/serviceConfig.json
 server/config.json
 server/DBData/*
+server/certificates/*
 proxyServer/config.json
