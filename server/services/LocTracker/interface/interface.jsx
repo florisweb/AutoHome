@@ -11,7 +11,7 @@ export default new class extends Service {
 			panelConstructor: panelConstructor,
 		});
 	}
-onEvent(_event) {
+	onEvent(_event) {
 		switch (_event.type)
 		{
 			case "curState":

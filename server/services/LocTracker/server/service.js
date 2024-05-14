@@ -12,8 +12,6 @@ function CustomSubscriber(_config) {
     Subscriber.call(this, {..._config, handleRequest: handleRequest});
 
     async function handleRequest(_message) {
-        console.log('LocVisualizer.handleRequest', _message, This.service);
-
         if (!_message.isRequestMessage) return;
         switch (_message.type)
         {

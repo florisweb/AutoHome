@@ -15,14 +15,13 @@ const Endpoints = [];
 
 
 const WebServer = new class {
-    PORT = process.env.port || 8080;
+    PORT = process.env.port || 443;
     server;
     constructor() {
         this.server = https.createServer({
-            key: fs.readFileSync(__dirname + "/certificates/key.pem"),
-            cert: fs.readFileSync(__dirname + "/certificates/cert.pem")
+            key: fs.readFileSync(__dirname + "/certificates/thuiswolk.local.key.pem"),
+            cert: fs.readFileSync(__dirname + "/certificates/thuiswolk.local.cer.pem"),
         }, Express).listen(this.PORT, () => {Logger.log('[!] Server started on port ' + this.PORT)});
-        // this.server = Express.listen(this.PORT, () => {Logger.log('[!] Server started on port ' + this.PORT)});
         Express.get('/*', this.handleRequest);
         Express.post('/*', this.handleRequest);
     }

@@ -10,29 +10,37 @@ import { WebSocketServer } from 'ws';
 import https from 'https';
 import { fileURLToPath } from 'url';
 import path from 'path';
-
 const __dirname = path.dirname(fileURLToPath(new URL(import.meta.url)));
 
+const PORTS = {
+  IOT: 8081,
+  Interface: 8082
+}
 
-
-console.log('test', __dirname);
-const PORT = 8081;
 const httpsServer =  https.createServer({
-    key: fs.readFileSync(__dirname + "/certificates/key.pem"),
-    cert: fs.readFileSync(__dirname + "/certificates/cert.pem"),
-}).listen(PORT)
+    key: fs.readFileSync(__dirname + "/certificates/thuiswolk.local.key.pem"),
+    cert: fs.readFileSync(__dirname + "/certificates/thuiswolk.local.cer.pem"),
+}).listen(PORTS.Interface)
 
-
-// const wss = new WebSocketServer({ port: PORT });
-const wss = new WebSocketServer({ 
+const InterfaceWSS = new WebSocketServer({ 
   server: httpsServer
 });
-console.log("The WebSocket server is running on port " + PORT);
-Logger.log("The WebSocket server is running on port " + PORT, null, 'SYSTEM');
+const IOTWSS = new WebSocketServer({ port: PORTS.IOT });
 
-wss.on("connection", _conn => {
+console.log("The WebSocket servers are running on ports " + JSON.stringify(PORTS));
+Logger.log("The WebSocket servers are running on ports " + JSON.stringify(PORTS), null, 'SYSTEM');
+
+IOTWSS.on("connection", _conn => {
   new UnDifferentiatedClient(_conn);
 });
+
+InterfaceWSS.on("connection", _conn => {
+  new UnDifferentiatedClient(_conn);
+});
+
+
+
+
 
 // Remove disconnected clients
 const interval = setInterval(function () {
