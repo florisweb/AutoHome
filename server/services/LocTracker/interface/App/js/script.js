@@ -64,9 +64,9 @@ function drawTiles() {
     let dx = pos2.x - pos.x;
     let dy = pos2.y - pos.y;
 
-    let opacity = (1 - Math.pow(2, -tile.counts / 10)) / 2;
-    fill('rgba(255, 0, 0, ' + opacity + ')');
-    stroke('#f00');
+    let opacity = (1 - Math.pow(2, -tile.counts / 10)) * .6 + .4;
+    fill(`rgba(${tile.RGB[0]}, ${tile.RGB[1]}, ${tile.RGB[2]}, ${opacity})`);
+    stroke(tile.RGB[0], tile.RGB[1], tile.RGB[2]);
     rect(pos.x, pos.y, dx, dy);
   }
 }

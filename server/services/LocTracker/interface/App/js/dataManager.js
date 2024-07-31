@@ -1,9 +1,17 @@
-
+const COLORS = [
+  [255, 0, 0],
+  [0, 200, 0],
+  [0, 0, 255],
+  [200, 200, 0],
+  [255, 0, 255],
+  [0, 200, 200]
+];
 
 const DataManager = new class {
   #dataPoints = [];
   tileGrid = [];
   tileList = [];
+  countryList = {};
 
   tileWidth = 0.009; // in latitudal degrees
   tileHeight = 0.015; // in longitudal degrees
@@ -35,8 +43,10 @@ const DataManager = new class {
 
   async setup() {
     await this.#fetchData();
+    this.#fetchCountryList().then(() => onChange());
     setInterval(() => this.#fetchData(), 1000 * 30);
   }
+
 
   async #fetchData() {
     let headers = new Headers();
@@ -66,6 +76,28 @@ const DataManager = new class {
     this.tileGrid = tiles.grid;
     this.tileList = tiles.list;
     this.onFetchData();
+  }
+
+  async #fetchCountryList() {
+    let headers = new Headers();
+    headers.append('pragma', 'no-cache');
+    headers.append('cache-control', 'no-cache');
+
+    let init = {
+      method: 'GET',
+      headers: headers,
+    };
+
+    let response = await fetch('LocTracker/API/countryList.json', init);
+    let result = await response.json();
+    if (typeof result === 'object') 
+    {
+      this.countryList = result;
+      for (let i = 0; i < Object.keys(this.countryList).length; i++)
+      {
+        this.countryList[Object.keys(this.countryList)[i]].color = COLORS[i];
+      }
+    }
   }
 
   #convertDataToTiles(_data) {
@@ -99,6 +131,27 @@ class Tile {
   long;
   lat;
   counts = 1;
+
+  #country;
+
+  get RGB() {
+    if (!this.#country)
+    {
+      if (!Object.keys(DataManager.countryList).length) return [0, 0, 0];
+      for (let country in DataManager.countryList)
+      {
+        for (let tile of DataManager.countryList[country])
+        {
+          if (tile.lat !== this.lat || tile.long !== this.long || tile.counts !== this.counts) continue;
+          this.#country = country;
+          break;
+        }
+        if (this.#country) break;
+      }
+    }
+    return DataManager.countryList[this.#country]?.color || [0, 0, 0];
+  }
+
   constructor({long, lat}) {
     this.long = long;
     this.lat = lat;

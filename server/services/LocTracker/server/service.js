@@ -3,7 +3,7 @@ import { URL } from 'url';
 import WebServer from '../../../webServer.js';
 import { Subscriber, Service, ServiceFileManager } from '../../../serviceLib.js';
 
-
+import coordinateToCountry from 'coordinate_to_country';
 
 
 
@@ -19,12 +19,12 @@ function CustomSubscriber(_config) {
                 return _message.respond({
                     type: 'localisationFactor',
                     data: await This.service.getLocalisationFactor()
-                })
+                });
             case "getNewTilesInLast4Weeks": 
                 return _message.respond({
                     type: 'getNewTilesInLast4Weeks',
                     data: await This.service.getNewTilesInLast4Weeks()
-                })
+                });
         }
     }
 }
@@ -70,6 +70,10 @@ export default class extends Service {
 
         WebServer.registerEndPoint('/LocTracker/API/data.json', async (_request, _response) => {;
             let data = await this.dataManager.getData();
+            _response.send(data);
+        });
+        WebServer.registerEndPoint('/LocTracker/API/countryList.json', async (_request, _response) => {;
+            let data = await this.getCountryList();
             _response.send(data);
         });
     }
@@ -125,6 +129,31 @@ export default class extends Service {
         let points = dataPoints.filter((_p) => (new Date() - new Date(_p.date)) / 1000 / 60 / 60 / 24 > 7 * 4);
         return totalTileCount - this.#convertDataToTiles(points).length;
     }
+    
+
+    // async getCountryList() {
+    //     let dataPoints = await this.dataManager.getData();
+    //     return this.#binDataByCountry(dataPoints);
+    // }
+    async getCountryList() {
+        let dataPoints = await this.dataManager.getData();
+        let tiles = this.#convertDataToTiles(dataPoints);
+
+        let countries = {};
+        for (let tile of tiles)
+        {
+            let countrySet = coordinateToCountry(tile.lat, tile.long);
+            if (!countrySet.length) {
+                console.log('not found', countrySet);
+                continue;
+            }
+            let country = countrySet[0];
+
+            if (!countries[country]) countries[country] = [];
+            countries[country].push(tile);
+        }
+        return countries;
+    }
 
 
 
@@ -163,6 +192,26 @@ export default class extends Service {
 
         return tileGrid;
     }
+
+
+
+    // #binDataByCountry(_data) {
+    //     let countries = {};
+    //     for (let point of _data)
+    //     {
+    //         let countrySet = coordinateToCountry(point.lat, point.long);
+    //         if (!countrySet.length) {
+    //             console.log('not found', countrySet);
+    //             continue;
+    //         }
+    //         let country = countrySet[0];
+
+    //         if (!countries[country]) countries[country] = [];
+    //         countries[country].push(point);
+    //     }
+    //     return countries;
+    
+    // }
 }
 
 
