@@ -17,6 +17,7 @@ const TopBar = new class {
   #HTML = {
     topBar: $('#topBar')[0],
     tileInfoHolder: $('#topBar .infoHolder.tileCountHolder')[0],
+    countryInfoHolder: $('#topBar .infoHolder.countryCountHolder')[0],
     bottomOverlay: $('#bottomOverlay')[0]
   }
 
@@ -24,6 +25,7 @@ const TopBar = new class {
   update() {
     let lastPoint = DataManager.data[DataManager.data.length - 1];
     setTextToElement(this.#HTML.tileInfoHolder, DataManager.tileList.length + (DataManager.tileList.length != 1 ? ' Tiles' : ' Tile'));
+    setTextToElement(this.#HTML.countryInfoHolder, Object.keys(DataManager.countryList).length + (Object.keys(DataManager.countryList).length != 1 ? ' Countries' : ' Country'));
     setTextToElement(this.#HTML.bottomOverlay, DataManager.data.length + ' Points' + (lastPoint ? ' (' + formatDate(lastPoint.date) + ')' : ''));
   }
 }

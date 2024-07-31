@@ -98,6 +98,7 @@ const DataManager = new class {
         this.countryList[Object.keys(this.countryList)[i]].color = COLORS[i];
       }
     }
+    this.onFetchData();
   }
 
   #convertDataToTiles(_data) {

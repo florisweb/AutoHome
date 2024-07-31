@@ -56,12 +56,11 @@ body {
 #topBar .infoHolder {
   flex: 1;
   font-size: 14px;
-}
-
-#topBar .infoHolder.tileCountHolder {
+  
   position: relative;
   flex: unset;
   margin-top: -2.5px;
+  margin-right: 10px;
 
   width: auto;
   height: 35px;
@@ -70,10 +69,21 @@ body {
 
 
   text-align: center;
-  background: #f30;
+  
   border-radius: 5px;
   color: #fff;
 }
+
+#topBar .infoHolder.countryCountHolder {
+  background: #fa0;
+}
+
+#topBar .infoHolder.tileCountHolder {
+  background: #f30;
+}
+
+
+
 
 
 #bottomOverlay {
