@@ -124,6 +124,7 @@ const DataManager = new class {
 
   onFetchData() {
     TopBar.update();
+    CountryPanel.update(this.countryList);
   }
 }
 

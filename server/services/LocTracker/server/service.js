@@ -59,6 +59,7 @@ export default class extends Service {
             'js/p5.min.js',
             'js/script.js',
             'js/topBar.js',
+            'js/countryPanel.js',
             'css/main.css'
         ];
 
