@@ -47,6 +47,8 @@ export default class extends Service {
         }
     })(this);
 
+    countryCacheManager = new ServiceFileManager({path: "countryCache.json", defaultValue: []}, this);
+
     constructor({id, config}) {
         super(arguments[0], CustomSubscriber);
 
@@ -132,11 +134,58 @@ export default class extends Service {
     }
     
 
-    // async getCountryList() {
-    //     let dataPoints = await this.dataManager.getData();
-    //     return this.#binDataByCountry(dataPoints);
-    // }
     async getCountryList() {
+        let cache = await this.countryCacheManager.getContent();
+        let countries = {};
+        if (!cache || !cache.lastCacheUpdate)
+        {
+            console.log('calcing countries from scratch')
+            countries = await this.#calcCountryListFromScratch();
+        } else {
+            countries = cache.countries;
+            let dataPoints = await this.dataManager.getData();
+            let newPoints = dataPoints.filter((point) => new Date(point.date) > cache.lastCacheUpdate);
+            let tiles = this.#convertDataToTiles(newPoints);
+
+            // Update the cache
+            for (let tile of tiles)
+            {
+                let foundTile = false;
+                for (let country in countries)
+                {
+                    for (let i = 0; i < countries[country].length; i++)
+                    {
+                        if (countries[country][i].lat !== tile.lat || countries[country][i].long !== tile.long) continue;
+                        countries[country].counts += tile.counts;
+                        foundTile = true;
+                        break;
+                    }
+                }
+
+                if (foundTile) continue;
+
+                let countrySet = coordinateToCountry(tile.lat, tile.long);
+                 if (!countrySet.length) {
+                    console.log('not found', countrySet);
+                    continue;
+                }
+                let country = countrySet[0];
+
+                if (!countries[country]) countries[country] = [];
+                countries[country].push(tile);
+            }
+        }
+
+        this.countryCacheManager.writeContent({
+            countries: countries,
+            lastCacheUpdate: new Date().getTime()
+        });
+        return countries;
+    }
+
+
+
+    async #calcCountryListFromScratch() {
         let dataPoints = await this.dataManager.getData();
         let tiles = this.#convertDataToTiles(dataPoints);
 
@@ -153,8 +202,30 @@ export default class extends Service {
             if (!countries[country]) countries[country] = [];
             countries[country].push(tile);
         }
+
         return countries;
     }
+
+
+    // async getCountryList() {
+    //     let dataPoints = await this.dataManager.getData();
+    //     let tiles = this.#convertDataToTiles(dataPoints);
+
+    //     let countries = {};
+    //     for (let tile of tiles)
+    //     {
+    //         let countrySet = coordinateToCountry(tile.lat, tile.long);
+    //         if (!countrySet.length) {
+    //             console.log('not found', countrySet);
+    //             continue;
+    //         }
+    //         let country = countrySet[0];
+
+    //         if (!countries[country]) countries[country] = [];
+    //         countries[country].push(tile);
+    //     }
+    //     return countries;
+    // }
 
 
 
