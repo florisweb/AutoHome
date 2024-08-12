@@ -95,6 +95,7 @@ body {
   z-index: 1000;
 
   max-height: calc(100vh - 70px - 30px);
+  min-width: 200px;
   overflow: auto;
 
   padding: 20px;
@@ -136,9 +137,88 @@ body {
   background: red;
 }
 
-#countryList.panel {
-  min-width: 200px;
+
+
+
+#travelPanel.panel {
+/*  bottom: 40px;*/
+/*  top: unset;*/
+  left: 20px;
+  right: unset;
+
 }
+
+#travelPanel.panel .listHolder .listItem {
+  --sectionHeight: 50px;
+  --pathColor: #f00;
+  padding: calc((var(--sectionHeight) - 30px) / 2) 0;
+  height: var(--sectionHeight);
+}
+
+#travelPanel.panel .listHolder .listItem .enterDate {
+  position: absolute;
+  left: 20px;
+  top: -7px;
+
+  height: 15px;
+  line-height: 15px;
+  font-size: 10px;
+}
+#travelPanel.panel .listHolder .listItem .title {
+  font-size: 14px;
+}
+#travelPanel.panel .listHolder .listItem .durationHolder {
+  position: relative;
+  margin-left: auto;
+  text-align: right;
+  font-size: 9px;
+  line-height: 30px;
+  color: #999;
+}
+
+
+#travelPanel.panel .listHolder .listItem:first-child {
+  margin-top: 20px;
+}
+
+#travelPanel.panel .listHolder .listItem:last-child::after {
+  position: absolute;
+  content: '';
+  display: block;
+  bottom: calc(-5px);
+
+  margin-right: 10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 20px;
+  border: 2px solid var(--pathColor);
+}
+
+
+
+#travelPanel.panel .listHolder .listItem .pathIndicator {
+  position: relative;
+  top: calc(-9px - 6px);
+
+  margin-right: 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 20px;
+  border: 2px solid var(--pathColor);;
+}
+#travelPanel.panel .listHolder .listItem .pathIndicator::after {
+  position: relative;
+  top: 6px;
+  left: 1.5px;
+  content: '';
+  display: block;
+  
+  width: 3px;
+  height: calc(var(--sectionHeight) - 6px);
+  background: var(--pathColor);
+}
+
+
 
 
 

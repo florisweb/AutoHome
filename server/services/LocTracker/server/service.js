@@ -62,6 +62,7 @@ export default class extends Service {
             'js/script.js',
             'js/topBar.js',
             'js/countryPanel.js',
+            'js/travelPanel.js',
             'css/main.css'
         ];
 
@@ -209,6 +210,7 @@ export default class extends Service {
     async getTravelList() {
         let dataPoints = await this.dataManager.getData();
         if (dataPoints.length < 2) return [];
+        dataPoints.sort((a, b) => new Date(a.date).getTime() > new Date(b.date).getTime());
         let countries = await this.getCountryList();
 
         let sections = [];
@@ -223,7 +225,7 @@ export default class extends Service {
             sections.push({
                 country: prevCountry,
                 start: prevPoint.date,
-                end: dataPoints[i - 1].date
+                end: dataPoints[i].date
             });
             prevPoint = dataPoints[i];
             prevCountry = curCountry;
