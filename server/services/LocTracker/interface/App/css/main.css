@@ -95,7 +95,7 @@ body {
   z-index: 1000;
 
   max-height: calc(100vh - 70px - 30px);
-  min-width: 200px;
+  min-width: 240px;
   overflow: auto;
 
   padding: 20px;
@@ -105,9 +105,15 @@ body {
   box-shadow: 5px 5px 30px rgba(255, 200, 200, .1);
 
   border-radius: 5px;
+
+  transition: opacity .3s, margin-top .3s;
 }
 
-
+.panel.hide {
+  opacity: 0;
+  pointer-events: none;
+  margin-top: -30px;
+}
 
 .listHolder {
   display: flex;
@@ -127,10 +133,35 @@ body {
 
 
 
+#countryList.panel {
+  left: 20px;
+  right: unset;
+  bottom: 20px;
+  top: unset;
+  max-width: 600px;
+}
+
+#countryList.panel .listHolder {
+  flex-direction: row;
+  margin-top: -25px;
+  margin-bottom: -5px;
+  margin-left: -17.5px;
+  margin-right: -7.5px;
+}
+#countryList.panel .listHolder .listItem {
+  margin-left: 12.5px;
+}
+
+#countryList.panel .listHolder .listItem .title {
+  font-size: 14px;
+  margin-left: 0;
+}
+
+
 #countryList.panel .listHolder .listItem .colorIndicator {
   position: relative;
   margin: 11.5px 0;
-  margin-right: 10px;
+  margin-right: 7px;
   width: 7px;
   height: 7px;
   border-radius: 20px;
@@ -139,12 +170,7 @@ body {
 
 
 
-
 #travelPanel.panel {
-/*  bottom: 40px;*/
-/*  top: unset;*/
-  left: 20px;
-  right: unset;
 
 }
 
@@ -240,5 +266,12 @@ body {
 @media only screen and (max-width: 600px) {
   #topBar {
     padding: 10px 0;
+  }
+  .panel {
+    width: calc(100vw - 40px);
+  }
+
+  #countryList.panel {
+    display: none;
   }
 }

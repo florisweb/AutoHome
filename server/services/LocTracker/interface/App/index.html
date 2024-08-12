@@ -20,15 +20,14 @@
   	<div id="topBar">
      <div class='logoHolder' onclick='window.location.replace("/")'>〈 Location Mapper</div>
      <div class='infoHolder tileCountHolder'>Tiles</div>
-     <div class='infoHolder countryCountHolder'>Countries</div>
+     <div class='infoHolder countryCountHolder' onclick='travelPanel.classList.toggle("hide")'>Countries</div>
     </div>
 
     <div class="panel" id='countryList'>
-      <div class="panelTitle">Countries</div>
       <div class="listHolder"></div>
     </div>
 
-     <div class="panel" id='travelPanel'>
+     <div class="panel hide" id='travelPanel'>
       <div class="panelTitle">Travel</div>
       <div class="listHolder">
        
