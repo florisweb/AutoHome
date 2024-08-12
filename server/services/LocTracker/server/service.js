@@ -79,6 +79,11 @@ export default class extends Service {
             let data = await this.getCountryList();
             _response.send(data);
         });
+
+        WebServer.registerEndPoint('/LocTracker/API/travelList.json', async (_request, _response) => {;
+            let data = await this.getTravelList();
+            _response.send(data);
+        });
     }
 
     onMessage(_message) {
@@ -200,22 +205,68 @@ export default class extends Service {
     }
 
 
+
+    async getTravelList() {
+        let dataPoints = await this.dataManager.getData();
+        if (dataPoints.length < 2) return [];
+        let countries = await this.getCountryList();
+
+        let sections = [];
+        let prevPoint = dataPoints[0];
+        let prevCountry = this.#getCountryFromPoint(prevPoint, countries);
+
+        for (let i = 1; i < dataPoints.length; i++)
+        {
+            let curCountry = this.#getCountryFromPoint(dataPoints[i], countries);
+            if (curCountry === prevCountry && i !== dataPoints.length - 1) continue;
+
+            sections.push({
+                country: prevCountry,
+                start: prevPoint.date,
+                end: dataPoints[i - 1].date
+            });
+            prevPoint = dataPoints[i];
+            prevCountry = curCountry;
+        }
+        return sections;
+    }
+
+    #getCountryFromPoint(_point, _countries) {
+        let tileCoords = this.#getTileCoordFromPoint(_point);
+        for (let country in _countries)
+        {
+            for (let tile of _countries[country])
+            {
+                if (tile.lat !== tileCoords.lat || tile.long !== tileCoords.long) continue;
+                return country;
+            }
+        }
+        return 'Unknown';
+    }
+
+
+
+
+
     #convertDataToTiles(_data) {
         let tileList = [];
         
         for (let point of _data)
         {
-            let lat = Math.floor(point.lat / this.#tileWidth) * this.#tileWidth;
-            let long = Math.floor(point.long / this.#tileHeight) * this.#tileHeight;
-            let foundTile = tileList.find((tile) => tile.lat === lat && tile.long === long);
+            let coord = this.#getTileCoordFromPoint(point);
+            let foundTile = tileList.find((tile) => tile.lat === coord.lat && tile.long === coord.long);
 
             if (!foundTile)
             {
-                tileList.push(new Tile({long: long, lat: lat}));
+                tileList.push(new Tile({long: coord.long, lat: coord.lat}));
             } else foundTile.counts++;
         }
 
         return tileList;
+    }
+
+    #getTileCoordFromPoint(_point) {
+         return {lat: Math.floor(_point.lat / this.#tileWidth) * this.#tileWidth, long: Math.floor(_point.long / this.#tileHeight) * this.#tileHeight}
     }
 
     #tileListToGrid(_list) {
