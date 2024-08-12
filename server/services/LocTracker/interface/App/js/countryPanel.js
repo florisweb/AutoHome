@@ -9,6 +9,7 @@ const CountryPanel = new class {
 
     for (let country in _countries)
     {
+      if (!_countries[country].color) _countries[country].color = [0, 0, 0];
       let element = this.#renderCountry(country, `rgb(${_countries[country].color.join(',')})`);
       this.HTML.listHolder.append(element);
     }

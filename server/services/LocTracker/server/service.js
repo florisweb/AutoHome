@@ -139,7 +139,6 @@ export default class extends Service {
         let countries = {};
         if (!cache || !cache.lastCacheUpdate)
         {
-            console.log('calcing countries from scratch')
             countries = await this.#calcCountryListFromScratch();
         } else {
             countries = cache.countries;
@@ -165,10 +164,7 @@ export default class extends Service {
                 if (foundTile) continue;
 
                 let countrySet = coordinateToCountry(tile.lat, tile.long);
-                 if (!countrySet.length) {
-                    console.log('not found', countrySet);
-                    continue;
-                }
+                if (!countrySet.length) continue;
                 let country = countrySet[0];
 
                 if (!countries[country]) countries[country] = [];
@@ -193,10 +189,7 @@ export default class extends Service {
         for (let tile of tiles)
         {
             let countrySet = coordinateToCountry(tile.lat, tile.long);
-            if (!countrySet.length) {
-                console.log('not found', countrySet);
-                continue;
-            }
+            if (!countrySet.length) continue;
             let country = countrySet[0];
 
             if (!countries[country]) countries[country] = [];
@@ -205,29 +198,6 @@ export default class extends Service {
 
         return countries;
     }
-
-
-    // async getCountryList() {
-    //     let dataPoints = await this.dataManager.getData();
-    //     let tiles = this.#convertDataToTiles(dataPoints);
-
-    //     let countries = {};
-    //     for (let tile of tiles)
-    //     {
-    //         let countrySet = coordinateToCountry(tile.lat, tile.long);
-    //         if (!countrySet.length) {
-    //             console.log('not found', countrySet);
-    //             continue;
-    //         }
-    //         let country = countrySet[0];
-
-    //         if (!countries[country]) countries[country] = [];
-    //         countries[country].push(tile);
-    //     }
-    //     return countries;
-    // }
-
-
 
 
     #convertDataToTiles(_data) {
