@@ -26,7 +26,7 @@ export default class extends DeviceService {
             onEvent: async (_data) => {
                 console.log('event', _data);
                 if (_data.type !== 'phoneCharging') return; // Initialization packet
-                this.playChargePhoneAnimation();
+                this.playChargePhoneAnimation(_data.data);
             }
         });
     }
@@ -39,8 +39,8 @@ export default class extends DeviceService {
     async onDeviceConnect() {
     }
 
-    async playChargePhoneAnimation() {
-        this.send({type: 'playChargePhoneAnimation', data: 0});
+    async playChargePhoneAnimation(_percentage = 100) {
+        this.send({type: 'playChargePhoneAnimation', data: _percentage});
     }
 }
 
