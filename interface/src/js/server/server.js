@@ -13,7 +13,7 @@ const Server = new class {
 		authButton: signInWithFloriswebButton,
 	}
 
-	socketServerURL = 'wss://' + window.location.hostname + ':8082';
+	socketServerURL = 'ws://' + window.location.hostname + ':8081';
 	Socket;
 	authenticated = false;
 

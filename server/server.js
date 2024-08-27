@@ -5,42 +5,16 @@ import { UnDifferentiatedClient } from './clients/unDifferentiatedClient.js';
 
 import Logger from './logger.js';
 
-import fs from 'fs';
 import { WebSocketServer } from 'ws';
-import https from 'https';
-import { fileURLToPath } from 'url';
-import path from 'path';
-const __dirname = path.dirname(fileURLToPath(new URL(import.meta.url)));
 
-const PORTS = {
-  IOT: 8081,
-  Interface: 8082
-}
+const PORT = 8081;
+const wss = new WebSocketServer({ port: PORT });
+console.log("The WebSocket server is running on port " + PORT);
+Logger.log("The WebSocket server is running on port " + PORT, null, 'SYSTEM');
 
-const httpsServer =  https.createServer({
-    key: fs.readFileSync(__dirname + "/certificates/thuiswolk.local.key.pem"),
-    cert: fs.readFileSync(__dirname + "/certificates/thuiswolk.local.cer.pem"),
-}).listen(PORTS.Interface)
-
-const InterfaceWSS = new WebSocketServer({ 
-  server: httpsServer
-});
-const IOTWSS = new WebSocketServer({ port: PORTS.IOT });
-
-console.log("The WebSocket servers are running on ports " + JSON.stringify(PORTS));
-Logger.log("The WebSocket servers are running on ports " + JSON.stringify(PORTS), null, 'SYSTEM');
-
-IOTWSS.on("connection", _conn => {
+wss.on("connection", _conn => {
   new UnDifferentiatedClient(_conn);
 });
-
-InterfaceWSS.on("connection", _conn => {
-  new UnDifferentiatedClient(_conn);
-});
-
-
-
-
 
 // Remove disconnected clients
 const interval = setInterval(function () {

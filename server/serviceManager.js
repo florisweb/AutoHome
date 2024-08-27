@@ -176,7 +176,7 @@ export default new class {
         {
             if (!service.wantedServices.includes(_service.id)) continue;
             Logger.log("Loaded wanted service " + _service.id + " of " + service.id + ".", null, 'SERVICES');
-            service.onWantedServiceLoad(service);
+            service.onWantedServiceLoad(_service);
         }
     }
 
