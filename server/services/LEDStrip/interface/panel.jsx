@@ -41,6 +41,7 @@ export default class extends HomePagePanel {
     }
 
     updateData() {
+    	if (!this.html.subText) return;
     	this.html.subText.children[0].style.background = '#f00';
     	this.setOnlineState(this.service.state.deviceOnline);
     }

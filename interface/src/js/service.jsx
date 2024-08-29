@@ -6,7 +6,7 @@ const ServiceManager = new function() {
 	const ServiceId = 'serviceManager';
 	this.services = [];
 
-	this.setup = function() {
+	this.setup = async function() {
 		for (let service of this.services) service.setup();
 	}
 
@@ -17,9 +17,20 @@ const ServiceManager = new function() {
 		return this.services.find((_service) => _service.id == _id);
 	}
 
-	this.getServiceConditions = function() {
-		let message = new RequestMessage({serviceId: ServiceId, type: 'getServiceConditions'})
-		return message.send();
+	this.getServiceConditions = async function() {
+		let message = new RequestMessage({serviceId: ServiceId, type: 'getServiceConditions'});
+		let state = await message.send();;
+		for (let serviceId in state)
+		{
+			for (let service of this.services)
+			{
+				if (service.id !== serviceId) continue;
+				service.enabled = state[serviceId].enabled;
+				break;
+			}
+		}
+
+		return state;
 	}
 
 	this.setEnableState = function(_serviceId, _enable) {
@@ -39,7 +50,17 @@ export class Service {
 	panel;
 	iconSrc;
 
+	
 	#args;
+	#enabled = false;
+	set enabled(_value) {
+		this.#enabled = _value;
+		this.panel?.setVisibility(_value);
+	}
+
+	get enabled() {
+		return this.#enabled;
+	}
 
 	constructor({id, name, pageConstructor, panelConstructor, iconSrc}) {
 		this.id = id;

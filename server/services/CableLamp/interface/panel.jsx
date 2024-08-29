@@ -81,6 +81,7 @@ export default class extends HomePagePanel {
 		this.html.lightBolbIcon.setAttribute('src', "images/lightBolb" + (_lampOn ? "On" : "Off") + ".png");
 	}
 	setSternIntensity(_intensity) {
+    	if (!this.html.icon) return;
     	let src = _intensity > 0 ? 'images/sternOn.png' : 'images/sternOff.png';
     	this.html.icon.setAttribute('src', src);
     	setTextToElement(this.html.subText, 'Intensity: ' + (_intensity ?? '-') + '%');

@@ -65,6 +65,7 @@ const Server = new class {
 				return this.requireAuthentication();
 			}			
 			this.#closeLoadScreen();
+			await ServiceManager.getServiceConditions();
 		}
 
 		this.Socket.onerror = function(_error) {

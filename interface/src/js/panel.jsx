@@ -18,6 +18,11 @@ export class Panel {
 	}
 	
 	renderContent() {}
+
+	setVisibility(_visible) {
+		if (!this.html.self) return;
+		this.html.self.classList.toggle('hide', !_visible);
+	}
 }
 
 
@@ -37,6 +42,7 @@ export class HomePagePanel extends Panel {
 			if (!this.service.page) return;
 			MainContent.servicePage.open(this.service);
 		});
+		this.setVisibility(this.service.enabled);
 		return html;
 	}
 
@@ -49,10 +55,7 @@ export class HomePagePanel extends Panel {
 	setOnlineState(_isOnline) {
 		this.#isOnline = _isOnline;
 		if (!this.html.onlineIndicator) return;
-
-		this.html.onlineIndicator.classList.remove("online");
-		if (!this.#isOnline) return;
-		this.html.onlineIndicator.classList.add("online");
+		this.html.onlineIndicator.classList.toggle("online", this.#isOnline);
 	}
 }
 

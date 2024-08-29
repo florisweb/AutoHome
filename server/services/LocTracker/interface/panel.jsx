@@ -28,6 +28,7 @@ export default class extends HomePagePanel {
     }
 
     updateData(_newTileCount) {
+        if (!this.html.state) return;
         setTextToElement(this.html.state, _newTileCount + ' new tiles in the last 4 weeks')
     }
 }
