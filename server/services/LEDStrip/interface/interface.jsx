@@ -3,12 +3,10 @@ import panelConstructor from './panel.jsx';
 
 export default new class extends Service {
 	state = {
-		lampOn: false,
-		sternIntensity: 0,
 	};
 
 	get iconSrc() {
-		return this.state.lampOn ? 'images/lightBolbOn.png' : 'images/lightBolbOff.png';
+		return 'images/lightBolbOn.png';
 	}
 
 	constructor() {
@@ -30,16 +28,7 @@ export default new class extends Service {
 		}
 	}
 
-
-	toggleLight() {
-		return this.setLampState(!this.state.lampOn);
-	}
-
-	setLampState(_lampOn) {
-		return this.send({type: "setLampState", data: _lampOn})
-	}
-
-	setSternIntensity(_intensity) {
-		return this.send({type: 'setSternIntensity', data: _intensity})
+	setColor(_rgb) {
+		return this.send({type: 'setColor', data: _rgb})	
 	}
 }

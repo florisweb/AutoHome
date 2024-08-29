@@ -7,85 +7,53 @@ import { Button, Slider } from '../../components.jsx';
 export default class extends HomePagePanel {
     constructor(_service) {
         super({
-            size: [1, 2.4],
+            size: [1, 1],
         }, _service)
     }
     render() {
         let html = super.render();
-        html.className += ' CableLamp hasIcon hasButtonBar';
+        html.className += ' LEDStrip hasIcon';
         return html;
     }
 
     renderContent() {
-    	let content = [this.renderSternPanel(), this.renderCablePanel()];
-    	this.updateData();
-    	return content;
-    }
-
-    renderCablePanel() {
-    	this.html.lampStatus = <div className='text subText'>lamp off</div>;
-		let toggleButton = new Button({
-			text: "Toggle",
-			onclick: (_e) => {
-				this.service.toggleLight();
-				_e.stopPropagation();
-			}
-		});
-
-		this.html.lightBolbIcon = <img className='panelIcon' src='images/lightBolbOn.png'></img>;
-		return <div className='cablePanel Panel animateIn hasIcon'>
-			{this.html.lightBolbIcon}
-			<div className='text panelTitle'>{this.service.name}</div>
-			{this.html.lampStatus}
-			<div className='bottomBar'>
-				{toggleButton.render()}
-			</div>
-		</div>
-    }
-
-
-    renderSternPanel() {
-    	this.html.subText = <div className='text subText'>0%</div>;
-		this.html.intensitySlider = new Slider({
-			min: 0, 
-			max: 100,
-			onInput: (_intensity) => {
-				this.service.setSternIntensity(_intensity);
-				this.setSternIntensity(_intensity);
-			}
-		});
-
+    	this.html.subText = <div className='text subText'>
+    		<div class='curColorIndicator'></div>
+    	</div>;
+		this.html.colorInput = <input type='color' className='colorPicker' value='#f00'/>;
+		this.html.colorInput.addEventListener('input', () => this.#onInput());
 		this.html.icon = <img className='panelIcon' src='images/sternOn.png'></img>;
 		let onlineIndicator = this.renderOnlineIndicator();
 
-		return <div className='sternPanel Panel animateIn hasIcon'>
-			{this.html.icon}
-			<div className='text panelTitle'>Stern</div>
-			{onlineIndicator}
-			{this.html.subText}
-			<div className='bottomBar'>
-				{this.html.intensitySlider.render()}
-			</div>
-		</div>
+		return [
+			this.html.icon,
+			<div className='text panelTitle'>{this.service.name}</div>,
+			onlineIndicator,
+			this.html.subText,
+			this.html.colorInput,
+		];
+    }
+
+    #onInput() {
+    	const base = 100;
+    	let color = hexToRGB(this.html.colorInput.value, 1);
+    	this.service.setColor(color);
     }
 
     updateData() {
-    	this.setLampState(this.service.state.lampOn);
+    	this.html.subText.children[0].style.background = '#f00';
     	this.setOnlineState(this.service.state.deviceOnline);
-        this.setSternIntensity(this.service.state.sternIntensity);
-    }
-
-	setLampState(_lampOn) {
-		if (!this.html.lampStatus) return;
-		setTextToElement(this.html.lampStatus, _lampOn ? "Lamp On" : "Lamp Off");
-		this.html.lightBolbIcon.setAttribute('src', "images/lightBolb" + (_lampOn ? "On" : "Off") + ".png");
-	}
-	setSternIntensity(_intensity) {
-    	let src = _intensity > 0 ? 'images/sternOn.png' : 'images/sternOff.png';
-    	this.html.icon.setAttribute('src', src);
-    	setTextToElement(this.html.subText, 'Intensity: ' + (_intensity ?? '-') + '%');
-    	this.html.intensitySlider.value = _intensity;
     }
 }
+
+
+function hexToRGB(_hex, _intensity = 1) {
+	let number = parseInt('0x' + (_hex.split('#')[1]))
+	return [
+		((number & 0xff0000) >> 16) * _intensity,
+		((number & 0x00ff00) >> 8) * _intensity,
+		((number & 0x0000ff)) * _intensity
+    ];
+};
 
 

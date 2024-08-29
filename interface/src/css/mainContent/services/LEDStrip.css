@@ -1,0 +1,10 @@
+
+
+.Panel.LEDStrip .colorPicker {
+	position: relative;
+	grid-area: onlineIndicator;
+	top: 2.5px;
+	right: 50px;
+	width: 35px;
+	height: 35px;
+}

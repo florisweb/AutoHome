@@ -97,5 +97,7 @@ class PushMessage extends Message {
 function parseJSON(_string) {
     try {
         return JSON.parse(_string);
-    } catch (e) {return E_InvalidJSON};
+    } catch (e) {
+        return E_InvalidJSON;
+    };
 }
