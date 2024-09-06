@@ -3,14 +3,9 @@
   "name": "ThuisWolk",
   "icons": [
     {
-      "src": "images/logo.png",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "logo100.png",
+      "src": "thuisWolkLogo_PWA.png",
       "type": "image/png",
-      "sizes": "100x100"
+      "sizes": "300x300"
     }
   ],
   "start_url": ".",

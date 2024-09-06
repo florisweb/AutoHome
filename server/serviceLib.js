@@ -83,7 +83,6 @@ export class Service {
 export class DeviceService extends Service {
     get isDeviceService() {return true};
     #key;
-    deviceInfo = {};
     
     curState = new DeviceServiceState();
     deviceClient = false;
@@ -127,11 +126,6 @@ export class DeviceService extends Service {
     onDeviceConnect() {}
     onDeviceDisconnect() {};
     onMessage(_message) {
-        if (_message.type === 'deviceInfo')
-        {
-            this.deviceInfo = _message.data;
-            return this.pushEvent(...arguments)
-        }
         return _message;
     }
 }

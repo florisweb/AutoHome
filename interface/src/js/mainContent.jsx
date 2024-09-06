@@ -1,6 +1,7 @@
 import { appendContent } from './extraFunctions.js';
 import GestureManager from './gestureManager.js';
-import { DownTimePanel, SystemPagePanel } from './panel.jsx';
+import { Panel, DownTimePanel, SystemPagePanel } from './panel.jsx';
+import { Button } from './components.jsx';
 import ServiceManager from './service.jsx';
 import { Page, PageHeader } from './page.jsx' ;
 
@@ -188,12 +189,14 @@ class MainContent_serviceConfigPage extends Page {
 		this.header.html.leftButton.addEventListener('click', () => MainContent.systemPage.open());
 
 		this.downTimePanel = new DownTimePanel({size: [2, 3]});
+		this.infoPanel = new ServiceInfoPanel({size: [2, 2]}, this);
 	}
 
 	open(_service) {
 		this.curService = _service;
 		this.header.title = _service.name;
 		this.header.pageIconSrc = _service.iconSrc;
+		this.infoPanel.updateContent();
 
 		return super.open();
 	}
@@ -206,6 +209,7 @@ class MainContent_serviceConfigPage extends Page {
 			this.header.render(),
 			<div className='panelBoxHolder'>
 				<div className='PanelBox'>
+					{ this.infoPanel.render() }
 					{ this.downTimePanel.render() }
 				</div>
 			</div>
@@ -217,5 +221,41 @@ class MainContent_serviceConfigPage extends Page {
 	}
 }
 
+class ServiceInfoPanel extends Panel {
+	#parent;
+	#versionHolder;
+	#eventHolder;
+	#endPointHolder;
+
+	constructor(_config, _parent) {
+		super(_config);
+		this.#parent = _parent
+		this.#versionHolder = <div></div>;
+		this.#eventHolder = <div></div>;
+		this.#endPointHolder = <div></div>;
+		
+	}
+	render() {
+		let html = super.render(...arguments);
+		html.classList.add('ServiceInfoPanel')
+		return html;
+	}
+
+	renderContent() {
+		return <div>
+			{ new Button({text: 'Identify', onclick: () => this.#parent.curService.identify(), boxy: true}).render() }
+			{ this.#versionHolder }
+			{ this.#eventHolder }
+			{ this.#endPointHolder }
+		</div>;
+	}
+
+	async updateContent() {
+		let info = await this.#parent.curService.getDeviceInfo();
+		this.#versionHolder.innerHTML = 'ConnectionManager version: ' + info.connectionManagerVersion;
+		this.#eventHolder.innerHTML = '<br>Events:<br>' + JSON.stringify(info.events);
+		this.#endPointHolder.innerHTML = '<br>Endpoints:<br>' +  JSON.stringify(info.endPoints);
+	}
+}
 
 

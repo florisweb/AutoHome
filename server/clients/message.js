@@ -5,7 +5,8 @@ export function parseMessage(_string, _client) {
     let data = parseJSON(_string);
     if (data === E_InvalidJSON) return false;
     if (data.id && data.requestId) return new AuthMessage(data, _client);
-    if (data.requestId) return new RequestMessage(data, _client);
+    if (data.requestId && !data.isResponse) return new RequestMessage(data, _client);
+    if (data.requestId && data.isResponse) return new ResponseMessage(data, _client);
     return new PushMessage(data, _client);
 }
 
@@ -64,6 +65,27 @@ class RequestMessage extends Message {
         return JSON.stringify(messsage);
     }
 }
+
+class ResponseMessage extends RequestMessage {
+    isResponse = true;
+    response;
+    constructor({response}) {
+        super(...arguments);
+        this.response = response;
+    }
+    stringify() {
+        let messsage = {
+            response: this.response,
+            type: this.type,
+            serviceId: this.serviceId,
+            requestId: this.requestId,
+            isResponse: this.isResponse,
+            isRequestMessage: true,
+        }
+        return JSON.stringify(messsage);
+    }
+}
+
 
 class AuthMessage extends RequestMessage {
     isAuthMessage = true;

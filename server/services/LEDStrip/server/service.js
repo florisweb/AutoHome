@@ -34,7 +34,7 @@ export default class extends DeviceService {
 
     onMessage(_message) {
         super.onMessage(_message);
-        this.pushCurState();
+        this.pushEvent(_message);
     }
 
     async onDeviceConnect() {

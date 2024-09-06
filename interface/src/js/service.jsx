@@ -90,6 +90,14 @@ export class Service {
 	identify() {
 		this.send({type: "identify"});
 	}
+
+	getDeviceInfo() {
+		let message = new RequestMessage({
+			type: 'getDeviceInfo',
+			serviceId: this.id
+		}, this);
+		return message.send();
+	}
 }
 
 

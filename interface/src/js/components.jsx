@@ -460,11 +460,12 @@ export function DownTimeGraph({} = {}) {
 
 	function renderDayWrapper(_hourData, _date) {
 		let hourPills = [];
+		const msPerPill = 60 * 60 * 1000;
 
-		for (let i = 0; i < 24; i++)
+		for (let i = 0; i < msPerDay / msPerPill; i++)
 		{
-			let maxDate = _date.getTime() + i * 60 * 60 * 1000;
-			let isCurPill = Math.abs(Date.now() - maxDate) < 60 * 60 * 1000 && Date.now() - maxDate < 0;
+			let maxDate = _date.getTime() + i * msPerPill;
+			let isCurPill = Math.abs(Date.now() - maxDate) < msPerPill && Date.now() - maxDate < 0;
 			hourPills.push(renderHourPill(_hourData[i], Date.now() < maxDate, isCurPill));
 		}
 		let dateName = _date.getDate() + " " + _date.getMonths()[_date.getMonth()].name.substr(0, 3)

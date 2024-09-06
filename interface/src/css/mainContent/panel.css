@@ -343,6 +343,13 @@
 
 
 
+.Panel.ServiceInfoPanel {
+    height: auto !important;
+    display: inline-block;
+    font-size: 14px;
+}
+
+
 
 
 :root {
