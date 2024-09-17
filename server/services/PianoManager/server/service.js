@@ -6,7 +6,6 @@ import { Service } from '../../../serviceLib.js';
 export default class extends Service {
     #reConnectInterval = 15 * 1000;
     #LEDStripService;
-    #preDefinedPianoDeviceName = 'Digital Piano';
 
     constructor({id, config}) {
         super(arguments[0]);
@@ -18,9 +17,7 @@ export default class extends Service {
         if (!pianoDevice) return setTimeout(() => this.attachPiano(), this.#reConnectInterval);
         this.resolveOnDisconnect().then(() => setTimeout(() => this.attachPiano(), this.#reConnectInterval));
 
-        var input = new easymidi.Input(pianoDevice);
         let curLEDBatch = [];
-
         let handleOnNote = (msg, _on) => {
             let rgb = HSVtoRGB(Math.max(Math.min(msg.velocity / 100, 1), 0), 1, 1);
             if (!_on) rgb = [0, 0, 0];
@@ -28,17 +25,25 @@ export default class extends Service {
             curLEDBatch.push(msg.note * 2 + 1, ...rgb);
 
             setTimeout(() => {
-                console.log('send batch', curLEDBatch);
                 this.sendLEDData(curLEDBatch);
                 curLEDBatch = [];
             }, 1);
         }
-        input.on('noteon', (msg) => handleOnNote(msg, true));
-        input.on('noteoff', (msg) => handleOnNote(msg, false));
+        pianoDevice.on('noteon', (msg) => handleOnNote(msg, true));
+        pianoDevice.on('noteoff', (msg) => handleOnNote(msg, false));
     }
 
     getPianoMidiDevice() {
-        if (this.#preDefinedPianoDeviceName) return this.#preDefinedPianoDeviceName;
+        let deviceName = this.#getPianoMidiDeviceName();
+        try {
+            return new easymidi.Input(deviceName);
+        } catch {
+            return false;
+        }
+    }
+
+    #getPianoMidiDeviceName() {
+        if (this.config.preDefinedDeviceName) return this.config.preDefinedDeviceName;
         let devices = easymidi.getInputs();
         return devices[0];
     }
@@ -93,9 +98,6 @@ function HSVtoRGB(h, s, v) {
         Math.round(b * 255)
     ]
 }
-
-
-
 
 
 

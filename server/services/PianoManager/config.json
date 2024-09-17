@@ -1,5 +1,7 @@
 {
     "hasUI": false,
     "key": "",
-    "requires": ["LEDStrip"]
+    "requires": ["LEDStrip"],
+
+    "preDefinedPianoDeviceName": "Digital Piano"
 }
