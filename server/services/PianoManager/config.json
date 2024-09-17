@@ -3,5 +3,5 @@
     "key": "",
     "requires": ["LEDStrip"],
 
-    "preDefinedPianoDeviceName": "Digital Piano"
+    "preDefinedDeviceName": "Digital Piano"
 }
