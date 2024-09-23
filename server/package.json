@@ -6,6 +6,7 @@
     "coordinate_to_country": "^1.1.0",
     "crypto": "^1.0.1",
     "crypto-js": "^4.1.1",
+    "easymidi": "^3.1.0",
     "express": "^4.17.2",
     "fs": "^0.0.1-security",
     "https": "^1.0.0",

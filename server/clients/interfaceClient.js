@@ -34,7 +34,6 @@ export class InterfaceClient extends BaseClient {
                     message.respond(await ServiceManager.getServiceConditions());
                     break;
                 case "setServiceEnableState":
-                    console.log('??message', message)
                     message.respond(await ServiceManager.setServiceEnableState(message.data.serviceId, message.data.enable));
                     break;
             }

@@ -31,7 +31,7 @@ export default class extends Service {
         WebServer.registerEndPoint('/ShortCutAPI/upload', async (_request, _response) => {
             if (_request.method !== 'POST') return _response.sendStatus(400);
             try {
-                let data = JSON.parse(_request.body.data)
+                let data = JSON.parse(_request.body.data);
                 let subscriber = this.subscribers.find((sub) => sub.acceptorService.id === data.serviceId || sub.acceptorService.id === _request.body.serviceId)
                 console.log('[ShortCutAPI] Upload data:', !!subscriber, data.serviceId);
                 if (!subscriber) return _response.sendStatus(400);
