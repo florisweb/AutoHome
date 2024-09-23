@@ -1,6 +1,29 @@
-
 import easymidi from 'easymidi';
-import { Service } from '../../../serviceLib.js';
+import { Subscriber, Service } from '../../../serviceLib.js';
+
+
+
+function CustomSubscriber(_config) {
+    const This = this;
+    Subscriber.call(this, {..._config, handleRequest: handleRequest});
+
+    async function handleRequest(_message) {
+        console.log('handleRequest', _message)
+        switch (_message.type)
+        {
+            case "setLightningMode": 
+                This.service.lightningMode = _message.data;
+                break;
+            case "getLightningMode": 
+                if (!_message.isRequestMessage) return;
+                return _message.respond({
+                    type: 'lightningMode',
+                    data: This.service.lightningMode
+                });
+        }
+    }
+}
+
 
 
 export default class extends Service {
@@ -8,10 +31,37 @@ export default class extends Service {
     #LEDStripService;
     #LEDIndexRange = [224, 299];
     #NoteIndexRange = [21, 108];
+    #sustainedKeys = []; // [key, velocity, time]
+    #loopFrequency = 20; // ms per loop
 
+    #sustainDuration = 2000;
+    #sustainOn = false;
+
+
+    #lightningMode = "sustain"; // Sustain, keypress, off
+
+    #NoteCount = this.#NoteIndexRange[1] - this.#NoteIndexRange[0];
+    #LEDCount = this.#LEDIndexRange[1] - this.#LEDIndexRange[0];
+    #LEDsPerNote = Math.min(Math.round(this.#LEDCount / this.#NoteCount), 1);
+    
     constructor({id, config}) {
-        super(arguments[0]);
+        super(arguments[0], CustomSubscriber);
         this.attachPiano();
+    }
+    
+    get lightningMode() {
+        return this.#lightningMode;
+    }
+    set lightningMode(_mode) {
+        if (_mode === "sustain") 
+        {
+            this.#lightningMode = "sustain";
+            this.#sustainUpdateLoop();
+        } else {
+            for (let key of this.#sustainedKeys) key.duration = this.#loopFrequency + 1; // Turn all sustained keys off when 
+            this.#sustainUpdateLoop();
+        }
+        this.#lightningMode = _mode;
     }
 
     attachPiano() {
@@ -19,21 +69,18 @@ export default class extends Service {
         if (!pianoDevice) return setTimeout(() => this.attachPiano(), this.#reConnectInterval);
         this.resolveOnDisconnect().then(() => setTimeout(() => this.attachPiano(), this.#reConnectInterval));
 
-        const NoteCount = this.#NoteIndexRange[1] - this.#NoteIndexRange[0];
-        const LEDCount = this.#LEDIndexRange[1] - this.#LEDIndexRange[0];
-        const LEDsPerNote = Math.round(LEDCount / NoteCount);
-        if (LEDsPerNote === 0) LEDsPerNote = 1;
-
+        this.#sustainUpdateLoop();
 
         let curLEDBatch = [];
         let handleOnNote = (msg, _on) => {
+            if (this.#lightningMode !== "keypress") return;
             let rgb = HSVtoRGB(Math.max(Math.min(msg.velocity / 100, 1), 0), 1, 1);
             if (!_on) rgb = [0, 0, 0];
 
-            let percNote = 1 - (msg.note - this.#NoteIndexRange[0]) / NoteCount;
-            let index = Math.floor(this.#LEDIndexRange[0] + LEDCount * percNote);
+            let percNote = 1 - (msg.note - this.#NoteIndexRange[0]) / this.#NoteCount;
+            let index = Math.floor(this.#LEDIndexRange[0] + this.#LEDCount * percNote);
 
-            for (let i = 0; i < LEDsPerNote; i++)
+            for (let i = 0; i < this.#LEDsPerNote; i++)
             {
                 curLEDBatch.push(index + i, ...rgb);
             }
@@ -45,6 +92,70 @@ export default class extends Service {
         }
         pianoDevice.on('noteon', (msg) => handleOnNote(msg, true));
         pianoDevice.on('noteoff', (msg) => handleOnNote(msg, false));
+        
+
+
+
+
+        pianoDevice.on('noteon', (msg) => {
+            if (this.#lightningMode !== "sustain") return;
+            this.#sustainedKeys = this.#sustainedKeys.filter((key) => key[0] !== msg.note); // Prevent doubles
+            let trueDuration = this.#sustainDuration * (msg.velocity / 125);
+
+            this.#sustainedKeys.push({
+                note: msg.note,
+                velocity: msg.velocity,
+                duration: trueDuration,
+                startedUnderSustain: this.#sustainOn,
+                released: false,
+            });
+        });
+
+        pianoDevice.on('noteoff', (msg) => {
+            if (this.#lightningMode !== "sustain") return;
+            let key = this.#sustainedKeys.find((_key) => _key.note === msg.note); 
+            if (!key) return;
+            key.released = true;
+            if (key.startedUnderSustain) return; // Don't turn off if started under sustain
+            key.duration = this.#loopFrequency + 1;
+        });
+        pianoDevice.on('cc', (msg) => {
+            if (this.#lightningMode !== "sustain") return;
+            if (msg.controller !== 64) return; // Not sustain
+            this.#sustainOn = msg.value > 70;// 0 - 127
+            if (this.#sustainOn) return;
+            let sustainedKeys = this.#sustainedKeys.filter(_key => _key.startedUnderSustain && _key.released); 
+            for (let key of sustainedKeys) key.duration = this.#loopFrequency + 1; // Turn all sustained keys off when 
+        })
+    }
+
+    #sustainUpdateLoop() {
+        if (this.#lightningMode !== "sustain") return;
+
+        for (let key of this.#sustainedKeys) key.duration -= this.#loopFrequency;
+        this.#sustainedKeys = this.#sustainedKeys.filter((key) => key.duration > 0);
+
+        let curLEDBatch = [];
+        for (let key of this.#sustainedKeys) {
+            let perc = key.duration / this.#sustainDuration;
+            let intensity = Math.min((2 / (2 - perc * .5) - 1) / .3, 1);
+
+
+            let rgb = HSVtoRGB(Math.max(Math.min(key.velocity / 100, 1), 0), 1, intensity);
+            if (intensity < this.#loopFrequency / this.#sustainDuration * 2) rgb = [0, 0, 0];
+
+            let percNote = 1 - (key.note - this.#NoteIndexRange[0]) / this.#NoteCount;
+            let index = Math.floor(this.#LEDIndexRange[0] + this.#LEDCount * percNote);
+
+            for (let i = 0; i < this.#LEDsPerNote; i++)
+            {
+                curLEDBatch.push(index + i, ...rgb);
+            }
+        }
+
+        if (curLEDBatch.length) this.sendLEDData(curLEDBatch);
+        curLEDBatch = [];
+        setTimeout(() => this.#sustainUpdateLoop(), this.#loopFrequency);
     }
 
     getPianoMidiDevice() {
