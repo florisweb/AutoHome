@@ -6,6 +6,8 @@ import { Service } from '../../../serviceLib.js';
 export default class extends Service {
     #reConnectInterval = 15 * 1000;
     #LEDStripService;
+    #LEDIndexRange = [224, 299];
+    #NoteIndexRange = [21, 108];
 
     constructor({id, config}) {
         super(arguments[0]);
@@ -17,12 +19,24 @@ export default class extends Service {
         if (!pianoDevice) return setTimeout(() => this.attachPiano(), this.#reConnectInterval);
         this.resolveOnDisconnect().then(() => setTimeout(() => this.attachPiano(), this.#reConnectInterval));
 
+        const NoteCount = this.#NoteIndexRange[1] - this.#NoteIndexRange[0];
+        const LEDCount = this.#LEDIndexRange[1] - this.#LEDIndexRange[0];
+        const LEDsPerNote = Math.round(LEDCount / NoteCount);
+        if (LEDsPerNote === 0) LEDsPerNote = 1;
+
+
         let curLEDBatch = [];
         let handleOnNote = (msg, _on) => {
             let rgb = HSVtoRGB(Math.max(Math.min(msg.velocity / 100, 1), 0), 1, 1);
             if (!_on) rgb = [0, 0, 0];
-            curLEDBatch.push(msg.note * 2, ...rgb);
-            curLEDBatch.push(msg.note * 2 + 1, ...rgb);
+
+            let percNote = 1 - (msg.note - this.#NoteIndexRange[0]) / NoteCount;
+            let index = Math.floor(this.#LEDIndexRange[0] + LEDCount * percNote);
+
+            for (let i = 0; i < LEDsPerNote; i++)
+            {
+                curLEDBatch.push(index + i, ...rgb);
+            }
 
             setTimeout(() => {
                 this.sendLEDData(curLEDBatch);
