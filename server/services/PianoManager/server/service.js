@@ -1,5 +1,5 @@
 import easymidi from 'easymidi';
-import { Subscriber, Service } from '../../../serviceLib.js';
+import { Subscriber, Service, ServiceState } from '../../../serviceLib.js';
 
 
 
@@ -8,7 +8,6 @@ function CustomSubscriber(_config) {
     Subscriber.call(this, {..._config, handleRequest: handleRequest});
 
     async function handleRequest(_message) {
-        console.log('handleRequest', _message)
         switch (_message.type)
         {
             case "setLightningMode": 
@@ -27,7 +26,12 @@ function CustomSubscriber(_config) {
 
 
 export default class extends Service {
-    #reConnectInterval = 15 * 1000;
+    curState = new ServiceState({
+        pianoConnected: false,
+        lightningMode: 'sustain' // Sustain, keypress, off
+    });
+
+    #reConnectInterval = 500;
     #LEDStripService;
     #LEDIndexRange = [224, 299];
     #NoteIndexRange = [21, 108];
@@ -37,9 +41,6 @@ export default class extends Service {
     #sustainDuration = 2000;
     #sustainOn = false;
 
-
-    #lightningMode = "sustain"; // Sustain, keypress, off
-
     #NoteCount = this.#NoteIndexRange[1] - this.#NoteIndexRange[0];
     #LEDCount = this.#LEDIndexRange[1] - this.#LEDIndexRange[0];
     #LEDsPerNote = Math.min(Math.round(this.#LEDCount / this.#NoteCount), 1);
@@ -48,32 +49,39 @@ export default class extends Service {
         super(arguments[0], CustomSubscriber);
         this.attachPiano();
     }
+
     
     get lightningMode() {
-        return this.#lightningMode;
+        return this.curState.lightningMode;
     }
     set lightningMode(_mode) {
         if (_mode === "sustain") 
         {
-            this.#lightningMode = "sustain";
+            this.curState.lightningMode = "sustain";
             this.#sustainUpdateLoop();
         } else {
             for (let key of this.#sustainedKeys) key.duration = this.#loopFrequency + 1; // Turn all sustained keys off when 
             this.#sustainUpdateLoop();
         }
-        this.#lightningMode = _mode;
+        this.curState.lightningMode = _mode;
+        this.pushCurState();
     }
 
     attachPiano() {
         let pianoDevice = this.getPianoMidiDevice();
         if (!pianoDevice) return setTimeout(() => this.attachPiano(), this.#reConnectInterval);
-        this.resolveOnDisconnect().then(() => setTimeout(() => this.attachPiano(), this.#reConnectInterval));
+        this.#onPianoConnectStateChange(true);
+        this.resolveOnDisconnect().then(() => {
+            pianoDevice.close();
+            this.#onPianoConnectStateChange(false);
+            setTimeout(() => this.attachPiano(), this.#reConnectInterval);
+        });
 
         this.#sustainUpdateLoop();
 
         let curLEDBatch = [];
         let handleOnNote = (msg, _on) => {
-            if (this.#lightningMode !== "keypress") return;
+            if (this.curState.lightningMode !== "keypress") return;
             let rgb = HSVtoRGB(Math.max(Math.min(msg.velocity / 100, 1), 0), 1, 1);
             if (!_on) rgb = [0, 0, 0];
 
@@ -88,17 +96,14 @@ export default class extends Service {
             setTimeout(() => {
                 this.sendLEDData(curLEDBatch);
                 curLEDBatch = [];
-            }, 1);
+            }, 5);
         }
         pianoDevice.on('noteon', (msg) => handleOnNote(msg, true));
         pianoDevice.on('noteoff', (msg) => handleOnNote(msg, false));
         
 
-
-
-
         pianoDevice.on('noteon', (msg) => {
-            if (this.#lightningMode !== "sustain") return;
+            if (this.curState.lightningMode !== "sustain") return;
             this.#sustainedKeys = this.#sustainedKeys.filter((key) => key[0] !== msg.note); // Prevent doubles
             let trueDuration = this.#sustainDuration * (msg.velocity / 125);
 
@@ -112,7 +117,7 @@ export default class extends Service {
         });
 
         pianoDevice.on('noteoff', (msg) => {
-            if (this.#lightningMode !== "sustain") return;
+            if (this.curState.lightningMode !== "sustain") return;
             let key = this.#sustainedKeys.find((_key) => _key.note === msg.note); 
             if (!key) return;
             key.released = true;
@@ -120,7 +125,7 @@ export default class extends Service {
             key.duration = this.#loopFrequency + 1;
         });
         pianoDevice.on('cc', (msg) => {
-            if (this.#lightningMode !== "sustain") return;
+            if (this.curState.lightningMode !== "sustain") return;
             if (msg.controller !== 64) return; // Not sustain
             this.#sustainOn = msg.value > 70;// 0 - 127
             if (this.#sustainOn) return;
@@ -130,7 +135,7 @@ export default class extends Service {
     }
 
     #sustainUpdateLoop() {
-        if (this.#lightningMode !== "sustain") return;
+        if (this.curState.lightningMode !== "sustain") return;
 
         for (let key of this.#sustainedKeys) key.duration -= this.#loopFrequency;
         this.#sustainedKeys = this.#sustainedKeys.filter((key) => key.duration > 0);
@@ -160,6 +165,7 @@ export default class extends Service {
 
     getPianoMidiDevice() {
         let deviceName = this.#getPianoMidiDeviceName();
+        if (!deviceName) return false;
         try {
             return new easymidi.Input(deviceName);
         } catch {
@@ -168,20 +174,23 @@ export default class extends Service {
     }
 
     #getPianoMidiDeviceName() {
-        if (this.config.preDefinedDeviceName) return this.config.preDefinedDeviceName;
-        let devices = easymidi.getInputs();
-        return devices[0];
+        return easymidi.getInputs()[0];
     }
 
     resolveOnDisconnect() {
         return new Promise((resolve) => {
             let checkLoop = () => {
-                let device = this.getPianoMidiDevice()
-                if (!device) return resolve();
+                if (!this.#getPianoMidiDeviceName()) return resolve();
                 setTimeout(checkLoop, this.#reConnectInterval);
             };
+            checkLoop();
         })
+    }
 
+    #onPianoConnectStateChange(_online) {
+        this.curState.pianoConnected = _online;
+        if (this.#LEDStripService) this.#LEDStripService.send({type: 'setPianoOnlineState', data: _online});
+        this.pushCurState();
     }
 
 
