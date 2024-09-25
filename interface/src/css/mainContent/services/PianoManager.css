@@ -1,0 +1,37 @@
+
+
+.Panel.PianoManager {
+    grid-template-areas: 
+        'icon title onlineIndicator'
+        'icon title dropDown'
+        'icon subText dropDown';
+    grid-template-columns: 40px auto 115px;
+    grid-template-rows: 10px 20px 20px;
+    z-index: 10;
+}
+
+.Panel.PianoManager .text.panelTitle {
+	line-height: 40px;
+}
+.Panel.PianoManager .onlineIndicator {
+	margin-left: auto;
+	margin-right: 10px;
+}
+
+.Panel.PianoManager .DropDownWrapper {
+	z-index: 100000;
+	grid-area: dropDown;
+	margin-top: -5px;
+}
+
+.Panel.PianoManager .DropDownWrapper .DropDown {
+	width: 80px;
+	display: inline-block;
+	height: 35px;
+	padding: 12.5px 9px;
+	text-align: center;
+}
+
+.Panel.PianoManager .DropDownWrapper .popup {
+	display: block;
+}

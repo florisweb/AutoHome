@@ -10,6 +10,7 @@
 .Panel {
     position: relative;
     float: left;
+    z-index: 1;
 
     padding: 20px;
     width: calc(var(--componentWidth) - 10px * 2);
@@ -224,6 +225,7 @@
     text-align: left;
     font-weight: lighter;
     color:  #666;
+    white-space: nowrap;
 }
 .Panel .text.panelTitle.small {
     line-height: 20px;

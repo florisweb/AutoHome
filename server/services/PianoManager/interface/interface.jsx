@@ -7,15 +7,11 @@ export default new class extends Service {
 	state = {
 	};
 
-	get iconSrc() {
-		return 'images/lightBolbOn.png';
-	}
-
 	constructor() {
 		super({
 			id: 'PianoManager',
 			name: 'Piano Manager',
-			iconSrc: 'images/lightBolbOn.png',
+			iconSrc: 'images/pianoManager.jpg',
 			panelConstructor: panelConstructor,
 		});
 	}
@@ -30,8 +26,8 @@ export default new class extends Service {
 		}
 	}
 
-	setLightningState(_state) {
-		return this.send({type: 'setLightningState', data: _state})	
+	setLightningMode(_state) {
+		return this.send({type: 'setLightningMode', data: _state})	
 	}
 	async getLightningState() {
 		let message = new RequestMessage({serviceId: this.id, type: 'getLightningState'});

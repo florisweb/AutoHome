@@ -1,7 +1,7 @@
 
 import { HomePagePanel } from '../../panel.jsx';
 import { setTextToElement } from '../../extraFunctions.js';
-import { Button, Slider } from '../../components.jsx';
+import { DropDown } from '../../components.jsx';
 
 
 export default class extends HomePagePanel {
@@ -20,29 +20,38 @@ export default class extends HomePagePanel {
     	this.html.subText = <div className='text subText'>
     		<div class='curColorIndicator'></div>
     	</div>;
-		this.html.colorInput = <input type='color' className='colorPicker' value='#f00'/>;
-		this.html.colorInput.addEventListener('input', () => this.#onInput());
-		this.html.icon = <img className='panelIcon' src='images/sternOn.png'></img>;
-		let onlineIndicator = this.renderOnlineIndicator();
-
+        this.lightningModeDropDown = new DropDown({
+            onChange: (_value) => this.service.setLightningMode(_value),
+            options: [
+                {
+                    name: 'Sustain',
+                    value: 'sustain'
+                },
+                {
+                    name: 'Key Press',
+                    value: 'keypress'
+                }, 
+                {
+                    name: 'Off',
+                    value: 'off'
+                }
+            ]
+        });
+        
+		this.html.icon = <img className='panelIcon' src='images/pianoManager.jpg'></img>;
 		return [
 			this.html.icon,
 			<div className='text panelTitle'>{this.service.name}</div>,
-			onlineIndicator,
+			this.renderOnlineIndicator(),
 			this.html.subText,
-			this.html.colorInput,
+			this.lightningModeDropDown.render()
 		];
     }
-
-    #onInput() {
-    	const base = 100;
-    	let color = hexToRGB(this.html.colorInput.value, 1);
-    	this.service.setColor(color);
-    }
+   
 
     updateData() {
     	if (!this.html.subText) return;
-    	this.html.subText.children[0].style.background = '#f00';
-    	this.setOnlineState(this.service.state.deviceOnline);
+    	this.setOnlineState(this.service.state.pianoConnected);
+        this.lightningModeDropDown.setValue(this.service.state.lightningMode);
     }
 }
