@@ -20,7 +20,19 @@ export default new class extends Service {
 		});
 	}
 
-
+	onEvent(_event) {
+		super.onEvent(_event);
+		switch (_event.type)
+		{
+			case "lampStatus": 
+				this.curState.lampOn = _event.data;
+			break;
+			case "sternIntensity": 
+				this.curState.sternIntensity = _event.data;
+			break;
+		}
+		this.panel.updateData();
+	}
 	onStateChange() {
 		super.onStateChange(...arguments);
 		this.panel.updateData();
