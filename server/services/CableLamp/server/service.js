@@ -23,6 +23,7 @@ export default class extends DeviceService {
     }
 
     onMessage(_message) {
+        super.onMessage(_message);
         switch (_message.type) {
             case 'sternIntensity': 
                 this.curState.sternIntensity = _message.data;
@@ -31,12 +32,7 @@ export default class extends DeviceService {
                 this.curState.lampOn = _message.data;
             break;
         }
-        this.pushCurState();
-    }
-
-    async onDeviceConnect() {
-        this.send({type: 'setLampState', data: this.curState.lampOn});
-        this.send({type: 'setSternIntensity', data: this.curState.sternIntensity});
+        this.pushEvent(_message);
     }
 }
 

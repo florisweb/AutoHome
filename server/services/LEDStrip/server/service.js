@@ -45,9 +45,6 @@ export default class extends DeviceService {
         this.pushEvent(_message);
     }
 
-    async onDeviceConnect() {
-    }
-
     async playChargePhoneAnimation(_percentage = 100) {
         this.send({type: 'playChargePhoneAnimation', data: _percentage});
     }
