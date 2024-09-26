@@ -51,7 +51,7 @@ export default class extends HomePagePanel {
 
     updateData() {
     	if (!this.html.subText) return;
-    	this.setOnlineState(this.service.state.pianoConnected);
-        this.lightningModeDropDown.setValue(this.service.state.lightningMode);
+    	this.setOnlineState(this.service.curState.pianoConnected);
+        this.lightningModeDropDown.setValue(this.service.curState.lightningMode);
     }
 }

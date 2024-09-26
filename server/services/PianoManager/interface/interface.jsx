@@ -4,9 +4,7 @@ import { RequestMessage } from '../../server/message.js';
 import panelConstructor from './panel.jsx';
 
 export default new class extends Service {
-	state = {
-	};
-
+	
 	constructor() {
 		super({
 			id: 'PianoManager',
@@ -16,14 +14,9 @@ export default new class extends Service {
 		});
 	}
 
-	onEvent(_event){
-		switch (_event.type)
-		{
-			case "curState": 
-				this.state = _event.data;
-				this.panel.updateData();
-			break;
-		}
+	onStateChange() {
+		super.onStateChange(...arguments);
+		this.panel.updateData();
 	}
 
 	setLightningMode(_state) {

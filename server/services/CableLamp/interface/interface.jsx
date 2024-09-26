@@ -2,13 +2,13 @@ import { Service } from '../../service.jsx';
 import panelConstructor from './panel.jsx';
 
 export default new class extends Service {
-	state = {
+	curState = {
 		lampOn: false,
 		sternIntensity: 0,
 	};
 
 	get iconSrc() {
-		return this.state.lampOn ? 'images/lightBolbOn.png' : 'images/lightBolbOff.png';
+		return this.curState.lampOn ? 'images/lightBolbOn.png' : 'images/lightBolbOff.png';
 	}
 
 	constructor() {
@@ -20,19 +20,14 @@ export default new class extends Service {
 		});
 	}
 
-	onEvent(_event){
-		switch (_event.type)
-		{
-			case "curState": 
-				this.state = _event.data;
-				this.panel.updateData();
-			break;
-		}
+
+	onStateChange() {
+		super.onStateChange(...arguments);
+		this.panel.updateData();
 	}
 
-
 	toggleLight() {
-		return this.setLampState(!this.state.lampOn);
+		return this.setLampState(!this.curState.lampOn);
 	}
 
 	setLampState(_lampOn) {

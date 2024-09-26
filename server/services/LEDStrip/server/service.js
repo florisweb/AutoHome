@@ -5,6 +5,12 @@ function CustomSubscriber(_config) {
     Subscriber.call(this, {..._config, handleRequest: handleRequest});
     const This = this;
     async function handleRequest(_message) {
+        if (_message.type === 'setBaseColor')
+        {
+            This.service.curState.baseColor = _message.data;
+            This.service.pushCurState();
+        }
+
         return This.service.send(_message);
     }
 }
@@ -13,7 +19,9 @@ export default class extends DeviceService {
     constructor({id, config}) {
         super(arguments[0], CustomSubscriber);
     }
-    curState = new DeviceServiceState({});
+    curState = new DeviceServiceState({
+        baseColor: [0, 0, 0]
+    });
 
 
     async setup() {

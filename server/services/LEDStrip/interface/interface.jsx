@@ -2,13 +2,6 @@ import { Service } from '../../service.jsx';
 import panelConstructor from './panel.jsx';
 
 export default new class extends Service {
-	state = {
-	};
-
-	get iconSrc() {
-		return 'images/lightBolbOn.png';
-	}
-
 	constructor() {
 		super({
 			id: 'LEDStrip',
@@ -18,17 +11,12 @@ export default new class extends Service {
 		});
 	}
 
-	onEvent(_event){
-		switch (_event.type)
-		{
-			case "curState": 
-				this.state = _event.data;
-				this.panel.updateData();
-			break;
-		}
+	onStateChange() {
+		super.onStateChange(...arguments);
+		this.panel.updateData();
 	}
 
-	setColor(_rgb) {
-		return this.send({type: 'setColor', data: _rgb})	
+	setBaseColor(_rgb) {
+		return this.send({type: 'setBaseColor', data: _rgb})	
 	}
 }

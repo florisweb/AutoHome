@@ -56,12 +56,11 @@ export default class extends HomePagePanel {
 		});
 
 		this.html.icon = <img className='panelIcon' src='images/sternOn.png'></img>;
-		let onlineIndicator = this.renderOnlineIndicator();
 
 		return <div className='sternPanel Panel animateIn hasIcon'>
 			{this.html.icon}
 			<div className='text panelTitle'>Stern</div>
-			{onlineIndicator}
+			{this.renderOnlineIndicator()}
 			{this.html.subText}
 			<div className='bottomBar'>
 				{this.html.intensitySlider.render()}
@@ -70,9 +69,8 @@ export default class extends HomePagePanel {
     }
 
     updateData() {
-    	this.setLampState(this.service.state.lampOn);
-    	this.setOnlineState(this.service.state.deviceOnline);
-        this.setSternIntensity(this.service.state.sternIntensity);
+    	this.setLampState(this.service.curState.lampOn);
+        this.setSternIntensity(this.service.curState.sternIntensity);
     }
 
 	setLampState(_lampOn) {
@@ -80,6 +78,7 @@ export default class extends HomePagePanel {
 		setTextToElement(this.html.lampStatus, _lampOn ? "Lamp On" : "Lamp Off");
 		this.html.lightBolbIcon.setAttribute('src', "images/lightBolb" + (_lampOn ? "On" : "Off") + ".png");
 	}
+	
 	setSternIntensity(_intensity) {
     	if (!this.html.icon) return;
     	let src = _intensity > 0 ? 'images/sternOn.png' : 'images/sternOff.png';

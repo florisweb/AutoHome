@@ -14,22 +14,17 @@ export default class extends HomePagePanel {
     }
 
     renderContent() {
-        let icon = <img className='panelIcon' src='images/eLumenIcon.png'></img>;
+        this.html.icon = <img className='panelIcon' src='images/eLumenIcon.png'></img>;
         let state = <div className='text subText waterPercentage'>&#128167;52% filled</div>;
-        this.html.icon = icon;
-
-        let onlineIndicator = this.renderOnlineIndicator();
-        this.setOnlineState(this.service.state.deviceOnline);
 
         return [
-            icon,
+            this.html.icon,
             state,
             <div className='text panelTitle'>{this.service.name}</div>,
-            onlineIndicator,
+            this.renderOnlineIndicator(),
         ];
     }
 
     updateData() {
-        this.setOnlineState(this.service.state.deviceOnline);
     }
 }

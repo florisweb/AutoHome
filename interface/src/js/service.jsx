@@ -79,9 +79,20 @@ export class Service {
 	
 
 	// Functional Aspects
-	onEvent() {
-		console.log("Service " + this.id + " doesn't have it's onEvent handler set yet.", ...arguments)
+	onEvent(_event) {
+		switch (_event.type)
+		{
+			case "curState": 
+				this.curState = _event.data;
+				this.onStateChange(this.curState);
+			break;
+		}
 	};
+
+	onStateChange(_state) {
+		if (this.panel?.setOnlineState) this.panel.setOnlineState(_state.deviceOnline);
+	}
+	
 	send(_json) {
 		_json.serviceId = this.id;
 		return Server.send(_json);

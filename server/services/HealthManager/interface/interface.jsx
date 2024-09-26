@@ -15,15 +15,17 @@ export default new class extends Service {
 	}
 
 	onEvent(_event) {
+		super.onEvent(_event);
 		switch (_event.type)
 		{
 			case "data": 
 				this.panel.updateData(_event.data);
 			break;
-			case "curState":
-				this.getData()
-			break;
 		}
+	}
+	onStateChange() {
+		super.onStateChange(...arguments);
+		this.getData();
 	}
 
 	async getData() {

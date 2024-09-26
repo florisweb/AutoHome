@@ -58,9 +58,9 @@ export default class extends ServicePage {
 	}
 
 	updateContent() {
-		this.setLampState(this.service.state.lampOn);
+		this.setLampState(this.service.curState.lampOn);
 		this.updatePrograms();
-		this.alarmPanel.setAlarmData(this.service.state.alarm);
+		this.alarmPanel.setAlarmData(this.service.curState.alarm);
 	}
 }
 

@@ -16,12 +16,11 @@ export default class extends HomePagePanel {
     }
 
     renderContent() {
-        let icon = <img className='panelIcon' src='images/eLumenIcon.png'></img>;
         this.html.state = <div className='text subText waterPercentage'>? new tiles in the last 4 weeks</div>;
-        this.html.icon = icon;
+        this.html.icon = <img className='panelIcon' src='images/eLumenIcon.png'></img>;;
 
         return [
-            icon,
+            this.html.icon,
             this.html.state,
             <div className='text panelTitle'>{this.service.name}</div>,
         ];

@@ -4,7 +4,7 @@ import panelConstructor from './panel.jsx';
 import pageConstructor from './page.jsx';
 
 export default new class extends Service {
-	state = {
+	curState = {
 		humidty: 0,
 		temperature: 0,
 	};
@@ -19,17 +19,19 @@ export default new class extends Service {
 		});
 	}
 
-	onEvent(_event){
+	onEvent(_event) {
+		super.onEvent(_event);
 		switch (_event.type)
 		{
-			case "curState": 
-				this.state = _event.data;
-				this.panel.updateData();
-				this.page.updateData();
-			break;
 			case "data": 
 				this.page.updateGraph(_event.data);
 			break;
 		}
+	}
+
+	onStateChange() {
+		super.onStateChange(...arguments);
+		this.panel.updateData();
+		this.page.updateData();
 	}
 }

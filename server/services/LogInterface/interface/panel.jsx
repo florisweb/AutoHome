@@ -15,9 +15,8 @@ export default class extends SystemServicePagePanel {
     }
 
     renderContent() {
-        let icon = <img className='panelIcon' src='images/eLumenIcon.png'></img>;
         this.html.state = <div className='text subText waterPercentage'>x logs</div>;
-        this.html.icon = icon;
+        this.html.icon = <img className='panelIcon' src='images/eLumenIcon.png'></img>;;
 
         let sendForLogs = () => {
             this.service.getLogs().then((_result) => {
@@ -27,7 +26,7 @@ export default class extends SystemServicePagePanel {
         sendForLogs();
 
         return [
-            icon,
+            this.html.icon,
             this.html.state,
             <div className='text panelTitle'>{this.service.name}</div>,
         ];

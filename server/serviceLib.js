@@ -110,7 +110,11 @@ export class DeviceService extends Service {
         this.downTimeTracker.updateConnectionState(!!this.deviceClient);
         this.pushCurState();
         
-        if (this.deviceClient) return this.onDeviceConnect();
+        if (this.deviceClient) 
+        {
+            this.deviceClient.send({type: 'curState', data: this.curState});
+            return this.onDeviceConnect();
+        }
         this.onDeviceDisconnect();
     }
 
