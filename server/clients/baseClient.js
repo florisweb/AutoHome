@@ -12,7 +12,6 @@ export class BaseClient {
     constructor(_conn) {
         this.conn = _conn;
         clients.push(this);
-        // Logger.log('[Client Connected] Total: ' + clients.length, null, 'CLIENT');
 
         this.conn.on('pong',    () => {if (!this.isDead) this._onPong()});
         this.conn.on('close',   () => {if (!this.isDead) this._onClose()});

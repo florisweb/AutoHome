@@ -16,7 +16,7 @@ export default class extends DeviceService {
     curState = new DeviceServiceState({
         lampOn: false,
         sternIntensity: 0,
-    });
+    }, this);
 
 
     async setup() {
@@ -33,6 +33,16 @@ export default class extends DeviceService {
             break;
         }
         this.pushEvent(_message);
+    }
+
+    setSternIntensity(_intensity) {
+        this.curState.sternIntensity = _intensity;
+        this.curState.pushToDevice();
+    }
+
+    setLampOnState(_lampOn) {
+        this.curState.lampOn = _lampOn;
+        this.curState.pushToDevice();
     }
 }
 

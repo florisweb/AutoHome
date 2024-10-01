@@ -6,14 +6,32 @@ import { ServiceLogger } from './logger.js';
 
 
 export class ServiceState {
-    constructor(_params = {}) {
+    constructor(_params = {}, _service) {
         for (let key in _params) this[key] = _params[key];
+    }
+    export() {
+        let data = {};
+        for (let key in this)
+        {
+            if (typeof key === 'function') continue;
+            data[key] = this[key];
+        }
+
+        return data;
     }
 }
 export class DeviceServiceState extends ServiceState {
+    #service;
+
     deviceOnline = false;
-    constructor() {
+    constructor(_params, _service) {
         super(...arguments);
+        this.#service = _service;
+    }
+
+    pushToDevice() {
+        if (!this.#service || !this.#service.deviceClient) return;
+        this.#service.deviceClient.send({type: 'curState', data: this.export()});
     }
 }
 
@@ -50,7 +68,7 @@ export class Service {
     }
 
     pushCurState(_sub) {
-        let event = {type: "curState", data: this.curState};
+        let event = {type: "curState", data: this.curState.export()};
         if (!_sub) return this.pushEvent(event);
         _sub.onEvent(event);
     }
@@ -84,7 +102,7 @@ export class DeviceService extends Service {
     get isDeviceService() {return true};
     #key;
     
-    curState = new DeviceServiceState();
+    curState = new DeviceServiceState(null, this);
     deviceClient = false;
     downTimeTracker = new Service_downTimeTracker(this);
 

@@ -21,7 +21,7 @@ export default class extends DeviceService {
     }
     curState = new DeviceServiceState({
         baseColor: [0, 0, 0]
-    });
+    }, this);
 
 
     async setup() {
@@ -47,6 +47,12 @@ export default class extends DeviceService {
 
     async playChargePhoneAnimation(_percentage = 100) {
         this.send({type: 'playChargePhoneAnimation', data: _percentage});
+    }
+
+
+    setBaseColor(_color) {
+        this.curState.baseColor = _color;
+        this.curState.pushToDevice();
     }
 }
 

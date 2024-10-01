@@ -130,7 +130,7 @@ export default new class {
         if (!(await FM.fileExists())) return Logger.log('Error: ' + _serviceId + '\'s service.js-file was not found.', null, 'SERVICES');
 
         await import('./services/' + _serviceId + '/server/service.js').then((mod) => {
-            Services.push(new mod.default({id: _serviceId, config: serviceConfig}, serviceConfig));
+            Services.push(new mod.default({id: _serviceId, config: serviceConfig}));
         });
     }
 
