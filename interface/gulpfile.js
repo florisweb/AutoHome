@@ -32,7 +32,7 @@ function miscellanious() {
 
 function wrapper() {
   let out = gulp.series(javascript, css, images, miscellanious);
-  setTimeout(() => process.exit(), 2000);
+  setTimeout(() => process.exit(), 5000);
   return out;
 }
 export default wrapper()

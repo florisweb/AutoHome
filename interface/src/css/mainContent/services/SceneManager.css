@@ -1,0 +1,32 @@
+
+
+.Panel.SceneManager {
+    grid-template-areas: 
+        'icon title onlineIndicator'
+        'icon title dropDown';
+    grid-template-columns: 40px auto 115px;
+    grid-template-rows: 10px 40px;
+    z-index: 10;
+}
+
+.Panel.SceneManager .text.panelTitle {
+	line-height: 40px;
+}
+
+.Panel.SceneManager .DropDownWrapper {
+	z-index: 100000;
+	grid-area: dropDown;
+	margin-top: -5px;
+}
+
+.Panel.SceneManager .DropDownWrapper .DropDown {
+	width: 110px;
+	display: inline-block;
+	height: 35px;
+	padding: 12.5px 9px;
+	text-align: center;
+}
+
+.Panel.SceneManager .DropDownWrapper .popup {
+	display: block;
+}

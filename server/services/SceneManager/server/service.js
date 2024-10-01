@@ -6,9 +6,16 @@ function CustomSubscriber(_config) {
     Subscriber.call(this, {..._config, handleRequest: handleRequest});
     const This = this;
     async function handleRequest(_message) {
-        if (_message.type === 'activateScene')
+        switch (_message.type)
         {
-            This.service.activateScene(_message.data);
+            case "activateScene": return This.service.activateScene(_message.data);
+            case "getScenes": 
+                if (!_message.isRequestMessage) return;
+                let sceneIds = Object.keys(This.service.scenes);
+                return _message.respond({
+                    type: 'scenes',
+                    data: sceneIds.map(id => {return {name: This.service.scenes[id].name, id: id}})
+                });
         }
     }
 }

@@ -2,7 +2,9 @@
 function $(_string) {
   return document.querySelectorAll(_string);
 }
-
+export function wait(_ms) {
+  return new Promise((resolve) => setTimeout(resolve, _ms));
+}
 
 export function appendContent(_html, _children) {
   if (typeof _children.length !== 'number') return _html.append(_children);
