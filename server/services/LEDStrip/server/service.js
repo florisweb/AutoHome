@@ -9,6 +9,10 @@ function CustomSubscriber(_config) {
         {
             This.service.curState.baseColor = _message.data;
             This.service.pushCurState();
+        } else if (_message.type === 'animateBaseColor')
+        {
+            This.service.curState.baseColor = [_message.data[0], _message.data[1], _message.data[2]];
+            This.service.pushCurState();
         }
 
         return This.service.send(_message);
@@ -53,6 +57,13 @@ export default class extends DeviceService {
     setBaseColor(_color) {
         this.curState.baseColor = _color;
         this.curState.pushToDevice();
+        this.pushCurState();
+    }
+
+    animateBaseColor(_color, _duration = 200) {
+        this.curState.baseColor = _color;
+        this.send({type: 'animateBaseColor', data: [..._color, _duration]});
+        this.pushCurState();
     }
 }
 
