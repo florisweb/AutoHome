@@ -95,6 +95,22 @@
     padding: 30px 10px;
 }
 
+#mainContent .page .pageOverview .iconHolder div:has(.overviewIcon.overviewButton.hasNotification)::after {
+    content: '';
+    position: absolute;
+    top: 32px;
+    margin-left: 43px;
+
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+}
+#mainContent .page .pageOverview .iconHolder div:has(.overviewIcon.overviewButton.hasNotification.warning:not(.error))::after {
+    background: rgb(247, 160, 50);
+}
+#mainContent .page .pageOverview .iconHolder div:has(.overviewIcon.overviewButton.hasNotification.error)::after {
+    background: rgb(247, 0, 0);
+}
 
 
 #mainContent .page .pageOverview .text.title {

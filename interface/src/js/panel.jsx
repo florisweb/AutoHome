@@ -92,6 +92,7 @@ export class SystemPagePanel extends Panel {
 		let html = super.render();
 		html.className += ' hasIcon systemPagePanel';
 		if (this.condition.error) html.classList.add('error');
+		if (this.condition.warning) html.classList.add('warning');
 		html.addEventListener('click', (_e) => {
 			if (_e.target.classList.contains('button') || !this.condition.enabled || !this.condition.isDeviceService) return;
 			MainContent.serviceConfigPage.open(this.service)
@@ -100,7 +101,7 @@ export class SystemPagePanel extends Panel {
 	}
 
 	renderContent() {
-       	this.html.subText = <div className='text subText'>{this.condition.state + (this.condition.error ? ' - ' + this.condition.error : '')}</div>;
+       	this.html.subText = <div className='text subText'>{this.condition.state + (this.condition.error ? ' - ' + this.condition.error : '') + (this.condition.warning ? ' - ' + this.condition.warning : '')}</div>;
 		this.html.icon = <img className='panelIcon' src={this.service.iconSrc}></img>;
 		this.html.enableButton = <div className='button bDefault bBoxy filled' onclick={() => {
 			MainContent.systemPage.setServiceEnableState(this.service.id, !this.condition.enabled)

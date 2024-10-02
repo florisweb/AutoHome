@@ -53,6 +53,7 @@ class MainContent_homePage extends Page {
 			rightButtonSrc: 'images/settingsIcon.png',
 		});
 		this.header.html.rightButton.addEventListener('click', () => MainContent.systemPage.open());
+		this.header.html.rightButton.classList.add('hasNotification');
 		this.header.title = 'ThuisWolk';
 	}
 
@@ -84,8 +85,10 @@ class MainContent_systemPage extends Page {
 		this.header = new PageHeader({
 			pageIconInBox: false,
 			pageIconSrc: 'images/settingsIcon.png', 
+			rightButtonSrc: 'images/settingsIcon.png',
 		});
 		this.header.html.leftButton.addEventListener('click', () => MainContent.homePage.open());
+		this.header.html.rightButton.addEventListener('click', () => ServiceManager.restartServer());
 		this.header.title = 'System';
 	}
 
@@ -99,7 +102,6 @@ class MainContent_systemPage extends Page {
 	}
 
 	async setServiceEnableState(_serviceId, _enable) {
-		console.log('setServiceEnableState');
 		let result = await ServiceManager.setEnableState(_serviceId, _enable);
 		if (result !== 'Restarting') return alert(result);
 		Server.disconnect();
@@ -108,11 +110,12 @@ class MainContent_systemPage extends Page {
 			if (!Server.connected) return;
 			MainContent.systemPage.open();
 			clearInterval(refreshPageInterval)		
-		}, 1000)
+		}, 1000);
 	}
 
 	async #updateContent() {
 		let config = await ServiceManager.getServiceConditions();
+		let ServerManager = ServiceManager.getService('ServerManager');
 
 		let systemServicePanels = [];
 		let enabledServicePanels = [];
@@ -121,6 +124,7 @@ class MainContent_systemPage extends Page {
 		for (let serviceId in config)
 		{
 			let serviceCondition = config[serviceId];
+			// let serviceOutdated = ServerManager.curState.outdatedServices.includes(serviceId);
 			let service = ServiceManager.getService(serviceId);	
 			if (!service) service = {iconSrc: '', name: serviceId, id: serviceId} // Only installed, no actual frontend-service available
 

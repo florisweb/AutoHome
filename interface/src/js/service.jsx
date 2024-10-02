@@ -1,9 +1,9 @@
 import Server from './server/server.js';
 import { Page, PageHeader} from './page.jsx';
-import { RequestMessage } from './server/message.js';
+import { RequestMessage, Message } from './server/message.js';
 
 const ServiceManager = new function() {
-	const ServiceId = 'serviceManager';
+	const ServiceId = 'ServerManager';
 	this.services = [];
 
 	this.setup = async function() {
@@ -19,23 +19,43 @@ const ServiceManager = new function() {
 
 	this.getServiceConditions = async function() {
 		let message = new RequestMessage({serviceId: ServiceId, type: 'getServiceConditions'});
-		let state = await message.send();;
+		let state = await message.send();
+		let hasError = false;
+		let hasWarning = false;
 		for (let serviceId in state)
 		{
 			for (let service of this.services)
 			{
 				if (service.id !== serviceId) continue;
 				service.enabled = state[serviceId].enabled;
+
+				if (!service.enabled) continue;
+				if (state[serviceId].warning) hasWarning = true;
+				if (state[serviceId].error) hasError = true;
 				break;
 			}
 		}
 
+		MainContent.homePage.header.html.rightButton.classList.toggle('warning', hasWarning);
+		MainContent.homePage.header.html.rightButton.classList.toggle('error', hasError);
 		return state;
 	}
 
 	this.setEnableState = function(_serviceId, _enable) {
 		let message = new RequestMessage({serviceId: ServiceId, type: 'setServiceEnableState', data: {serviceId: _serviceId, enable: _enable}})
 		return message.send();
+	}
+
+	this.restartServer = function() {
+		let message = new Message({serviceId: ServiceId, type: 'restart'});
+		message.send();
+		Server.disconnect();
+		let refreshPageInterval;
+		refreshPageInterval = setInterval(() => {
+			if (!Server.connected) return;
+			MainContent.systemPage.open();
+			clearInterval(refreshPageInterval)		
+		}, 1000);
 	}
 }
 

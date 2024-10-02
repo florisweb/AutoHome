@@ -72,7 +72,6 @@ export default class extends Service {
 
     #prevSceneId;
     onSubscriptionEvent(_serviceId, _event) {
-        console.log('sub-event', _serviceId, _event.type);
         let curSceneId = this.getCurSceneId();
         if (curSceneId === this.#prevSceneId) return;
         this.#prevSceneId = curSceneId;

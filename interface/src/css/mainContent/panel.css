@@ -331,17 +331,27 @@
     background: #fcd;
     grid-template-rows: 15px 40px;
 }
+.Panel.systemPagePanel.warning:not(.error) {
+    border: 3px solid rgb(247, 180, 50);
+    background: #fdc;
+}
 
 .Panel.systemPagePanel.error .panelTitle {
     margin-top: -15px;
 }
-.Panel.systemPagePanel.error .subText {
+.Panel.systemPagePanel.error .subText,
+.Panel.systemPagePanel.warning .subText {
     overflow: auto;
 }
 .Panel.systemPagePanel.error .button {
     background: rgb(247, 100, 100);
     border-color: rgb(247, 100, 100);
 }
+.Panel.systemPagePanel.warning:not(.error) .button {
+    background: rgb(247, 180, 50);
+    border-color: rgb(247, 180, 50);
+}
+
 
 
 

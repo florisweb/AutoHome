@@ -1,6 +1,7 @@
 import child_process from 'child_process';
 import Logger from './logger.js';
 import { readdirSync } from 'fs'
+import fs from 'fs';
 import { FileManager, getCurDir } from './DBManager.js';
 const __dirname = getCurDir();
 
@@ -29,11 +30,11 @@ export default new class {
             Config.server.enabledServices.splice(index, 1);
         } else Config.server.enabledServices.push(_serviceId);
         await ConfigFileManager.writeContent(Config);
-        this.#restartServer();
+        this.restartServer();
         return "Restarting";
     }
 
-    #restartServer() {
+    restartServer() {
         console.log("Restarting... PID: " + process.pid);
         setTimeout(function () {
             process.on("exit", function () {
@@ -74,10 +75,23 @@ export default new class {
             conditions[service.id].isDeviceService = service.isDeviceService;
             conditions[service.id].isSystemService = service.config.isSystemService;
             if (service.condition.loadError) conditions[service.id].error = service.condition.loadError;
+            if (this.#outdatedServices.includes(service.id)) conditions[service.id].warning = "Files Outdated";
         }
 
         return conditions;
     }
+
+    #outdatedServices = [];
+    #registerServiceChangeWatcher() {
+        fs.watch(`${__dirname}/services`, {recursive: true}, (eventType, filename) => {
+            let serviceId = filename.split('/')[0];
+            if (serviceId === '.DS_Store') return;
+            if (this.#outdatedServices.find(_serviceId => _serviceId === serviceId)) return;
+            this.#outdatedServices.push(serviceId);
+            this.getService('ServerManager')?.setOutDatedServices(this.#outdatedServices);
+        });
+    }
+
 
     async #getInstalledServiceIdList() {
         return readdirSync(__dirname + '/services', { withFileTypes: true })
@@ -180,7 +194,11 @@ export default new class {
         }
     }
 
-
-
-    constructor() {this.loadServices()}
+    constructor() {
+        this.loadServices();
+        this.#registerServiceChangeWatcher();;
+    }
 }
+
+
+
