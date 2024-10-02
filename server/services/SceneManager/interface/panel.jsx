@@ -39,7 +39,7 @@ export default class extends HomePagePanel {
    
 
     updateData() {
-    	if (!this.html.subText) return;
+    	if (!this.sceneDropDown) return;
         this.sceneDropDown.setValue(this.service.curState.curSceneId);
     }
 }

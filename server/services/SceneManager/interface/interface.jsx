@@ -13,6 +13,12 @@ export default new class extends Service {
 		});
 	}
 
+	onEvent(_event) {
+		super.onEvent(_event);
+		console.log('on-event', _event);
+		this.panel.updateData();
+	}
+
 	setCurScene(_sceneId) {
 		return this.send({type: "activateScene", data: _sceneId})
 	}

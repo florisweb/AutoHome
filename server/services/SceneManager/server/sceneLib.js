@@ -7,7 +7,7 @@ const ScenePath = __dirname + `/services/${ServiceId}/server/scenes`;
 export class Scene {
     name;
     id;
-    #enabled = false;
+    enabled = false;
     #requiredServices = [];
     Services = {};
 
@@ -17,7 +17,7 @@ export class Scene {
     }
 
     activate() {
-        if (!this.#enabled) return;
+        if (!this.enabled) return;
         this.onActivate();
     }
 
@@ -27,16 +27,15 @@ export class Scene {
         {
             if (!this.Services[reqService]) return `Missing service ${reqService}`;
         }
-        this.#enabled = true;
+        this.enabled = true;
     }
     
     // Overwrite
     isActive() {
         return false;
     }
-    onActivate() {
-
-    }
+    
+    onActivate() {}
 }
 
 

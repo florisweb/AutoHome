@@ -40,7 +40,6 @@ export class InterfaceClient extends BaseClient {
             return;
         }
 
-
         let subscription = this.subscriptions.get(message.serviceId);
         if (!subscription) return this.send({error: "Subscription not found"});
         subscription.handleRequest(message);
