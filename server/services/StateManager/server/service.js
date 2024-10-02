@@ -6,7 +6,7 @@ export default class extends Service {
     }
 
 
-    onLoadRequiredServices({ShortCutAPI}) {
+    onLoadRequiredServices({ShortCutAPI, SceneManager}) {
         if (!ShortCutAPI) return console.error(`${this.serviceId}: Error while loading, ShortCutAPI not found`);
         ShortCutAPI.subscribe({
             acceptorService: this,
@@ -16,8 +16,10 @@ export default class extends Service {
                     case "onWindDownStart":
                         break;
                     case "onBedTimeStart":
+                        SceneManager.activateScene('GoodNight');
                         break;
                     case "onWakeUp":
+                        SceneManager.activateScene('GoodMorning');
                         break;
                 }
             }

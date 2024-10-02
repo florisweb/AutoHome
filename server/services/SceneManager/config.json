@@ -1,4 +1,4 @@
 {
     "hasUI": true,
-    "requires": ["ShortCutAPI", "CableLamp", "LEDStrip"]
+    "requires": ["CableLamp", "LEDStrip"]
 }

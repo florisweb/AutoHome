@@ -30,7 +30,6 @@ const WebServer = new class {
             _response.send('Stopping server...');
             return;
         }
-
         for (let endpoint of Endpoints)
         {
             if (_request.url !== endpoint.url) continue;

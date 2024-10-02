@@ -21,7 +21,7 @@ function CustomSubscriber(_config) {
 }
 
 export default class extends Service {
-    curState = new (class extends ServiceState{
+    curState = new (class extends ServiceState {
         #service;
         constructor(_service) {
             super();

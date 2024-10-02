@@ -8,14 +8,13 @@ export default new class extends Service {
 		super({
 			id: 'SceneManager',
 			name: 'Scene Manager',
-			iconSrc: 'images/pianoManager.jpg',
+			iconSrc: 'images/SceneManager.png',
 			panelConstructor: panelConstructor,
 		});
 	}
 
 	onEvent(_event) {
 		super.onEvent(_event);
-		console.log('on-event', _event);
 		this.panel.updateData();
 	}
 
