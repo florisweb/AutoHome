@@ -22,7 +22,7 @@ export default class extends HomePagePanel {
             options: []
         });
 
-        wait(100).then(
+        wait(200).then(
             () => this.service.getScenes().then((_response) => {
                 this.sceneDropDown.setOptions(_response.data.map(set => {return {value: set.id, name: set.name}}));
                 this.sceneDropDown.setValue(this.service.curState.curSceneId);
@@ -41,5 +41,9 @@ export default class extends HomePagePanel {
     updateData() {
     	if (!this.sceneDropDown) return;
         this.sceneDropDown.setValue(this.service.curState.curSceneId);
+        this.service.getScenes().then((_response) => {
+            this.sceneDropDown.setOptions(_response.data.map(set => {return {value: set.id, name: set.name}}));
+            this.sceneDropDown.setValue(this.service.curState.curSceneId);
+        });
     }
 }
