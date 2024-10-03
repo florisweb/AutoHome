@@ -60,7 +60,7 @@ export default class extends DeviceService {
         this.pushCurState();
     }
 
-    animateBaseColor(_color, _duration = 200) {
+    animateBaseColor(_color, _duration = 300) {
         this.curState.baseColor = _color;
         this.send({type: 'animateBaseColor', data: [..._color, _duration]});
         this.pushCurState();

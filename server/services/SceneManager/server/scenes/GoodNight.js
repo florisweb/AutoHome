@@ -15,7 +15,7 @@ export default class extends Scene {
     }
 
     onActivate() {
-        this.Services.CableLamp.setSternIntensity(0);
+        this.Services.CableLamp.animateSternIntensity(0);
         this.Services.CableLamp.setLampOnState(false);
         this.Services.LEDStrip.animateBaseColor([0, 0, 0]);
     }

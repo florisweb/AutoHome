@@ -35,9 +35,14 @@ export default class extends DeviceService {
         this.pushEvent(_message);
     }
 
+    
     setSternIntensity(_intensity) {
         this.curState.sternIntensity = _intensity;
         this.curState.pushToDevice();
+    }
+    animateSternIntensity(_intensity, _duration = 300) {
+        this.curState.sternIntensity = _intensity;
+        this.deviceClient.send({type: 'animateSternIntensity', data: [_intensity, _duration]});
     }
 
     setLampOnState(_lampOn) {

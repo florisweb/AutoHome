@@ -42,7 +42,7 @@ export class Scene {
 
 export async function importScenes() {
     let scenePaths = readdirSync(ScenePath, { withFileTypes: true })
-            .filter(dirent => !dirent.isDirectory())
+            .filter(dirent => !dirent.isDirectory() && !dirent.name.includes(".DS_Store"))
             .map(dirent => dirent.name);
 
     let Scenes = {};
