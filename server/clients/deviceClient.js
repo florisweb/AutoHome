@@ -15,7 +15,7 @@ export class DeviceClient extends BaseClient {
         super(_conn);
         this.service = _service;
         this.service.setDeviceClient(this);
-        Logger.log('Bound DeviceClient ' + this.id + " to service " + this.service.id, null, 'CONNECTOR');
+        Logger.log(`${this.service.id}: DeviceClient connected.`, null, 'CONNECTOR');
     }
 
     _onMessage(_buffer) {    

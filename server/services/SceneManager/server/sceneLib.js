@@ -1,5 +1,7 @@
 import { readdirSync } from 'fs'
 import { FileManager, getCurDir } from '../../../DBManager.js';
+import Logger from '../../../logger.js';
+
 const __dirname = getCurDir();
 const ServiceId = 'SceneManager';
 const ScenePath = __dirname + `/services/${ServiceId}/server/scenes`;
@@ -18,7 +20,11 @@ export class Scene {
 
     activate() {
         if (!this.enabled) return;
-        this.onActivate();
+        try {
+            this.onActivate();
+        } catch (e) {
+            Logger.log(`Error while activating scene '${this.name}': ` + e, null, 'SceneManager');
+        }
     }
 
     enable(_services) {

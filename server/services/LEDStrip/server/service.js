@@ -36,7 +36,6 @@ export default class extends DeviceService {
         _Service.subscribe({
             acceptorService: this,
             onEvent: async (_data) => {
-                console.log('event', _data);
                 if (_data.type !== 'phoneCharging') return; // Initialization packet
                 this.playChargePhoneAnimation(_data.data);
             }
