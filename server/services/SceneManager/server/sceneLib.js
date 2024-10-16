@@ -19,12 +19,13 @@ export class Scene {
     }
 
     activate() {
-        if (!this.enabled) return;
+        if (!this.enabled) return false;
         try {
             this.onActivate();
         } catch (e) {
             Logger.log(`Error while activating scene '${this.name}': ` + e, null, 'SceneManager');
         }
+        return true;
     }
 
     enable(_services) {
@@ -44,6 +45,33 @@ export class Scene {
     onActivate() {}
 }
 
+
+export class DynamicScene extends Scene {
+    isDynamicScene = true;
+    running = false;
+    constructor() {
+        super(...arguments);
+    }
+
+
+    activate() {
+        if (!super.activate()) return;
+        this.running = true;
+    }
+
+    handleEvent(_event) {
+        if (!this.running) return;
+        this.onEvent(_event);
+    }
+
+    isActive() {
+        return this.running;
+    }
+
+
+    // Overwrite
+    onEvent(_event) {}
+}
 
 
 export async function importScenes() {

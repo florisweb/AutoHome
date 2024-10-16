@@ -73,12 +73,16 @@ export default class extends Service {
     #prevSceneId;
     onSubscriptionEvent(_serviceId, _event) {
         let curSceneId = this.getCurSceneId();
+        let curScene = this.scenes[curSceneId];
+        if (curScene && curScene.isDynamicScene) curScene.onEvent(_event, _serviceId);
+
         if (curSceneId === this.#prevSceneId) return;
         this.#prevSceneId = curSceneId;
         this.pushCurState();
     }
 
     activateScene(_sceneId, _params) {
+        for (let key in this.scenes) if (this.scenes[key].isDynamicScene && key !== _sceneId) this.scenes[key].running = false;
         if (!this.scenes[_sceneId]) return;
         this.scenes[_sceneId].activate(_params);
         this.pushCurState();

@@ -24,7 +24,9 @@ export default class extends DeviceService {
         super(arguments[0], CustomSubscriber);
     }
     curState = new DeviceServiceState({
-        baseColor: [0, 0, 0]
+        baseColor: [0, 0, 0],
+        outsideLightLevel: 0,
+        insideLightLevel: 0,
     }, this);
 
 
@@ -45,6 +47,15 @@ export default class extends DeviceService {
 
     onMessage(_message) {
         super.onMessage(_message);
+        switch (_message.type)
+        {
+            case "OutsideLightLevelChangeEvent": 
+                this.curState.outsideLightLevel = _message.data;
+                return this.pushCurState();
+            case "InsideLightLevelChangeEvent": 
+                this.curState.insideLightLevel = _message.data;
+                return this.pushCurState();
+        }
         this.pushEvent(_message);
     }
 
