@@ -8,7 +8,7 @@ function CustomSubscriber(_config) {
     async function handleRequest(_message) {
         switch (_message.type)
         {
-            case "activateScene": return This.service.activateScene(_message.data);
+            case "activateScene": return This.service.activateScene(_message.data, true);
             case "getScenes": 
                 if (!_message.isRequestMessage) return;
                 let sceneIds = Object.keys(This.service.scenes);

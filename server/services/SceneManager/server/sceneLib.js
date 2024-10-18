@@ -12,16 +12,18 @@ export class Scene {
     enabled = false;
     #requiredServices = [];
     Services = {};
+    config = {};
 
-    constructor({name, requiredServices}) {
+    constructor({name, requiredServices}, _config) {
         this.name = name;
         this.#requiredServices = requiredServices;
+        this.config = _config;
     }
 
     activate() {
         if (!this.enabled) return false;
         try {
-            this.onActivate();
+            this.onActivate(...arguments);
         } catch (e) {
             Logger.log(`Error while activating scene '${this.name}': ` + e, null, 'SceneManager');
         }
@@ -55,7 +57,7 @@ export class DynamicScene extends Scene {
 
 
     activate() {
-        if (!super.activate()) return;
+        if (!super.activate(...arguments)) return;
         this.running = true;
     }
 

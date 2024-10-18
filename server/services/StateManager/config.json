@@ -1,5 +1,6 @@
 {
     "hasUI": false,
     "key": "",
-    "requires": ["ShortCutAPI", "SceneManager"]
+    "requires": ["ShortCutAPI", "SceneManager"],
+    "wants": ["LocTracker"]
 }

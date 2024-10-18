@@ -1,7 +1,7 @@
 import { URL } from 'url';
 
 import WebServer from '../../../webServer.js';
-import { Subscriber, Service, ServiceFileManager } from '../../../serviceLib.js';
+import { Subscriber, Service, ServiceFileManager, ServiceState } from '../../../serviceLib.js';
 
 import coordinateToCountry from 'coordinate_to_country';
 
@@ -34,6 +34,11 @@ export default class extends Service {
     #tileWidth = .009;
     #tileHeight = 0.015;
 
+    curState = new ServiceState({
+        curLat: 0,
+        curLong: 0,
+        locUpdateTime: new Date(),
+    }, this);
 
     dataManager = new (function(_service) {
         let fm = new ServiceFileManager({path: "data.json", defaultValue: []}, _service);
@@ -104,6 +109,11 @@ export default class extends Service {
                     }
                     if (isNaN(data.lat) || isNaN(data.long)) return _response.sendStatus(400);
                     this.dataManager.addDataPoint(data);
+
+                    this.curState.curLat = data.lat;
+                    this.curState.curLong = data.long;
+                    this.curState.locUpdateTime = new Date();
+                    this.pushCurState();
                 } catch (e) {
             }
         }})
