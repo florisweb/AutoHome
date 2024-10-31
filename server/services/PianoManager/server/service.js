@@ -38,12 +38,12 @@ export default class extends Service {
     #sustainedKeys = []; // [key, velocity, time]
     #loopFrequency = 20; // ms per loop
 
-    #sustainDuration = 2000;
+    #sustainDuration = 3000;
     #sustainOn = false;
 
     #NoteCount = this.#NoteIndexRange[1] - this.#NoteIndexRange[0];
     #LEDCount = this.#LEDIndexRange[1] - this.#LEDIndexRange[0];
-    #LEDsPerNote = Math.min(Math.round(this.#LEDCount / this.#NoteCount), 1);
+    #LEDsPerNote = 3;
     
     constructor({id, config}) {
         super(arguments[0], CustomSubscriber);
@@ -58,10 +58,8 @@ export default class extends Service {
         if (_mode === "sustain") 
         {
             this.curState.lightningMode = "sustain";
-            this.#sustainUpdateLoop();
         } else {
             for (let key of this.#sustainedKeys) key.duration = this.#loopFrequency + 1; // Turn all sustained keys off when 
-            this.#sustainUpdateLoop();
         }
         this.curState.lightningMode = _mode;
         this.pushCurState();
@@ -77,7 +75,6 @@ export default class extends Service {
             setTimeout(() => this.attachPiano(), this.#reConnectInterval);
         });
 
-        this.#sustainUpdateLoop();
 
         let curLEDBatch = [];
         let handleOnNote = (msg, _on) => {
@@ -103,13 +100,15 @@ export default class extends Service {
             if (this.curState.lightningMode === "keypress") return handleOnNote(msg, true);
             if (this.curState.lightningMode !== "sustain") return;
 
-            this.#sustainedKeys = this.#sustainedKeys.filter((key) => key.note !== msg.note); // Prevent doubles
+            this.#sustainedKeys = this.#sustainedKeys.filter((key) => key.note !== this.#NoteIndexRange[1] - msg.note); // Prevent doubles
+
             let trueDuration = this.#sustainDuration * (msg.velocity / 125);
+            let noteIndex = this.#NoteIndexRange[1] - msg.note;
+            this.#sendKeyInfoToDevice(noteIndex, msg.velocity, trueDuration)
 
             this.#sustainedKeys.push({
-                note: msg.note,
+                note: noteIndex,
                 velocity: msg.velocity,
-                duration: trueDuration,
                 startedUnderSustain: this.#sustainOn,
                 released: false,
             });
@@ -119,12 +118,14 @@ export default class extends Service {
             if (this.curState.lightningMode === "keypress") return handleOnNote(msg, false);
             if (this.curState.lightningMode !== "sustain") return;
 
-            let key = this.#sustainedKeys.find((_key) => _key.note === msg.note); 
+            let key = this.#sustainedKeys.find((_key) => _key.note === this.#NoteIndexRange[1] - msg.note); 
             if (!key) return;
             key.released = true;
-                        console.log("noteoff2", msg, key, this.#sustainedKeys)
+
+            if (this.#sustainOn) key.startedUnderSustain = true;
             if (key.startedUnderSustain) return; // Don't turn off if started under sustain
-            key.duration = this.#loopFrequency + 1;
+            this.#sendKeyInfoToDevice(key.note, key.velocity, 1);
+            this.#sustainedKeys = this.#sustainedKeys.filter((key) => key.note !== this.#NoteIndexRange[1] - msg.note)
         });
 
         pianoDevice.on('cc', (msg) => {
@@ -134,38 +135,24 @@ export default class extends Service {
             
             if (this.#sustainOn) return;
             let sustainedKeys = this.#sustainedKeys.filter(_key => _key.startedUnderSustain && _key.released); 
-            for (let key of sustainedKeys) key.duration = this.#loopFrequency + 1; // Turn all sustained keys off
-        })
+            this.#sustainedKeys = this.#sustainedKeys.filter(_key => !_key.startedUnderSustain || !_key.released)
+            for (let key of sustainedKeys) this.#sendKeyInfoToDevice(key.note, key.velocity, 1);
+        });
     }
 
-    #sustainUpdateLoop() {
-        if (this.curState.lightningMode !== "sustain") return;
-
-        for (let key of this.#sustainedKeys) key.duration -= this.#loopFrequency;
-        this.#sustainedKeys = this.#sustainedKeys.filter((key) => key.duration > 0);
-
-        let curLEDBatch = [];
-        for (let key of this.#sustainedKeys) {
-            let perc = key.duration / this.#sustainDuration;
-            let intensity = Math.min((2 / (2 - perc * .5) - 1) / .3, 1);
-
-            let rgb = HSVtoRGB(Math.max(Math.min(key.velocity / 100, 1), 0) * 1.5, 1, intensity);
-            if (intensity < this.#loopFrequency / this.#sustainDuration * 2) rgb = [0, 0, 0];
-
-            let percNote = 1 - (key.note - this.#NoteIndexRange[0]) / this.#NoteCount;
-            let index = Math.floor(this.#LEDIndexRange[0] + this.#LEDCount * percNote);
-
-            for (let i = 0; i < this.#LEDsPerNote; i++)
-            {
-                curLEDBatch.push(index + i, ...rgb);
-            }
-        }
-
-        if (curLEDBatch.length) this.sendLEDData(curLEDBatch);
-        curLEDBatch = [];
-        setTimeout(() => this.#sustainUpdateLoop(), this.#loopFrequency);
+    #curKeyBatch = [];
+    #curReq;
+    #sendKeyInfoToDevice(_index, _velocity, _duration) {
+        this.#curKeyBatch = this.#curKeyBatch.concat([_index, _velocity, _duration]);
+        if (this.#curReq) return;
+        this.#curReq = setTimeout(() => {
+            this.sendKeyData(this.#curKeyBatch);
+            this.#curKeyBatch = [];
+            this.#curReq = false;
+        }, 5);
     }
 
+   
     getPianoMidiDevice() {
         let deviceName = this.#getPianoMidiDeviceName();
         if (!deviceName) return false;
@@ -204,8 +191,11 @@ export default class extends Service {
 
     sendLEDData(_RGBData) {
         if (!this.#LEDStripService) return;
-        // console.log('Send data', this.#sustainedKeys, _RGBData);
         this.#LEDStripService.send({type: 'setLEDs', data: _RGBData});
+    }
+    sendKeyData(_keyData) {
+        if (!this.#LEDStripService || !_keyData.length) return;
+        this.#LEDStripService.send({type: 'setPianoKeys', data: _keyData});
     }
 }
 
