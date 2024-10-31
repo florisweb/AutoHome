@@ -12,7 +12,7 @@ export default class extends Service {
     }
 
 
-    onLoadRequiredServices({ShortCutAPI, SceneManager}) {
+    onLoadRequiredServices({ShortCutAPI, SceneManager, PianoManager}) {
         this.#Services = arguments[0];
         if (!ShortCutAPI) return console.error(`${this.serviceId}: Error while loading, ShortCutAPI not found`);
         ShortCutAPI.subscribe({
@@ -29,6 +29,19 @@ export default class extends Service {
                         SceneManager.activateScene('GoodMorning');
                         break;
                 }
+            }
+        });
+
+        let prevPianoIsBeingPlayed = false;
+        PianoManager.subscribe({
+            acceptorService: this,
+            onEvent: async (_event) => {
+                if (_event.type != 'curState') return;
+                if (_event.data.pianoIsBeingPlayed && !prevPianoIsBeingPlayed && new Date().getHours() > 20)
+                {
+                    SceneManager.activateScene('EveningPianist');
+                }
+                prevPianoIsBeingPlayed = _event.data.pianoIsBeingPlayed
             }
         })
     }

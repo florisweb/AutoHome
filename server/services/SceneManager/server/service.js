@@ -14,7 +14,7 @@ function CustomSubscriber(_config) {
                 let sceneIds = Object.keys(This.service.scenes);
                 return _message.respond({
                     type: 'scenes',
-                    data: sceneIds.map(id => {return {name: This.service.scenes[id].name, id: id}})
+                    data: sceneIds.filter(id => !This.service.scenes[id].hiddenInUI).map(id => {return {name: This.service.scenes[id].name, id: id}})
                 });
         }
     }

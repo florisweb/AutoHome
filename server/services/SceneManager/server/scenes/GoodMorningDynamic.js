@@ -6,6 +6,7 @@ export default class extends DynamicScene {
         super({
             name: 'Good Morning Auto',
             requiredServices: ['CableLamp', 'LEDStrip'],
+            hiddenInUI: true,
         }, {
             animateInDuration: 1000 * 60
         });

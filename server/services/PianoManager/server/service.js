@@ -28,6 +28,7 @@ function CustomSubscriber(_config) {
 export default class extends Service {
     curState = new ServiceState({
         pianoConnected: false,
+        pianoIsBeingPlayed: false,
         lightningMode: 'sustain' // Sustain, keypress, off
     });
 
@@ -187,6 +188,11 @@ export default class extends Service {
     onLoadRequiredServices({LEDStrip}) {
         if (!LEDStrip) return console.error(`${this.serviceId}: Error while loading, LEDStrip not found`);
         this.#LEDStripService = LEDStrip;  
+        this.#LEDStripService.subscribe({onEvent: (_event) => {
+            if (_event.type !== 'PianoPlayStateChange') return;
+            this.curState.pianoIsBeingPlayed = _event.data;
+            this.pushCurState();
+        }});
     }
 
     sendLEDData(_RGBData) {

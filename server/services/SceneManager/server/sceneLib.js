@@ -9,15 +9,17 @@ const ScenePath = __dirname + `/services/${ServiceId}/server/scenes`;
 export class Scene {
     name;
     id;
+    hiddenInUI = false;
     enabled = false;
     #requiredServices = [];
     Services = {};
     config = {};
 
-    constructor({name, requiredServices}, _config) {
+    constructor({name, requiredServices, hiddenInUI}, _config) {
         this.name = name;
         this.#requiredServices = requiredServices;
         this.config = _config;
+        this.hiddenInUI = hiddenInUI;
     }
 
     activate() {
