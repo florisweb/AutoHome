@@ -3,9 +3,10 @@
 .Panel.SceneManager {
     grid-template-areas: 
         'icon title onlineIndicator'
-        'icon title dropDown';
+        'icon title dropDown'
+        'sceneHolder sceneHolder sceneHolder';
     grid-template-columns: 40px auto 115px;
-    grid-template-rows: 10px 40px;
+    grid-template-rows: 10px 40px 40px;
     z-index: 10;
 }
 
@@ -29,4 +30,40 @@
 
 .Panel.SceneManager .DropDownWrapper .popup {
 	display: block;
+}
+
+.Panel.SceneManager .sceneHolder {
+	grid-area: sceneHolder;
+	height: 55px;
+	padding-bottom: 15px;
+	display: flex;
+	margin-left: -20px;
+	margin-top: 5px;
+	width: calc(100% + 20px * 2);
+	overflow: auto;
+}
+.Panel.SceneManager .sceneHolder .scene {
+	position: relative;
+	height: 35px;
+	padding: 0 10px;
+
+	line-height: 34px;
+	white-space: nowrap;
+	text-align: center;
+	color: #fff;
+	font-size: 14px;
+
+	border-radius: 20px;
+	margin-right: 5px;
+	background: rgb(245, 194, 66);
+	cursor: pointer;
+
+	transition: background .3s;
+}
+.Panel.SceneManager .sceneHolder .scene.selected {
+	background: rgb(255, 150, 0);
+}
+
+.Panel.SceneManager .sceneHolder .scene:first-child {
+	margin-left: 15px;
 }

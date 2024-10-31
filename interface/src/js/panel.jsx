@@ -13,6 +13,7 @@ export class Panel {
 			{this.renderContent()}
 		</div>;
 		this.html.self.style.width = 'calc(var(--componentWidth) * ' + this.#size[0] + ' - 10px * 2)'; 
+		this.html.self.style.maxWidth = 'calc(var(--componentWidth) * ' + this.#size[0] + ' - 10px * 2)'; 
 		this.html.self.style.height = 'calc(var(--componentHeight) * ' + this.#size[1] + ' - 10px * 2)'; 
 		return this.html.self;
 	}

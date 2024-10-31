@@ -14,8 +14,10 @@
 
     padding: 20px;
     width: calc(var(--componentWidth) - 10px * 2);
+    max-width: calc(var(--componentWidth) - 10px * 2);
     height: calc(var(--componentHeight) - 10px * 2);
     margin: 10px;
+    overflow: hidden;
 
     border-radius: 10px;
 
