@@ -1,4 +1,4 @@
-import { Service } from '../../../serviceLib.js';
+import { Service, ServiceState } from '../../../serviceLib.js';
 import { FileManager } from '../../../DBManager.js';
 let ConfigFileManager = new FileManager("../config.json");
 const Config = await ConfigFileManager.getContent(true);
@@ -6,19 +6,22 @@ const EarthCircumference = 6371; // km
 
 export default class extends Service {
     #Services = {};
+    curState = new ServiceState({
+        curFocus: '',
+    });
 
     constructor({id, config}) {
         super(arguments[0]);
     }
 
 
-    onLoadRequiredServices({ShortCutAPI, SceneManager, PianoManager}) {
+    onLoadRequiredServices({ShortCutAPI, SceneManager, PianoManager, LEDStrip}) {
         this.#Services = arguments[0];
         if (!ShortCutAPI) return console.error(`${this.serviceId}: Error while loading, ShortCutAPI not found`);
         ShortCutAPI.subscribe({
             acceptorService: this,
-            onEvent: async (_data) => {
-                switch (_data.type) 
+            onEvent: async (_event) => {
+                switch (_event.type) 
                 {
                     case "onWindDownStart":
                         break;
@@ -27,6 +30,11 @@ export default class extends Service {
                         break;
                     case "onWakeUp":
                         SceneManager.activateScene('GoodMorning');
+                        break;
+                    case "setFocus":
+                        this.curState.curFocus = _event.data;
+                        this.pushCurState();
+                        console.log('state', this.curState);
                         break;
                 }
             }
@@ -41,9 +49,23 @@ export default class extends Service {
                 {
                     SceneManager.activateScene('EveningPianist');
                 }
-                prevPianoIsBeingPlayed = _event.data.pianoIsBeingPlayed
+                prevPianoIsBeingPlayed = _event.data.pianoIsBeingPlayed;
             }
-        })
+        });
+
+        LEDStrip.subscribe({
+            acceptorService: this,
+            onEvent: async (_event) => {
+                if (_event.type != 'IRSensorEvent') return;
+                handleAutoLightsOnEvents();
+
+                if (this.curState.curFocus === 'Sleep') return; // Don't turn lights on when sleeping
+                if (LEDStrip.curState.insideLightLevel > 5) return;
+                if (SceneManager.getCurSceneId() !== 'GoodNight') return;
+                if (!_event.data) return;
+                SceneManager.activateScene('GoodMorning');
+            }
+        });
     }
 
     onWantedServiceLoad(_Service) {
