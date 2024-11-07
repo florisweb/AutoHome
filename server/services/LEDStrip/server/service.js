@@ -1,4 +1,4 @@
-import { Subscriber, SubscriptionList, DeviceService, DeviceServiceState } from '../../../serviceLib.js';
+import { Subscriber, SubscriptionList, DeviceService, DeviceServiceState, ServiceFileManager } from '../../../serviceLib.js';
 
 
 function CustomSubscriber(_config) {
@@ -29,6 +29,18 @@ export default class extends DeviceService {
         insideLightLevel: 0,
     }, this);
 
+    dataManager = new (function(_service) {
+        let fm = new ServiceFileManager({path: "light.json", defaultValue: []}, _service);
+        this.addDataRow = async function(_data) {
+            let data = await fm.getContent(true);
+            data.push({time: Date.now(), data: _data});
+            return fm.writeContent(data);
+        }
+        this.getData = function() {
+            return fm.getContent(true);
+        }
+    })(this);
+
 
     async setup() {
     }
@@ -51,9 +63,11 @@ export default class extends DeviceService {
         {
             case "OutsideLightLevelChangeEvent": 
                 this.curState.outsideLightLevel = _message.data;
+                this.dataManager.addDataRow([this.curState.outsideLightLevel, this.curState.insideLightLevel]);
                 return this.pushCurState();
             case "InsideLightLevelChangeEvent": 
                 this.curState.insideLightLevel = _message.data;
+                this.dataManager.addDataRow([this.curState.outsideLightLevel, this.curState.insideLightLevel]);
                 return this.pushCurState();
         }
         this.pushEvent(_message);
