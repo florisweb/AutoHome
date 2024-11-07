@@ -39,18 +39,28 @@ export default class extends Service {
             }
         });
 
-        let prevPianoIsBeingPlayed = false;
+        let overwrittenScene;
         PianoManager.subscribe({
             acceptorService: this,
             onEvent: async (_event) => {
                 if (_event.type != 'curState') return;
-                if (_event.data.pianoIsBeingPlayed && !prevPianoIsBeingPlayed && new Date().getHours() > 20)
+                if (_event.data.pianoIsBeingPlayed)
                 {
-                    SceneManager.activateScene('EveningPianist');
+                    if (new Date().getHours() >= 19 && SceneManager.getCurSceneId() !== 'EveningPianist')
+                    {
+                        overwrittenScene = SceneManager.getCurSceneId();
+                        SceneManager.activateScene('EveningPianist');
+                    }
+                } else {
+                    if (SceneManager.getCurSceneId() === 'EveningPianist')
+                    {
+                        SceneManager.activateScene(overwrittenScene);
+                    }
                 }
-                prevPianoIsBeingPlayed = _event.data.pianoIsBeingPlayed;
             }
         });
+
+
 
 
         let lastSensorEvent = new Date();
