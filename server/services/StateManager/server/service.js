@@ -34,7 +34,6 @@ export default class extends Service {
                     case "setFocus":
                         this.curState.curFocus = _event.data;
                         this.pushCurState();
-                        console.log('state', this.curState);
                         break;
                 }
             }
@@ -53,17 +52,26 @@ export default class extends Service {
             }
         });
 
+
+        let lastSensorEvent = new Date();
+        const autoLightsOffTimeout = 5 * 60 * 1000;
         LEDStrip.subscribe({
             acceptorService: this,
             onEvent: async (_event) => {
                 if (_event.type != 'IRSensorEvent') return;
-                handleAutoLightsOnEvents();
+                if (!_event.data) return;
+                lastSensorEvent = new Date();
 
                 if (this.curState.curFocus === 'Sleep') return; // Don't turn lights on when sleeping
                 if (LEDStrip.curState.insideLightLevel > 5) return;
                 if (SceneManager.getCurSceneId() !== 'GoodNight') return;
-                if (!_event.data) return;
                 SceneManager.activateScene('GoodMorning');
+
+                setTimeout(() => {
+                    if (SceneManager.getCurSceneId() !== 'GoodMorning') return;
+                    if (new Date() - lastSensorEvent < autoLightsOffTimeout) return;
+                    SceneManager.activateScene('GoodNight');
+                }, autoLightsOffTimeout);
             }
         });
     }
