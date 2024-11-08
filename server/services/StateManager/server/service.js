@@ -63,25 +63,24 @@ export default class extends Service {
 
 
 
-        let lastSensorEvent = new Date();
+        let curSensorTimeout;
         const autoLightsOffTimeout = 5 * 60 * 1000;
         LEDStrip.subscribe({
             acceptorService: this,
             onEvent: async (_event) => {
                 if (_event.type != 'IRSensorEvent') return;
                 if (!_event.data) return;
-                lastSensorEvent = new Date();
 
+                clearTimeout(curSensorTimeout);
+                curSensorTimeout = setTimeout(() => {
+                    if (SceneManager.getCurSceneId() !== 'GoodMorning') return;
+                    SceneManager.activateScene('GoodNight');
+                }, autoLightsOffTimeout);
+                
                 if (this.curState.curFocus === 'Sleep') return; // Don't turn lights on when sleeping
                 if (LEDStrip.curState.insideLightLevel > 5) return;
                 if (SceneManager.getCurSceneId() !== 'GoodNight') return;
                 SceneManager.activateScene('GoodMorning');
-
-                setTimeout(() => {
-                    if (SceneManager.getCurSceneId() !== 'GoodMorning') return;
-                    if (new Date() - lastSensorEvent < autoLightsOffTimeout) return;
-                    SceneManager.activateScene('GoodNight');
-                }, autoLightsOffTimeout);
             }
         });
     }
