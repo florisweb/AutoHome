@@ -1,0 +1,18 @@
+
+
+/*Page*/
+.Panel.CameraManager {
+	grid-template-areas: 
+        'image';
+    grid-template-columns: 100%;
+    grid-template-rows: 100%;
+    grid-row-gap: 0px
+}
+
+.Panel.CameraManager .imageHolder {
+    position: relative;
+    left: -20px;
+    top: -20px;
+    width: calc(100% + 20px * 2);
+    height: auto;
+}

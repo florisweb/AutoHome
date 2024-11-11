@@ -39,6 +39,7 @@ const linkBuilder = {
 		let includeFileContent = '';
 
 		let services = ServiceManager.getUIServices().map((service) => service.id);
+		console.log('Loaded UI Services: ' + services.join(', '));
 		for (let serviceId of services) {
 			let curDir = ServiceDirectory + serviceId + '/interface';
 			// symlink(curDir, ServiceOutputDir + serviceId);

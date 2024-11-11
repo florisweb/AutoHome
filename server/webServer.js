@@ -23,7 +23,7 @@ const WebServer = new class {
     }
 
     handleRequest(_request, _response) {
-         if (_request.url == '/stop') 
+        if (_request.url == '/stop') 
         {
             Logger.log('=== Stopping server ===');
             this.server.close();

@@ -11,7 +11,6 @@ function CustomSubscriber(_config) {
     this.acceptorService = _config.acceptorService
 
     async function handleRequest(_message) {
-        console.log('ELumensubscriber.handleRequest', _message);
 
         // Server intercepted messages
         switch (_message.type)
