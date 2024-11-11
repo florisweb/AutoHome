@@ -34,15 +34,16 @@ function symlink(_sourceLocation, _targetLocation) {
 const linkBuilder = {
 	build: async function() {
 		await fse.emptyDir(ServiceOutputDir);
-		await wait(50);
+		await ServiceManager.loadingPromise;
 
 		let includeFileContent = '';
 
 		let services = ServiceManager.getUIServices().map((service) => service.id);
+		if (services.includes('SceneManager')) services = ["SceneManager", ...services.filter(r => r !== "SceneManager")];
+
 		console.log('Loaded UI Services: ' + services.join(', '));
 		for (let serviceId of services) {
 			let curDir = ServiceDirectory + serviceId + '/interface';
-			// symlink(curDir, ServiceOutputDir + serviceId);
 			fse.copySync(curDir, ServiceOutputDir + serviceId, {overwrite: true, recursive: true});
 
 			includeFileContent += 'import ' + serviceId + ' from "./' + serviceId + '/interface.jsx";\n';
@@ -53,9 +54,7 @@ const linkBuilder = {
 		includeFileContent += 'export default ServiceIncludes;';
 
 		fs.writeFile('src/js/_services/includer.js', includeFileContent, err => {
-		  if (err) {
-		    console.error(err);
-		  }
+		  if (err) console.error(err);
 		});
 	}
 }

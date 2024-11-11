@@ -11,6 +11,8 @@ let Services = [];
 
 
 export default new class {
+    loadingPromise;
+
     getService(_id) {
         return Services.find((s) => s.id == _id);
     }
@@ -195,7 +197,7 @@ export default new class {
     }
 
     constructor() {
-        this.loadServices();
+        this.loadingPromise = this.loadServices();
         this.#registerServiceChangeWatcher();;
     }
 }
