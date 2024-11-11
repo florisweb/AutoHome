@@ -37,6 +37,7 @@ export class Automation {
     Config = {};
     requiredServices = [];
     name;
+    Services = {};
 
     constructor({name, triggers, requiredServices}, _config = {}) {
         this.name = name;
@@ -46,6 +47,7 @@ export class Automation {
     }
 
     handleEvent(_event, _service, _services) {
+        this.Services = _services;
         for (let serviceId of this.requiredServices) 
         {
             if (!_services[serviceId]) return; // Logger.log(`Error: Automation ${this.name} couldn't handle event as required service ${serviceId} was not loaded (yet).`, null, "AUTOMATOR");

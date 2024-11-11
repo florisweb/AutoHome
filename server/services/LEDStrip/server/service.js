@@ -27,6 +27,7 @@ export default class extends DeviceService {
         baseColor: [0, 0, 0],
         outsideLightLevel: 0,
         insideLightLevel: 0,
+        IRSensorSeesSomething: false,
     }, this);
 
     dataManager = new (function(_service) {
@@ -68,6 +69,9 @@ export default class extends DeviceService {
             case "InsideLightLevelChangeEvent": 
                 this.curState.insideLightLevel = _message.data;
                 this.dataManager.addDataRow([this.curState.outsideLightLevel, this.curState.insideLightLevel]);
+                return this.pushCurState();
+            case "IRSensorEvent":
+                this.curState.IRSensorSeesSomething = _message.data;
                 return this.pushCurState();
         }
         this.pushEvent(_message);
