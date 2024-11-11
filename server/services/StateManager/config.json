@@ -1,6 +1,6 @@
 {
     "hasUI": false,
     "key": "",
-    "requires": ["ShortCutAPI", "SceneManager", "PianoManager", "LEDStrip"],
-    "wants": ["LocTracker"]
+    "requires": ["ShortCutAPI"],
+    "wants": ["LocTracker", "SceneManager", "PianoManager", "LEDStrip"]
 }
