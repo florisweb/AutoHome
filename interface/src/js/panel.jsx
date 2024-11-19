@@ -18,7 +18,9 @@ export class Panel {
 		return this.html.self;
 	}
 	
-	renderContent() {}
+	renderContent() {
+		return [];
+	}
 
 	setVisibility(_visible) {
 		if (!this.html.self) return;
