@@ -13,16 +13,13 @@ export default class extends Automation {
                 value: true
             }]
         }, {
-            autoLightsOffTimeout: 5 * 60 * 1000,
+            autoLightsOffTimeout: 30 * 60 * 1000,
             minLightLevel: 5,
         })
     }
         
 
     onTrigger(_event, _triggerService, { StateManager, LEDStrip, SceneManager }) {
-        Logger.log(`Light-detect-event: IR: ${_event.data}, focus: ${StateManager.curState.curFocus}, lightlevel: ${LEDStrip.curState.insideLightLevel} <= 5?, curScene: ${SceneManager.getCurSceneId()}`, null, "STATEMANAGER-DEBUG");
-        LEDStrip.curState.IRSensorSeesSomething
-       
         this.#startTurnOffTimeout();
         if (StateManager.curState.curFocus === 'Sleep') return; // Don't turn lights on when sleeping
         if (LEDStrip.curState.insideLightLevel > this.Config.minLightLevel) return;

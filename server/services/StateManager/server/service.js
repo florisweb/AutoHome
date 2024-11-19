@@ -42,6 +42,7 @@ export default class extends Service {
                         this.pushCurState();
                         break;
                 }
+                Logger.log(`Focus change to ${this.curState.curFocus}`, "FOCUS");
             }
         });
     }

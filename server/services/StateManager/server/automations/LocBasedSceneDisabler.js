@@ -1,4 +1,7 @@
 import { Automation } from '../automationLib.js';
+import { FileManager } from '../../../../DBManager.js';
+let ConfigFileManager = new FileManager("../config.json");
+const Config = await ConfigFileManager.getContent(true);
 
 let overwrittenScene;
 export default class extends Automation {

@@ -42,9 +42,9 @@ export default class extends HomePagePanel {
                         this.#updateSelectedSceneUI(element.value);
                     }
                 }>{option.name}</div>
-                if (option.id === this.service.curState.curSceneId) element.classList.add('selected');
                 this.sceneOptionHolder.append(element);
             }
+            this.#updateSelectedSceneUI();
         });
     }
 
@@ -52,6 +52,15 @@ export default class extends HomePagePanel {
         if (!this.sceneOptionHolder) return;
         for (let child of this.sceneOptionHolder.children) {
             child.classList.toggle('selected', child.value === _curSceneId);
+            if (child.value === _curSceneId) this.#scrollItemIntoView(child);
         }
+    }
+
+    #scrollItemIntoView(_item) {
+        _item.parentNode.scrollTo({
+            top: 0,
+            left: _item.offsetLeft + _item.getBoundingClientRect().width / 2 - _item.parentNode.offsetWidth / 2,
+            behavior: "smooth",
+        });
     }
 }
