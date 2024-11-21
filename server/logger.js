@@ -16,16 +16,29 @@ const Logger = new class {
             content: content
         }));
     }
+    
+    #linesToLog = [];
+    #curLoggingPromise;
     async logLine(_logLine) {
-        return new Promise(async (resolve) => {
+        this.#linesToLog.push(_logLine);
+        while (this.#curLoggingPromise) await this.#curLoggingPromise;
+
+        this.#curLoggingPromise = new Promise(async (resolve) => {
             let logs = await this.getLogs();
-            logs.push(_logLine);
+            logs = [...logs, ...this.#linesToLog];
+            this.#linesToLog = [];
 
             this.#fm.writeContent(logs).then(
-                (_result) => {resolve(_result)}, 
+                (_result) => {
+                    resolve(_result);
+                    this.#curLoggingPromise = false;
+                    this.#handleOnLog();
+
+                }, 
                 () => {resolve(false)}
             );
         })
+        return this.#curLoggingPromise;
     }
     async getLogs() {
         return new Promise(async (resolve) => {
@@ -34,6 +47,19 @@ const Logger = new class {
                 resolve(_logs.map((log) => new LogLine(log)));
             }, () => resolve([]));
         });
+    }
+
+    #onLogHooks = []
+    registerOnLogHook(_onLog) {
+        this.#onLogHooks.push(_onLog);
+    }
+    #handleOnLog() {
+        for (let hook of this.#onLogHooks)
+        {
+            try {
+                hook();
+            } catch (e) {console.log("Logger: Error in hook", e)};
+        }
     }
 }
 

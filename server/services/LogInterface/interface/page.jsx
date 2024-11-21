@@ -17,6 +17,9 @@ export default class extends ServicePage {
         </div>;
 
         this.service.getLogs();
+        setTimeout(() => {
+            this.logPanel.html.holder.scrollTo({top: 10**10, left: 0, behavior: "smooth"});
+        }, 100);
 
         return [
             ...super.renderContent(),
@@ -44,6 +47,7 @@ class LogPanel extends Panel {
         return this.html.holder;
     }
     setData(_data) {
+        if (JSON.stringify(_data) === JSON.stringify(this.#curData)) return;
         this.#curData = _data;
         this.#updateContent();
     }
@@ -57,10 +61,11 @@ class LogPanel extends Panel {
         }
     }
     #renderLogLine(_log) {
-        let tagHolder = <div className='tagHolder'>{_log.tag}</div>;
-        let r = (_log.tag.charCodeAt(0) - 65) * 6 + 50;
-        let g = (_log.tag.charCodeAt(1) - 65) * 6 + 50;
-        let b = (_log.tag.charCodeAt(2) - 65) * 6 + 50;
+        let tag = _log.tag || "---";
+        let tagHolder = <div className='tagHolder'>{tag}</div>;
+        let r = (tag.charCodeAt(0) - 65) * 6 + 50;
+        let g = (tag.charCodeAt(1) - 65) * 6 + 50;
+        let b = (tag.charCodeAt(2) - 65) * 6 + 50;
         let color = 'rgb(' + (isNaN(r) ? 200 : r) + ',' + (isNaN(g) ? 200 : g) + ',' + (isNaN(b) ? 200 : b) + ')';
         tagHolder.style.background = color;
 

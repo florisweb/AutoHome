@@ -1,6 +1,6 @@
 import { Service, ServiceState, Subscriber } from '../../../serviceLib.js';
 import { importScenes } from './sceneLib.js';
-
+import Logger from '../../../logger.js';
 
 function CustomSubscriber(_config) {
     Subscriber.call(this, {..._config, handleRequest: handleRequest});
@@ -83,6 +83,7 @@ export default class extends Service {
 
     activateScene(_sceneId, _params) {
         for (let key in this.scenes) if (this.scenes[key].isDynamicScene && key !== _sceneId) this.scenes[key].running = false;
+        Logger.log(`Set scene to ${_sceneId}`, null, 'SCENEMANAGER');
         if (!this.scenes[_sceneId]) return;
         this.scenes[_sceneId].activate(_params);
         this.pushCurState();

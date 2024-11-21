@@ -1,5 +1,5 @@
 import { Subscriber, SubscriptionList, DeviceService, DeviceServiceState, ServiceFileManager } from '../../../serviceLib.js';
-
+import Logger from '../../../logger.js';
 
 function CustomSubscriber(_config) {
     Subscriber.call(this, {..._config, handleRequest: handleRequest});
@@ -86,12 +86,14 @@ export default class extends DeviceService {
         this.curState.baseColor = _color;
         this.curState.pushToDevice();
         this.pushCurState();
+        Logger.log(`Set base color to rgb(${_color.join(', ')})`, null, 'LEDSTRIP');
     }
 
     animateBaseColor(_color, _duration = 300) {
         this.curState.baseColor = _color;
         this.send({type: 'animateBaseColor', data: [..._color, _duration]});
         this.pushCurState();
+        Logger.log(`Animate base color to rgb(${_color.join(', ')}) in ${_duration}ms`, null, 'LEDSTRIP');
     }
 }
 

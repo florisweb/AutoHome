@@ -23,6 +23,12 @@ function CustomSubscriber(_config) {
 export default class extends Service {
     constructor({id, config}) {
         super(arguments[0], CustomSubscriber);
+        Logger.registerOnLogHook(async () => {
+            this.pushEvent({
+                type: "data",
+                data: await this.getLogs()
+            });
+        });
     }
 
     async getLogs() {
