@@ -72,6 +72,7 @@ export default class extends DeviceService {
                 return this.pushCurState();
             case "IRSensorEvent":
                 this.curState.IRSensorSeesSomething = _message.data;
+                this.pushEvent(_message);
                 return this.pushCurState();
         }
         this.pushEvent(_message);

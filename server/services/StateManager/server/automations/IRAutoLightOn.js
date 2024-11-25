@@ -13,7 +13,7 @@ export default class extends Automation {
                 value: true
             }]
         }, {
-            autoLightsOffTimeout: 30 * 60 * 1000,
+            autoLightsOffTimeout: 60 * 60 * 1000,
             minLightLevel: 5,
         })
     }
