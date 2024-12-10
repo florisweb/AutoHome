@@ -9,20 +9,31 @@ export default class extends Automation {
             requiredServices: ['LEDStrip', 'StateManager', 'SceneManager'],
             triggers: [{
                 service: 'LEDStrip',
-                event: 'IRSensorEvent',
-                value: true
+            },
+            {
+                service: 'StateManager',
+                event: 'curState'
             }]
         }, {
-            autoLightsOffTimeout: 60 * 60 * 1000,
+            autoLightsOffTimeout: 5 * 60 * 1000,
             minLightLevel: 5,
         })
     }
         
 
     onTrigger(_event, _triggerService, { StateManager, LEDStrip, SceneManager }) {
-        this.#startTurnOffTimeout();
+        if (_triggerService.id === "LEDStrip")
+        {
+            if (_event.type === 'IRSensorEvent' && _event.data === false)
+            {
+                this.#startTurnOffTimeout();
+                return;
+            }
+        }
+
         if (StateManager.curState.curFocus === 'Sleep') return; // Don't turn lights on when sleeping
         if (LEDStrip.curState.insideLightLevel > this.Config.minLightLevel) return;
+        if (!LEDStrip.curState.IRSensorSeesSomething) return;
         if (SceneManager.getCurSceneId() !== 'GoodNight') return;
         
         SceneManager.activateScene('GoodMorning');        
@@ -31,8 +42,9 @@ export default class extends Automation {
     #startTurnOffTimeout() {
         clearTimeout(curSensorTimeout);
         curSensorTimeout = setTimeout(() => {
+            Logger.log("Timeout elapsed", {scene: this.Services.SceneManager.getCurSceneId(), IR: this.Services.LEDStrip.curState.IRSensorSeesSomething}, "AUTOMATOR");
             if (this.Services.SceneManager.getCurSceneId() !== 'GoodMorning') return;
-            if (this.Services.LEDStrip.curState.IRSensorSeesSomething) return this.#startTurnOffTimeout();
+            if (this.Services.LEDStrip.curState.IRSensorSeesSomething) return;
             this.Services.SceneManager.activateScene('GoodNight');
         }, this.Config.autoLightsOffTimeout);
     }

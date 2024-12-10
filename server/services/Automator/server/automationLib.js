@@ -3,7 +3,7 @@ import { FileManager, getCurDir } from '../../../DBManager.js';
 import Logger from '../../../logger.js';
 
 const __dirname = getCurDir();
-const ServiceId = 'StateManager';
+const ServiceId = 'Automator';
 const AutomationPath = __dirname + `/services/${ServiceId}/server/automations`;
 
 
