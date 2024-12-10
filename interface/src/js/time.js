@@ -40,7 +40,7 @@ Date.prototype.setFromStr = Date.prototype.setDateFromStr;
 Date.prototype.toString = function(_addTime = false) {
 	let dateStr = this.getDate() + "-" + (this.getMonth() + 1) + "-" + this.getFullYear();
 	if (!_addTime) return dateStr;
-	return dateStr + " " + this.getHours() + ":" + this.getMinutes();
+	return dateStr + " " + (this.getHours() > 9 ? this.getHours() : '0' + this.getHours()) + ":" + (this.getMinutes() > 9 ? this.getMinutes() : '0' + this.getMinutes());
 }
 
 Date.prototype.getDayName = function() {

@@ -1,6 +1,6 @@
 {
     "hasUI": false,
-    "backupInterval": 360000,
+    "backupInterval": 3600000,
     "maxBackupCount": 48,
     "includeSource": true
 }

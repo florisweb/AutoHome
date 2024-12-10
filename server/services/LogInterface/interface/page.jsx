@@ -71,7 +71,8 @@ class LogPanel extends Panel {
 
 
         let date = new Date(_log.dateTime);
-        let dateString = '[' + date.toString() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds() + '] - ';
+        let dateString = '[' + date.toString(true) + ':' + (date.getSeconds() > 9 ? date.getSeconds() : '0' + date.getSeconds()) + '] - ';
+
 
         return <div className={'logLine ' + (_log.content ? 'hasContent' : '')}>
             {tagHolder}
