@@ -1,5 +1,5 @@
 {
     "hasUI": false,
     "key": "",
-    "requires": ["ShortCutAPI"]
+    "requires": ["ShortCutAPI", "CableLamp", "LEDStrip", "LocTracker"]
 }

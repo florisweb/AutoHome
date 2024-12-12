@@ -4,7 +4,9 @@ import WebServer from '../../../webServer.js';
 import { Subscriber, Service, ServiceFileManager, ServiceState } from '../../../serviceLib.js';
 
 import coordinateToCountry from 'coordinate_to_country';
-
+import { FileManager } from '../../../DBManager.js';
+let ConfigFileManager = new FileManager("../config.json");
+const Config = await ConfigFileManager.getContent(true);
 
 
 function CustomSubscriber(_config) {
@@ -53,6 +55,18 @@ export default class extends Service {
     })(this);
 
     countryCacheManager = new ServiceFileManager({path: "countryCache.json", defaultValue: []}, this);
+
+
+    getDistanceFromLoc(_lat, _long) {
+        return distanceBetweenPoints(this.curState.curLat, this.curState.curLong, _lat, _long);
+    }
+    getDistanceFromHome() {
+        return this.getDistanceFromLoc(Config.location.lat, Config.location.long);
+    }
+    isAtHome() {
+        return this.getDistanceFromHome() < Config.location.range;
+    }
+
 
     constructor({id, config}) {
         super(arguments[0], CustomSubscriber);
@@ -333,6 +347,17 @@ class Tile {
 
 
 
+
+
+
+const EarthCircumference = 6371; // km
+function distanceBetweenPoints(_lat1, _long1, _lat2, _long2) {
+    let lat1 = _lat1 / 180 * Math.PI;
+    let lat2 = _lat2 / 180 * Math.PI;
+    let long1 = _long1 / 180 * Math.PI;
+    let long2 = _long2 / 180 * Math.PI;
+    return 2 * EarthCircumference * Math.asin(Math.sqrt(Math.sin((lat2 - lat1)/2)**2 + Math.cos(lat1) * Math.cos(lat2) * (Math.sin((long2 - long1)/2)**2)));
+}
 
 
 
