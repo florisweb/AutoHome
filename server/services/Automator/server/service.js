@@ -4,8 +4,6 @@ import { importAutomations } from './automationLib.js';
 import Logger from '../../../logger.js';
 
 export default class extends Service {
-    #Services = {};
-
     constructor({id, config}) {
         super(arguments[0]);
     }
@@ -17,12 +15,10 @@ export default class extends Service {
 
 
     onLoadRequiredServices({ShortCutAPI}) {
-        Object.assign(this.#Services, arguments[0]);
-        for (let id in this.#Services) this.#subscribeToService(this.#Services[id]);
+        for (let id in this.Services) this.#subscribeToService(this.Services[id]);
     }
 
     onWantedServiceLoad(_service) {
-        this.#Services[_service.id] = _service;
         this.#subscribeToService(_service);
     }
 
@@ -34,7 +30,7 @@ export default class extends Service {
                 {
                     let curAutomation = this.automations[id];
                     try {
-                        curAutomation.handleEvent(_event, _service, this.#Services);
+                        curAutomation.handleEvent(_event, _service, this.Services);
                     } catch (e) {
                         Logger.log(`Error while executing event ${curAutomation.name}: `, e + '', "AUTOMATOR");
                     }

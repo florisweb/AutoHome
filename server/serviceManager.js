@@ -179,6 +179,7 @@ export default new class {
             requiredServices[serviceId] = service;
         }
 
+        _service.Services = {..._service.Services, ...requiredServices};
         _service.onLoadRequiredServices(requiredServices);
         _service.enabled = true;
         
@@ -192,6 +193,7 @@ export default new class {
         {
             if (!service.wantedServices.includes(_service.id)) continue;
             Logger.log("Loaded wanted service " + _service.id + " of " + service.id + ".", null, 'SERVICES');
+            _service.Services[_service.id] = _service;
             service.onWantedServiceLoad(_service);
         }
     }

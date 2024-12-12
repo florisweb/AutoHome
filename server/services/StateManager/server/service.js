@@ -7,9 +7,7 @@ export default class extends Service {
         isSleeping: false, // Defines whether I am sleeping (at home)
     });
 
-    #Services = {}
     onLoadRequiredServices({ShortCutAPI, CableLamp, LEDStrip, LocTracker}) {
-        this.#Services = arguments[0];
         ShortCutAPI?.subscribe({
             acceptorService: this,
             onEvent: async (_event) => {
@@ -38,12 +36,12 @@ export default class extends Service {
     #recalcSleepingState() {
         let prevState = this.curState.isSleeping;
         let lightsOff = 
-            !this.#Services.CableLamp.curState.lampOn && 
-            this.#Services.CableLamp.curState.sternIntensity === 0 &&
-            this.#Services.LEDStrip.curState.baseColor.reduce((a, b) => a + b, 0) === 0
-        let isDark = this.#Services.LEDStrip.curState.insideLightLevel < 5;
+            !this.Services.CableLamp.curState.lampOn && 
+            this.Services.CableLamp.curState.sternIntensity === 0 &&
+            this.Services.LEDStrip.curState.baseColor.reduce((a, b) => a + b, 0) === 0
+        let isDark = this.Services.LEDStrip.curState.insideLightLevel < 5;
         let sleepFocusOn = this.curState.curFocus === 'Sleep';
-        let atHome = this.#Services.LocTracker.isAtHome();
+        let atHome = this.Services.LocTracker.isAtHome();
        
         this.curState.isSleeping = lightsOff && isDark && sleepFocusOn && atHome;
 

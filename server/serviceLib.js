@@ -36,6 +36,8 @@ export class DeviceServiceState extends ServiceState {
 }
 
 
+
+
 export class Service {
     id;
     config;
@@ -50,6 +52,7 @@ export class Service {
     enabled = false;
     requiredServices = [];
     wantedServices = [];
+    Services = {}; // Will contain the required/wanted services when loaded
 
 
     constructor({id, config}, _subscriberTemplate = Subscriber) {
