@@ -4,15 +4,10 @@ import { importAutomations } from './automationLib.js';
 import Logger from '../../../logger.js';
 
 export default class extends Service {
-    constructor({id, config}) {
-        super(arguments[0]);
-    }
-
     async setup() {
         this.automations = await importAutomations();
         Logger.log(`Loaded ${Object.keys(this.automations).length} automations.`, Object.keys(this.automations), 'AUTOMATOR');
     }
-
 
     onLoadRequiredServices({ShortCutAPI}) {
         for (let id in this.Services) this.#subscribeToService(this.Services[id]);

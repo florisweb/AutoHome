@@ -15,7 +15,7 @@ export default class extends Automation {
                 event: 'curState'
             }]
         }, {
-            autoLightsOffTimeout: 5 * 60 * 1000,
+            autoLightsOffTimeout: 10 * 60 * 1000,
             minLightLevel: 5,
         })
     }
