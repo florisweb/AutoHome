@@ -1,0 +1,8 @@
+{
+    "name": "Evening Pianist",
+    "state": [
+        ["CableLamp.lampOn", false],
+        ["CableLamp.sternIntensity", 5, {"setFunc": "animateSternIntensity", "extraParams": [4000]}],
+        ["LEDStrip.baseColor", [50, 0, 0], {"setFunc": "animateBaseColor", "extraParams": [4000]}]
+    ]
+}

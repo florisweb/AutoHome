@@ -1,0 +1,8 @@
+{
+    "name": "Cinema",
+    "state": [
+        ["CableLamp.lampOn", true],
+        ["CableLamp.sternIntensity", 5, {"setFunc": "animateSternIntensity"}],
+        ["LEDStrip.baseColor", [40, 15, 0], {"setFunc": "animateBaseColor"}]
+    ]
+}

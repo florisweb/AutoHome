@@ -1,0 +1,8 @@
+{
+    "name": "Good Morning",
+    "state": [
+        ["CableLamp.lampOn", true],
+        ["CableLamp.sternIntensity", 100, {"setFunc": "animateSternIntensity"}],
+        ["LEDStrip.baseColor", [255, 191, 0], {"setFunc": "animateBaseColor"}]
+    ]
+}

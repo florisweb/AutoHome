@@ -7,6 +7,7 @@ export default class extends DynamicScene {
             name: 'Good Morning Auto',
             requiredServices: ['CableLamp', 'LEDStrip'],
             hiddenInUI: true,
+            disabled: true,
         }, {
             animateInDuration: 1000 * 60
         });

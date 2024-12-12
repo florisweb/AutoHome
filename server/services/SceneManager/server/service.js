@@ -66,7 +66,7 @@ export default class extends Service {
         for (let sceneId in this.scenes)
         {
             let error = this.scenes[sceneId].enable(_services);
-            if (error) console.log('[SceneManager] Error, can\'t activate Scene:', sceneId, error);
+            if (error) Logger.log('Error, can\'t activate Scene:' + sceneId, error, 'SCENEMANAGER');
         }  
     }
 
