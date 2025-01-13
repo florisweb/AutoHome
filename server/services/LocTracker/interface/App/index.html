@@ -23,14 +23,24 @@
         bottom: 20px;
 
         z-index: 10000;
-        width: 400px;
-        height: auto;
+        width: calc(100vw - 10px * 2);
+        max-width: 400px;
         background: rgba(255, 255, 255, 0.5);
         -webkit-backdrop-filter: blur(20px);
         box-shadow: 0 0 20px rgba(0, 0, 0, .1);
 
         border-radius: 10px;
         margin: 10px;
+
+        transition: width .3s, height .3s;
+      }
+      #countryOverview canvas {
+        width: 100%;
+        height: auto;
+      }
+      #countryOverview.fullScreen { 
+        max-width: calc(100vw - 10px * 2);
+        height: calc(100vh - 50px - 20px - 10px * 2);
       }
     </style>
   </head>
@@ -71,7 +81,9 @@
 
     <div id='bottomOverlay'></div>
 
-    <canvas id="countryOverview" width="1350" height="750"></canvas>
+    <div id="countryOverview" onclick="this.classList.toggle('fullScreen')">
+        <canvas id="countryOverviewCanvas" width="1800" height="1000"></canvas>
+    </div>
 
     <script src="LocTracker/js/extraFunctions.js"></script>
     <script src="LocTracker/js/dataManager.js"></script>

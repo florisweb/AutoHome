@@ -144,9 +144,9 @@ function drawCurLocation() {
 
 
 
-let countryCtx = countryOverview.getContext('2d');
+let countryCtx = countryOverviewCanvas.getContext('2d');
 function drawCountries() {
-  countryCtx.clearRect(0, 0, countryOverview.width, countryOverview.height);
+  countryCtx.clearRect(0, 0, countryOverviewCanvas.width, countryOverviewCanvas.height);
   let visitedCountries = Object.keys(DataManager.countryList).map(r => CountryData.map3To2Name(r))
   for (let country in CountryData.paths)
   {
@@ -163,7 +163,7 @@ function drawCountrySVG(_country, _visited = false) {
 
   const transPath = new Path2D();
   var ctxPath = new Path2D(path.d);
-  const scaleFactor = 0.4 * countryOverview.height / 400;
+  const scaleFactor = 0.4 * countryOverviewCanvas.height / 400;
   transPath.addPath(ctxPath, {
     e: -130,
     f: 0,
