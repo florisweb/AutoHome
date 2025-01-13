@@ -35,7 +35,6 @@ const Server = new class {
 
 
 	connect() {
-		let serverAuthenticated = false;
 
 		this.Socket = new WebSocket(this.socketServerURL);
 		this.Socket.onmessage = (_event) => { 
@@ -53,13 +52,23 @@ const Server = new class {
 		};
 
 		this.Socket.onopen = async () => {
-			let message = new AuthMessage({id: "InterfaceClient", key: Auth.getKey()});
-			let response = await message.send();
-			if (response.type !== 'auth') return;
+			let response;
+			if (Auth.token)
+			{
+				let message = new AuthMessage({id: "InterfaceClient", key: Auth.token});
+				response = await message.send();
+			} else {
+				let message = new AuthMessage({id: "InterfaceClient", key: Auth.getKeyFromURL()});
+				response = await message.send();
+				if (response.type === 'auth' && response.status && response.token)
+				{
+					Auth.token = response.token;
+				}
+			}
 
-			serverAuthenticated = response.status;
-			this.authenticated = serverAuthenticated;
-			if (!serverAuthenticated) 
+			if (response.type !== 'auth') return;
+			this.authenticated = response.status;
+			if (!this.authenticated) 
 			{
 				this.disconnect();
 				return this.requireAuthentication();
@@ -85,6 +94,8 @@ const Server = new class {
 	}
 
 
+
+
 	showMessage(_message) {
 		console.info("[SERVER: show user]", _message);
 	}
@@ -103,7 +114,7 @@ const Server = new class {
 
 	requireAuthentication() {
 		this.#openLoadScreen();
-		Auth.clearKey();
+		Auth.clearToken();
 		this.#HTML.authButton.classList.remove('hide');
 		this.authenticated = false;
 	}

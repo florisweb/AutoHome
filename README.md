@@ -211,3 +211,35 @@ CurState: [server -> any]
 
 servic.page.render()
 -> returns div.panelBox
+
+
+
+
+
+
+
+
+
+
+<p3>Config.json</p3>
+
+users: [
+	{
+		id
+		permissions: {
+			[service]: {
+				interact: false,
+				view: false,
+				editConfig: false
+			}
+		}
+		isOwner: true
+	}
+]
+
+
+
+
+
+
+<p3>User Manager</p3>

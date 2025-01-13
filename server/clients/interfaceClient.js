@@ -6,9 +6,11 @@ import { BaseClient } from './baseClient.js';
 export class InterfaceClient extends BaseClient {
     authenticated       = true;
     subscriptions       = [];
+    user;
 
-    constructor() {
+    constructor(_conn, _user) {
         super(...arguments);
+        this.user = _user;
 
         let UIServices = ServiceManager.getUIServices();
         this.subscriptions = new SubscriptionList(
@@ -20,6 +22,8 @@ export class InterfaceClient extends BaseClient {
             }))
         );
     }
+
+    
 
 
     async _onMessage(_buffer) {

@@ -17,7 +17,7 @@ export default DBManager;
 
 
 let curRequestPromise;
-export function FileManager(_path) {
+export function FileManager(_path, {createFileIfNotPresent} = {createFileIfNotPresent: true}) {
     const Path = _path;
     let ActualPath = dataStoragePath + '/' + Path;
 
@@ -26,7 +26,11 @@ export function FileManager(_path) {
 
         curRequestPromise = new Promise((resolve, error) => {
             fs.readFile(ActualPath, (err, content) => {
-                if (err) return error(err);
+                if (err) 
+                {
+                    if (err.code === 'ENOENT' && createFileIfNotPresent) return resolve();
+                    return error(err);
+                }
                 let parsedContent = content;
                 if (!_isJSON) return resolve(content);
                 try {
