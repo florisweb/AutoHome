@@ -55,6 +55,8 @@ export default class extends Service {
     })(this);
 
     countryCacheManager = new ServiceFileManager({path: "countryCache.json", defaultValue: []}, this);
+    countryLabelManager = new ServiceFileManager({path: "countryLabels.json", defaultValue: []}, this); // [label, country, start, end]
+
 
 
     getDistanceFromLoc(_lat, _long) {
@@ -255,8 +257,23 @@ export default class extends Service {
             prevPoint = dataPoints[i];
             prevCountry = curCountry;
         }
+
+        
+        // Add Labels
+        let labels = await this.countryLabelManager.getContent();
+        for (let label of labels)
+        {
+            let found = sections.find((sec) => sec.start === label.start && sec.end === label.end && sec.country === label.country);
+            if (found)
+            {
+                found.label = label.label;
+                continue;
+            }
+            sections.push(label);
+        }
         return sections;
     }
+
 
     #getCountryFromPoint(_point, _countries) {
         let tileCoords = this.#getTileCoordFromPoint(_point);

@@ -22,6 +22,9 @@ body {
   width: 100vw !important;
   height: 100vh !important;
 }
+.leaflet-pane.leaflet-tile-pane {
+  filter: grayscale(1);
+}
 
 .leaflet-control-zoom.leaflet-bar.leaflet-control, .leaflet-bottom.leaflet-right {
   display: none;
@@ -92,7 +95,7 @@ body {
   position: fixed;
   right: 20px;
   top: 70px;
-  z-index: 1000;
+  z-index: 10000;
 
   max-height: calc(100vh - 70px - 30px);
   min-width: 240px;
@@ -169,11 +172,6 @@ body {
 }
 
 
-
-#travelPanel.panel {
-
-}
-
 #travelPanel.panel .listHolder .listItem {
   --sectionHeight: 50px;
   --pathColor: #f00;
@@ -246,6 +244,31 @@ body {
 
 
 
+#countryOverview {
+  position: fixed;
+  right: 0;
+  bottom: 20px;
+
+  z-index: 1000;
+  width: calc(100vw - 10px * 2);
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.5);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 0 20px rgba(0, 0, 0, .1);
+
+  border-radius: 10px;
+  margin: 10px;
+
+  transition: width .3s, height .3s;
+}
+#countryOverview canvas {
+  width: 100%;
+  height: auto;
+}
+#countryOverview.fullScreen { 
+  max-width: calc(100vw - 10px * 2);
+  height: calc(100vh - 50px - 20px - 10px * 2);
+}
 
 
 
@@ -275,3 +298,5 @@ body {
     display: none;
   }
 }
+
+

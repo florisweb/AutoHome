@@ -25,7 +25,16 @@ const TopBar = new class {
   update() {
     let lastPoint = DataManager.data[DataManager.data.length - 1];
     setTextToElement(this.#HTML.tileInfoHolder, DataManager.tileList.length + (DataManager.tileList.length != 1 ? ' Tiles' : ' Tile'));
-    setTextToElement(this.#HTML.countryInfoHolder, Object.keys(DataManager.countryList).length + (Object.keys(DataManager.countryList).length != 1 ? ' Countries' : ' Country'));
+    
+    let uniqueCountries = [];
+    for (let countrySet of DataManager.travelList)
+    {
+      let found = uniqueCountries.filter((travel) => travel.country === CountryData.map2To3Name(countrySet.country) || travel.country === countrySet.country);
+      if (found.length) continue;
+      uniqueCountries.push(countrySet);
+    }
+
+    setTextToElement(this.#HTML.countryInfoHolder, uniqueCountries.length + (uniqueCountries.length != 1 ? ' Countries' : ' Country'));
     setTextToElement(this.#HTML.bottomOverlay, DataManager.data.length + ' Points' + (lastPoint ? ' (' + formatDate(lastPoint.date) + ')' : ''));
   }
 }

@@ -29,7 +29,7 @@ const TravelPanel = new class {
     element.innerHTML = `
       <div class="pathIndicator"></div>
       <div class="enterDate">${startDate.getDate()}-${startDate.getMonth() + 1}-${startDate.getFullYear()}</div>
-      <div class="title">${CountryData.names[_section.country]}</div>
+      <div class="title">${CountryData.getNameFromCode(_section.country)}</div>
       <div class="durationHolder">${durationString}</div>
     `;
     return element;

@@ -116,6 +116,7 @@ const DataManager = new class {
     let response = await fetch('LocTracker/API/travelList.json', init);
     let result = await response.json();
     if (typeof result === 'object') this.travelList = result;
+    this.travelList.sort((a, b) => a.start > b.start);
     this.onFetchData();
   }
 

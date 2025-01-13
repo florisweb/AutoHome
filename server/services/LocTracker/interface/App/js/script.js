@@ -147,10 +147,10 @@ function drawCurLocation() {
 let countryCtx = countryOverviewCanvas.getContext('2d');
 function drawCountries() {
   countryCtx.clearRect(0, 0, countryOverviewCanvas.width, countryOverviewCanvas.height);
-  let visitedCountries = Object.keys(DataManager.countryList).map(r => CountryData.map3To2Name(r))
   for (let country in CountryData.paths)
   {
-    drawCountrySVG(country, visitedCountries.includes(country));
+    let visited = !!DataManager.travelList.find((travel) => travel.country === CountryData.map2To3Name(country) || travel.country === country)
+    drawCountrySVG(country, visited);
   }
   drawCountrySVG('NL');
 }
