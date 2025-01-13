@@ -52,6 +52,7 @@ function onChange() {
   drawTiles();
   drawPoints();
   drawCurLocation();
+  drawCountries();
 }	
 
 
@@ -142,6 +143,40 @@ function drawCurLocation() {
 }
 
 
+
+let countryCtx = countryOverview.getContext('2d');
+function drawCountries() {
+  countryCtx.clearRect(0, 0, countryOverview.width, countryOverview.height);
+  let visitedCountries = Object.keys(DataManager.countryList).map(r => CountryData.map3To2Name(r))
+  for (let country in CountryData.paths)
+  {
+    drawCountrySVG(country, visitedCountries.includes(country));
+  }
+  drawCountrySVG('NL');
+}
+
+function drawCountrySVG(_country, _visited = false) {
+  let path = CountryData.paths[_country];
+  if (!path || !path.d) return;
+
+  let pos = myMap.latLngToPixel(0, 0);
+
+  const transPath = new Path2D();
+  var ctxPath = new Path2D(path.d);
+  const scaleFactor = 0.4 * countryOverview.height / 400;
+  transPath.addPath(ctxPath, {
+    e: -130,
+    f: 0,
+    a: scaleFactor,
+    b: 0, // rotation
+    c: 0, // rotation
+    d: scaleFactor,
+  }); 
+
+  countryCtx.stroke(transPath);
+  countryCtx.fillStyle = 'rgba(255, 0, 0, .5)';
+  if (_visited) countryCtx.fill(transPath);
+}
 
 
 function calcMetresPerPixel() {

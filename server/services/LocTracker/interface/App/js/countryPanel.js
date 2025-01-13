@@ -15,12 +15,12 @@ const CountryPanel = new class {
     }
   }
 
-  #renderCountry(_name, _color) {
+  #renderCountry(_shortName, _color) {
     let element = document.createElement('div');
     element.classList.add('listItem');
     element.innerHTML = `
       <div class="colorIndicator" style='background: ${_color}'></div>
-      <div class="title">${_name}</div>
+      <div class="title">${_shortName}</div>
     `;
 
     return element;

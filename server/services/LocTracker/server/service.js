@@ -82,6 +82,7 @@ export default class extends Service {
             'js/topBar.js',
             'js/countryPanel.js',
             'js/travelPanel.js',
+            'js/countryData.js',
             'css/main.css'
         ];
 

@@ -15,6 +15,24 @@
     <link rel="stylesheet" type="text/css" href="LocTracker/css/main.css">
 
     <title>Location Mapper</title>
+    <style>
+      
+      #countryOverview {
+        position: fixed;
+        right: 0;
+        bottom: 20px;
+
+        z-index: 10000;
+        width: 400px;
+        height: auto;
+        background: rgba(255, 255, 255, 0.5);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 0 20px rgba(0, 0, 0, .1);
+
+        border-radius: 10px;
+        margin: 10px;
+      }
+    </style>
   </head>
   <body>
   	<div id="topBar">
@@ -53,11 +71,14 @@
 
     <div id='bottomOverlay'></div>
 
+    <canvas id="countryOverview" width="1350" height="750"></canvas>
+
     <script src="LocTracker/js/extraFunctions.js"></script>
     <script src="LocTracker/js/dataManager.js"></script>
     <script src="LocTracker/js/topBar.js"></script>
     <script src="LocTracker/js/countryPanel.js"></script>
     <script src="LocTracker/js/travelPanel.js"></script>
+    <script src="LocTracker/js/countryData.js"></script>
     <script src="LocTracker/js/script.js"></script>
   </body>
 </html>
