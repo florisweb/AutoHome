@@ -51,7 +51,6 @@ function onChange() {
   clear();
   drawTiles();
   drawPoints();
-  drawCurLocation();
   drawCountries();
 }	
 
@@ -59,43 +58,73 @@ function onChange() {
 function drawTiles() {
   for (let tile of DataManager.tileList) 
   {
-    if (!myMap.map.getBounds().contains({lat: tile.lat, lng: tile.long})) continue;
+    if (
+      !myMap.map.getBounds().contains({lat: tile.lat, lng: tile.long}) &&
+      !myMap.map.getBounds().contains({lat: tile.lat + DataManager.tileWidth, lng: tile.long + DataManager.tileHeight})
+    ) continue;
+
     let pos = myMap.latLngToPixel(tile.lat, tile.long);
     let pos2 = myMap.latLngToPixel(tile.lat + DataManager.tileWidth, tile.long + DataManager.tileHeight);
     let dx = pos2.x - pos.x;
     let dy = pos2.y - pos.y;
 
-    let opacity = (1 - Math.pow(2, -tile.counts / 10)) * .6 + .4;
+    let opacity = (1 - Math.pow(2, -tile.counts / 10)) * .6 + .2;
     fill(`rgba(${tile.RGB[0]}, ${tile.RGB[1]}, ${tile.RGB[2]}, ${opacity})`);
-    stroke(tile.RGB[0], tile.RGB[1], tile.RGB[2]);
-    rect(pos.x, pos.y, dx, dy);
+    ctx.fillRect(pos.x, pos.y, dx, dy);
+    ctx.stroke();
+    ctx.fill();
+
+    // ctx.fillStyle = `rgba{${tile.RGB[0]}, ${tile.RGB[1]}, ${tile.RGB[2]}, ${opacity})`;
+    // ctx.strokeStyle = `rgb{${tile.RGB[0]}, ${tile.RGB[1]}, ${tile.RGB[2]})`;
+    // ctx.rect(pos.x, pos.y, dx, dy);
+    // ctx.stroke();
+    // ctx.fill();
   }
 }
 
 function drawPoints() {
-  let dataPoints = Object.assign([], DataManager.data);
-  dataPoints = dataPoints.splice(Math.max(dataPoints.length - drawXMostRecentPointsCount, 0), drawXMostRecentPointsCount);
-  for (let point of dataPoints) 
+  const updateInterval = 30 * 60 * 1000;
+  let lastDataPoint = DataManager.data[DataManager.data.length - 1];
+  if (!lastDataPoint) return;
+
+  let pointsInConnection = [];
+  let prevPoint = lastDataPoint;
+  for (let i = DataManager.data.length - 2; i >= 0; i--)
   {
-    if (!myMap.map.getBounds().contains({lat: point.lat, lng: point.long})) continue;
-    let pos = myMap.latLngToPixel(point.lat, point.long);
-    fill('#f00');
-    stroke('#f00');
-    ellipse(pos.x, pos.y, 5, 5);
+    if (DataManager.data[i].date < new Date().getTime() - 24 * 60 * 60 * 1000) break;
+    let dt = Math.abs(DataManager.data[i].date - prevPoint.date);
+    if (dt > updateInterval * 2) break;
+    prevPoint = DataManager.data[i];
+    pointsInConnection.push(prevPoint);
   }
+
+  drawCurLocation(lastDataPoint, new Date().getTime() - lastDataPoint.date < updateInterval ? '#00f' : '#668');
+  let pos = myMap.latLngToPixel(lastDataPoint.lat, lastDataPoint.long);
+  ctx.strokeStyle = '#55d';
+  ctx.beginPath();
+  ctx.moveTo(pos.x, pos.y);
+
+  for (let i = 1; i < pointsInConnection.length; i++) 
+  {
+    let pos = myMap.latLngToPixel(pointsInConnection[i].lat, pointsInConnection[i].long);
+    ctx.lineTo(pos.x, pos.y);
+  }
+  ctx.closePath();
+  ctx.stroke();
 }
 
-function drawCurLocation() {
-  if (!curLocation) return;
-  if (!myMap.map.getBounds().contains({lat: curLocation.latitude, lng: curLocation.longitude})) return;
-  let pos = myMap.latLngToPixel(curLocation.latitude, curLocation.longitude);
 
-  drawPointToCanvas(pos.x, pos.y, 10, "#f00")
+function drawCurLocation(_curLoc, _color) {
+  if (!_curLoc) return;
+  if (!myMap.map.getBounds().contains({lat: _curLoc.lat, lng: _curLoc.long})) return;
+  let pos = myMap.latLngToPixel(_curLoc.lat, _curLoc.long);
+
+  drawPointToCanvas(pos.x, pos.y, 30, _color)
 
   function drawPointToCanvas(x, z, radius, colour) {
     let r = 10;
 
-    if (radius) drawRadius(x, z, radius, colour);
+    if (radius) drawRadius(x, z, radius / 2, colour);
     drawNeedle(x, z, r);
 
     let gradient = ctx.createLinearGradient(x - r, z - r, x + r, z + r);
