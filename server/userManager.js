@@ -1,5 +1,6 @@
 import * as crypto from "crypto";
 import { FileManager } from './DBManager.js';
+
 let ConfigFileManager = new FileManager("../config.json");
 const Config = await ConfigFileManager.getContent(true);
 
@@ -94,14 +95,36 @@ export default UserManager;
 class User {
     name;
     id;
-    permissions;
+    #permissions;
     isOwner = false;
+    
+    get permissions() {
+        let obj = {};
+        for (let serviceId of Config.server.enabledServices)
+        {
+            obj[serviceId] = this.#permissions[serviceId];
+            if (!obj[serviceId]) obj[serviceId] = 0;
+            if (this.isOwner) obj[serviceId] = 3;
+        }
+
+        if (obj['ServerManager'] < 2) obj['ServerManager'] = 2; // You should always be able to interact with the server manager
+        return obj;
+    }
 
     constructor(_info, _isOwner = false, _permissions) {
         this.name = _info.userName;
         this.id = _info.userId;
         this.isOwner = _isOwner;
-        this.permissions = _permissions;
+        this.#permissions = _permissions;
+    }
+
+    export() {
+        return {
+            name: this.name,
+            id: this.id,
+            isOwner: this.isOwner,
+            permissions: this.permissions
+        }
     }
 }
 

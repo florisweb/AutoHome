@@ -13,6 +13,9 @@ const Server = new class {
 		authButton: signInWithFloriswebButton,
 	}
 
+	user;
+
+
 	socketServerURL = 'ws://' + window.location.hostname + ':8081';
 	Socket;
 	authenticated = false;
@@ -67,6 +70,8 @@ const Server = new class {
 			}
 
 			if (response.type !== 'auth') return;
+			this.user = response.user;
+			MainContent.openHomePage();
 			this.authenticated = response.status;
 			if (!this.authenticated) 
 			{

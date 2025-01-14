@@ -22,7 +22,7 @@ const MainContent = new class {
 		this.#pages = [this.homePage, this.servicePage, this.serviceConfigPage, this.systemPage];
 
 		this.render();
-		this.homePage.open();
+		this.openHomePage();
 	}
 	
 	render() {
@@ -36,6 +36,9 @@ const MainContent = new class {
 			if (This.servicePage.openState) return This.homePage.open();
 			if (This.serviceConfigPage.openState) return This.servicePage.open(This.serviceConfigPage.curService);
 		});
+	}
+	openHomePage() {
+		return this.homePage.open();
 	}
 }
 export default MainContent;
@@ -62,6 +65,7 @@ class MainContent_homePage extends Page {
 		for (let service of ServiceManager.services)
 		{
 			if (!service.panel || service.panel.isSystemPagePanel) continue;
+			if (Server.user && (!Server.user.permissions[service.id] || Server.user.permissions[service.id] < 1)) continue;
 			servicePanels.push(service.panel.render());
 		}
 

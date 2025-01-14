@@ -36,12 +36,12 @@ export class UnDifferentiatedClient extends BaseClient {
                 return;
             }
             
+            let user = await UserManager.getUser(typeof token === 'string' ? token : message.key);
             if (typeof token === 'string')
             {
-                message.respond({"type": "auth", "status": true, 'token': token});
-            } else message.respond({"type": "auth", "status": true});
+                message.respond({"type": "auth", "status": true, 'token': token, 'user': user.export()});
+            } else message.respond({"type": "auth", "status": true, 'user': user.export()});
 
-            let user = await UserManager.getUser(typeof token === 'string' ? token : message.key);
             let client = new InterfaceClient(this.conn, user);
             this.remove();
             return;

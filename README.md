@@ -227,10 +227,11 @@ users: [
 	{
 		id
 		permissions: {
-			[service]: {
-				interact: false,
-				view: false,
-				editConfig: false
+			[service]: 
+				0: -
+				1: can view
+				2: can interact
+				3: can modify
 			}
 		}
 		isOwner: true
