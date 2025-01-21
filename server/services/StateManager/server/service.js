@@ -15,6 +15,7 @@ export default class extends Service {
                 {
                     case "onWindDownStart":
                     case "onBedTimeStart":
+                    case "onMorningAlarmTrigger":
                     case "onWakeUp":
                         this.pushEvent({type: _event.type, data: _event.data});
                         break;

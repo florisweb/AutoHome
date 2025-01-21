@@ -7,9 +7,9 @@ export default class extends DynamicScene {
             name: 'Good Morning Auto',
             requiredServices: ['CableLamp', 'LEDStrip'],
             hiddenInUI: true,
-            disabled: true,
+            disabled: false,
         }, {
-            animateInDuration: 1000 * 60
+            animateInDuration: 1000 * 60 * 5
         });
     }
 
@@ -20,7 +20,7 @@ export default class extends DynamicScene {
                 arrayEquals(this.Services.LEDStrip.curState.baseColor, [255, 191, 0])
     }
 
-    onActivate(_animateIn = false) {
+    onActivate(_animateIn = true) {
         if (!_animateIn)
         {
             this.Services.CableLamp.animateSternIntensity(100);
@@ -40,7 +40,7 @@ export default class extends DynamicScene {
         setTimeout(() => {
             if (!this.running) return;
             this.Services.CableLamp.setLampOnState(true);
-        }, this.config.animateInDuration);   
+        }, this.config.animateInDuration); 
     }
 }
 
