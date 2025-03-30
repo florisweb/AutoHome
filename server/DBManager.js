@@ -17,10 +17,9 @@ export default DBManager;
 
 
 let curRequestPromise;
-export function FileManager(_path, {createFileIfNotPresent} = {createFileIfNotPresent: true}) {
+export function FileManager(_path, {createFileIfNotPresent, isAbsolutePath} = {createFileIfNotPresent: true, isAbsolutePath: false}) {
     const Path = _path;
-    let ActualPath = dataStoragePath + '/' + Path;
-
+    let ActualPath = isAbsolutePath ? Path : dataStoragePath + '/' + Path;
     this.getContent = async function(_isJSON = true) {
         while (curRequestPromise) await curRequestPromise;
 
@@ -34,8 +33,8 @@ export function FileManager(_path, {createFileIfNotPresent} = {createFileIfNotPr
                 let parsedContent = content;
                 if (!_isJSON) return resolve(content);
                 try {
-                    parsedContent = JSON.parse(content);
-                } catch (e) {console.log('[FileManager]: Invalid json content: (' + ActualPath + ')', e, ActualPath)};
+                    parsedContent = JSON.parse(String(content));
+                } catch (e) {console.log('[FileManager]: Invalid json content: (' + ActualPath + ')', e, ActualPath, content)};
                 resolve(parsedContent);
             });
         });

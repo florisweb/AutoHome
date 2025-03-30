@@ -1,0 +1,78 @@
+
+
+/*Panel*/
+.Panel.AutoCloud {
+    grid-template-areas: 
+        'icon title totalSizeHolder'
+        'icon subText totalSizeHolder'
+        'folderHolder folderHolder folderHolder';
+    grid-template-rows: 30px 20px auto;
+    grid-template-columns: 40px calc(100% - 40px - 65px) 65px;
+    padding-bottom: 0;
+}
+.Panel.AutoCloud .subText {
+    white-space: nowrap;
+}
+.Panel.AutoCloud .totalSizeHolder {
+    grid-area: totalSizeHolder;
+}
+.Panel.AutoCloud .totalSizeHolder .totalSize {
+    float: right;
+
+    height: 25px;
+    padding: 5px 8px;
+    border-radius: 7px;
+    background: rgb(241, 155, 56);
+
+    white-space: nowrap;
+    color: #fff;
+    text-align: right;
+    line-height: 15px;
+    font-size: 12px;
+}
+
+
+
+.Panel.AutoCloud .folderHolder {
+    grid-area: folderHolder;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+}
+.Panel.AutoCloud .folderHolder .folder {
+    position: relative;
+    width: 100%;
+    height: 30px;
+    margin-bottom: 5px;
+
+    display: flex;
+    gap: 10px;
+    box-shadow: 10px 0 5px 0px #fff inset;
+}
+
+.Panel.AutoCloud .folderHolder .folder .nameHolder {
+    display: flex;
+    justify-content: flex-end;
+    white-space: nowrap;
+    overflow: hidden;
+    line-height: 30px;
+    font-size: 12px;
+    color: #444;
+    z-index: -1;
+}
+
+.Panel.AutoCloud .folderHolder .folder .sizeHolder {
+    position: relative;
+    
+    margin-top: 2.5px;
+    height: 25px;
+    padding: 5px 8px;
+    border-radius: 7px;
+    background: rgb(245, 194, 66);
+
+    white-space: nowrap;
+    color: #fff;
+    text-align: right;
+    line-height: 15px;
+    font-size: 12px;
+}
