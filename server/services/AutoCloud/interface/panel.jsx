@@ -37,7 +37,8 @@ export default class extends HomePagePanel {
 
     updateData() {
     	let formatTime = _date => {
-    		return _date.getDate() + '/' + _date.getMonth() + ' ' + _date.getHours() + ':' + (_date.getMinutes() > 9 ? _date.getMinutes() : '0' + _date.getMinutes())
+            const monthAbbreviations = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    		return _date.getDate() + ' ' + monthAbbreviations[_date.getMonth()] + ' ' + _date.getHours() + ':' + (_date.getMinutes() > 9 ? _date.getMinutes() : '0' + _date.getMinutes())
     	}
 
 
@@ -55,6 +56,7 @@ export default class extends HomePagePanel {
     }
 
     #formatSize(_bytes) {
+        if (_bytes <= 0) return _bytes + ' B';
     	let sizes = ['TB', 'GB', 'MB', 'kB', 'B'];
     	let bases = [40, 30, 20, 10, 0];
     	let base = Math.floor(Math.log2(_bytes));

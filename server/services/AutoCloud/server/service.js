@@ -42,6 +42,7 @@ export default class extends Service {
                 this.#updateState();
             } catch (e) {Logger.log('Error while updating state: ' + e, 'AUTOCLOUD')}
         });
+        this.#updateState();
     }
 
     async #updateState() {
@@ -57,13 +58,15 @@ export default class extends Service {
 
         this.curState.lastChange = contents.lastChange;
         this.curState.lastSync = contents.lastSync;
-        this.curState.folders = contents.trackedFolders.map(({clientPath, serverPath}) => {
-            return {
-                clientPath: clientPath,
-                serverPath: serverPath,
-                size: getDirSize(this.config.storageFolder + '/' + serverPath)
-            }
-        });
+        this.curState.folders = [];
+        for (let folder of contents.trackedFolders)
+        {
+            this.curState.folders.push({
+                clientPath: folder.clientPath,
+                serverPath: folder.serverPath,
+                size: await getDirSize(this.config.storageFolder + '/' + folder.serverPath)
+            })
+        };
 
         return this.pushCurState();
     }
@@ -76,22 +79,25 @@ export default class extends Service {
 
 
 
-const getDirSize = (dirPath) => {
-  let size = 0;
-  const files = fs.readdirSync(dirPath);
+const getDirSize = async (dirPath) => {
+    let size = 0;
+    try {
+        let files = await readdir(dirPath)
+        for (let i = 0; i < files.length; i++) {
+            const filePath = path.join(dirPath, files[i]);
+            const stats = await stat(filePath);
 
-  for (let i = 0; i < files.length; i++) {
-    const filePath = path.join(dirPath, files[i]);
-    const stats = fs.statSync(filePath);
-
-    if (stats.isFile()) {
-      size += stats.size;
-    } else if (stats.isDirectory()) {
-      size += getDirSize(filePath);
+            if (stats.isFile()) {
+                size += stats.size;
+            } else if (stats.isDirectory()) {
+                size += await getDirSize(filePath);
+            }
+        }
+    } catch (e) {
+        return size;
     }
-  }
 
-  return size;
+    return size;
 };
 
 function wait(_ms) {
