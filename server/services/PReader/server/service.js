@@ -34,6 +34,10 @@ export default class extends DeviceService {
     #curRequestedMusicImages = [];
 
     async setup() {
+        MusicManager.onAvailableMusicChange = async () => {
+            this.curState.availableMusic = await MusicManager.getAvailableMusic();
+            this.pushCurState();
+        }
         this.curState.availableMusic = await MusicManager.getAvailableMusic();
     }
 

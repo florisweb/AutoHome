@@ -21,19 +21,37 @@ const MusicManager = new class {
         fs.watch(this.#pathToRawMusic, {}, async (eventType, relativePath) => {
             try {
                 console.log('changed!: name', relativePath);
-                this.#convertPDF(relativePath);
+                // this.#convertPDF(relativePath);
+                await this.onAvailableMusicChange();
             } catch (e) {Logger.log('Error while updating state: ' + e, 'AUTOCLOUD')}
         });
     }
 
+    // @overwrite
+    onAvailableMusicChange() {}
+
+
     async getAvailableMusic() {
-        let out = (await readdir(this.#pathToRawMusic)).filter(p => !p.includes('.DS_Store')).map(p => {
-            return {
-                name: p.split('.pdf')[0],
-                pages: 3, // TODO
-            }
-        });
-        console.log('getAvailableMusic', out);
+        let files = (await readdir(this.#pathToConvertedMusic)).filter(p => !p.includes('.DS_Store')).map(r => r.split('].base64')[0]);
+        let out = [];
+        for (let file of files)
+        {
+            let parts = file.split('_[');
+            let count = parseInt(parts.pop()) + 1;
+            let name = parts.join('_[');
+            let index = out.findIndex((item) => item.name === name);
+            if (index === -1)
+            {
+                out.push({
+                    name: name,
+                    pages: count, 
+                    learningState: Math.round(Math.random() * 2),
+                });
+                continue;
+            } 
+            out[index].pages = Math.max(out[index].pages, count);
+        }
+
         return out;
     }
 
@@ -42,24 +60,8 @@ const MusicManager = new class {
     }
 
     async getMusicImage(_imageName) {
-        // return new Promise(async (resolve, error) => {
-            let path = `${this.#pathToConvertedMusic}/${_imageName}.base64`;
-            console.log('req', path);
-            return fs.readFile(path, 'utf8');
-            // .then(() => {
-            //     reo
-            // })
-
-            //  (err, data) => {
-            //     console.log('read', path, data);
-            //     if (err) {
-            //         console.error('Error reading the file:', err);
-            //         error(err);
-            //         return;
-            //     }
-            //     resolve(data);
-            // });
-        // });
+        let path = `${this.#pathToConvertedMusic}/${_imageName}.base64`;
+        return fs.readFile(path, 'utf8');
     }
 
 
