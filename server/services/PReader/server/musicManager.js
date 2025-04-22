@@ -61,7 +61,8 @@ const MusicManager = new class {
 
     async getMusicImage(_imageName) {
         let path = `${this.#pathToConvertedMusic}/${_imageName}.base64`;
-        return fs.readFile(path, 'utf8');
+        let encodedString = await fs.readFile(path, 'utf8');
+        return Buffer.from(encodedString, 'base64');
     }
 
 

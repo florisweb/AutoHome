@@ -78,7 +78,7 @@ export default class extends DeviceService {
         let request = {
             musicName: _message.data.musicName,
             pageIndex: _message.data.pageIndex,
-            dataString: data,
+            dataBuffer: data,
             startTime: new Date(),
             id: parseInt(newId().substr(0, 5))
         }
@@ -99,16 +99,17 @@ export default class extends DeviceService {
         let startPos = _message.data.startIndex;
         let sectionLength = _message.data.sectionLength;
                 
-        if (startPos + sectionLength >= request.dataString.length) 
+        if (startPos + sectionLength >= request.dataBuffer.length) 
         {
             this.#curRequestedMusicImages = this.#curRequestedMusicImages.filter(r => r.id !== _message.data.imageRequestId);
             console.log('all image data has been requested');
         }
 
-        console.log('getImageSection: respond with:', request.dataString.substr(startPos, sectionLength))
+        let responseString = request.dataBuffer.slice(startPos, startPos + sectionLength).toString('base64');
+        console.log('getImageSection: respond with:', responseString.substr(0, 25) + '... (' + responseString.length + ')');
         _message.respond({
             startIndex: startPos,
-            data: request.dataString.substr(startPos, sectionLength)
+            data: responseString
         });
     }
 }
