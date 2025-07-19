@@ -26,4 +26,11 @@ export default new class extends Service {
 	onStateChange() {
 		super.onStateChange(...arguments);
 	}
+
+	async getMoistureData(_plantId) {
+		let request = new RequestMessage({type: 'getMoistureData', data: {id: _plantId}}, this);
+		let result = await request.send();
+		if (result.error) return false;
+		return result.data;
+	}
 }

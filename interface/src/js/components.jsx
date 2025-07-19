@@ -157,7 +157,7 @@ export function InputField({placeholder = null, isTimeInput, onChange, onBlur}) 
 
 export function Graph({xLabel = '', yLabel = '', yRange, xRange}) {
 	let canvas = <canvas></canvas>;
-	let legend = <div className='legendHolder'></div>
+	let legend = <div className='legendHolder hidden'></div>
 	let ctx = canvas.getContext('2d');
 
 	this.render = function() {
@@ -172,9 +172,9 @@ export function Graph({xLabel = '', yLabel = '', yRange, xRange}) {
 	}
 
 
-
 	this.updateLegend = function(_labels = []) {
 		legend.innerHTML = '';
+		legend.classList.toggle('hidden', _labels.length === 0);
 
 		for (let i = 0; i < _labels.length; i++) 
 		{
@@ -253,12 +253,12 @@ export function Graph({xLabel = '', yLabel = '', yRange, xRange}) {
 		for (let i = 0; i < _data.length; i++)
 		{
 			if (_data[i][0] < xRange[0] || _data[i][0] > xRange[1]) continue;
-		  let x = indexToXLoc(_data[i][0], ctx);
-		  let y = dataToYLoc(_data[i][1], ctx);
-		  if (!startPointAdded)
-		  {
-			  startPointAdded = true;
-			  ctx.moveTo(x, y);
+			let x = indexToXLoc(_data[i][0], ctx);
+			let y = dataToYLoc(_data[i][1], ctx);
+			if (!startPointAdded)
+			{
+				startPointAdded = true;
+				ctx.moveTo(x, y);
 			} else ctx.lineTo(x, y);
 		}
 
@@ -269,6 +269,7 @@ export function Graph({xLabel = '', yLabel = '', yRange, xRange}) {
 	function drawXAxis() {
 		let maxStepCount = Math.floor(ctx.canvas.width / minXLabelRoom);
 		const stepSize = getStepSize(maxStepCount, dx, xAxisTagIsDate);
+		console.log('stepSize', stepSize, maxStepCount, dx, xAxisTagIsDate);
 
 		ctx.lineWidth = 1;
 		ctx.strokeStyle = axisColor;
@@ -311,11 +312,11 @@ export function Graph({xLabel = '', yLabel = '', yRange, xRange}) {
 			let xLoc = indexToXLoc(d * sInDay, ctx);
 			ctx.strokeStyle = axisColor;
 			ctx.beginPath();
-		  ctx.moveTo(xLoc, 0);
-		  ctx.lineTo(xLoc, ctx.canvas.height - xLabelMargin);
-		  
-		  ctx.closePath();
-		  ctx.stroke();
+			ctx.moveTo(xLoc, 0);
+			ctx.lineTo(xLoc, ctx.canvas.height - xLabelMargin);
+			
+			ctx.closePath();
+			ctx.stroke();
 		}
 	}
 

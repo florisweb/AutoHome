@@ -1,5 +1,11 @@
 
 
+.page .PanelBox.ELumenManager {
+    position: absolute;
+    left: 0;
+    width: 100vw;
+}
+
 .page .plantPanelHolder {
     display: flex;
     width: 100%;
@@ -7,17 +13,18 @@
     overflow-y: hidden;
     overflow-x: auto;
     justify-content: center;
+    column-gap: 40px;
+    padding: 0 40px;
 }
 
 .page .plantPanelHolder .plantPanel {
     position: relative;
     display: grid;
-    margin: 0 20px;
     padding: 30px;
     
-    min-width: min(calc(100vw - 40px), 380px);
-    max-width: 380px;
-    aspect-ratio: .78;
+    min-width: min(calc(100vw - 40px), 360px);
+    max-width: 360px;
+    aspect-ratio: .73;
 
     border-radius: 15px;
 
@@ -34,8 +41,10 @@
         "moistureGraph moistureGraph moistureGraph";
 
     grid-template-columns: 50px auto 50px;
-    grid-template-rows: auto 25px 25px 20px 90px;
+    grid-template-rows: auto 25px 25px 50px 140px;
     padding-bottom: 5px;
+
+    scroll-snap-align: center;
 }
 
 .page .plantPanelHolder .plantPanel.isEmpty {
@@ -83,9 +92,16 @@
 
 .page .plantPanelHolder .plantPanel .extraInfoHolder {
     grid-area: extraInfo;
-    border: 1px solid red;
 }
-.page .plantPanelHolder .plantPanel .moistureGraphHolder {
+
+.page .plantPanelHolder .plantPanel .GraphHolder {
     grid-area: moistureGraph;
-    border: 1px solid red;
+    margin-left: -20px;
+    width: calc(100% + 30px);
+}
+
+@media only screen and (max-width: 600px) {
+    .page .plantPanelHolder {
+        scroll-snap-type: x mandatory;
+    }
 }
