@@ -15,7 +15,7 @@ export class Page {
 
 	render() {
 		this.html.pageContent = <div className='pageContent'>
-				{this.renderContent()}
+			{this.renderContent()}
 		</div>;
 		this.html.page = <div className={'page hide ' + this.#config.customClass ?? ''}>	
 			{this.html.pageContent}

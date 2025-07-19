@@ -1,0 +1,91 @@
+
+
+.page .plantPanelHolder {
+    display: flex;
+    width: 100%;
+    height: auto;
+    overflow-y: hidden;
+    overflow-x: auto;
+    justify-content: center;
+}
+
+.page .plantPanelHolder .plantPanel {
+    position: relative;
+    display: grid;
+    margin: 0 20px;
+    padding: 30px;
+    
+    min-width: min(calc(100vw - 40px), 380px);
+    max-width: 380px;
+    aspect-ratio: .78;
+
+    border-radius: 15px;
+
+    box-shadow: 5px 5px 10px 10px rgba(0, 0, 0, .05);
+    background: rgb(114, 197, 111);
+    box-sizing: border-box;
+
+
+    grid-template-areas: 
+        "graphic graphic graphic"
+        "curMoisture title targetMoisture"
+        "curMoisture subTitle targetMoisture"
+        "extraInfo extraInfo extraInfo"
+        "moistureGraph moistureGraph moistureGraph";
+
+    grid-template-columns: 50px auto 50px;
+    grid-template-rows: auto 25px 25px 20px 90px;
+    padding-bottom: 5px;
+}
+
+.page .plantPanelHolder .plantPanel.isEmpty {
+    filter: grayscale(1);
+    background-color: #ddd;
+    opacity: .4;
+}
+.page .plantPanelHolder .plantPanel.isEmpty > * {
+    filter: blur(5px);
+}
+
+.page .plantPanelHolder .plantPanel .title {
+    grid-area: title;
+    font-size: 20px;
+    text-align: center;
+    color: #eee;
+}
+.page .plantPanelHolder .plantPanel .subTitle {
+    grid-area: subTitle;
+    font-size: 12px;
+    color: rgba(238, 238, 238, .7);
+    text-transform: uppercase;
+}
+
+.page .plantPanelHolder .plantPanel .moistureValueHolder {
+    grid-area: curMoisture;
+    width: 50px;
+    height: 50px;
+
+    color: rgba(238, 238, 238, .6);
+    text-transform: uppercase;
+    font-size: 9px;
+    text-align: center;
+}
+.page .plantPanelHolder .plantPanel .moistureValueHolder .value {
+    color: rgba(238, 238, 238, .8);
+    font-size: 20px;
+    line-height: 25px;
+}
+
+.page .plantPanelHolder .plantPanel .moistureValueHolder.target {
+    grid-area: targetMoisture;
+}
+
+
+.page .plantPanelHolder .plantPanel .extraInfoHolder {
+    grid-area: extraInfo;
+    border: 1px solid red;
+}
+.page .plantPanelHolder .plantPanel .moistureGraphHolder {
+    grid-area: moistureGraph;
+    border: 1px solid red;
+}
