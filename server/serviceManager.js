@@ -173,8 +173,10 @@ class ServiceInterface {
 
 		this.process = fork('serviceSpawner.js', [this.id]);
 
-		this.process.on('message', (message) => {
-		  console.log(`Message from child: ${message}`);
+		this.process.on('message', (_message) => {
+            let message = JSON.parse(_message);
+            console.log(`Message from child`, message);
+            this.#onMessage(message);
 		});
 
 		this.process.on('close', (code) => {
@@ -182,13 +184,36 @@ class ServiceInterface {
 		});
 	}
 
-	async setup() {
+    #onMessage(_message) {
+        switch (_message.type)
+        {
+            case 'finishedSetup':
+                return this.#setupPromiseResolver(_message.data);
+        }
+    }
 
+    #setupPromiseResolver;
+	async setup() {
+        return new Promise((resolve) => {
+            this.#setupPromiseResolver = resolve;
+            this.#send({type: 'setup'});
+        })
 	}
+
 	async onEnable() {
 
 	}
 
+  
 	onLoadRequiredServices(_services) {
+        this.#send({type: 'onLoadRequiredServices', data: Object.keys(_services)});
 	}
+
+    onWantedServiceLoad(_service) {
+        this.#send({type: 'onWantedServiceLoad', data: _service.id});
+    }
+
+    #send(_messageObj) {
+        this.process.send(JSON.stringify(_messageObj));
+    }
 }
