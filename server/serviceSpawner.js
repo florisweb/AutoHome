@@ -1,4 +1,5 @@
 import { FileManager } from './DBManager.js';
+import { getPathToService } from './serviceManager.js';
 
 const serviceId = process.argv[2];
 

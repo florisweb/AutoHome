@@ -1,8 +1,9 @@
 
 import { fork } from 'node:child_process';
-import { readdirSync } from 'fs'
+import { readdirSync, stat, lstat, readlink } from 'fs'
 import { getCurDir } from './polyfill.js';
 import { FileManager } from './DBManager.js';
+import path from 'path';
 
 const __dirname = getCurDir();
 const Logger = console;
@@ -10,19 +11,16 @@ const Logger = console;
 let ConfigFileManager = new FileManager("config.json");
 const Config = await ConfigFileManager.getContent(true);
 
-
 let Services = [];
 export default new class {
     async #getInstalledServiceIdList() {
         return readdirSync(__dirname + '/services', { withFileTypes: true })
-            .filter(dirent => dirent.isDirectory())
-            .map(dirent => dirent.name)
+            .filter(dirent => dirent.isDirectory() || dirent.isSymbolicLink()).map(dirent => dirent.name);
     }
 
     getService(_id) {
     	return Services.find(r => r.id === _id);
     }
-
 
     async loadServices() {
     	let installedServiceIds = await this.#getInstalledServiceIdList();
@@ -52,7 +50,11 @@ export default new class {
                 continue;
             }
 
-            promises.push(this.#loadService(id).then(s => Services.push(s)));
+            promises.push(this.#loadService(id).then(s => {
+                if (!s) return;
+                Logger.log('Loaded service ' + id + '.', null, 'SERVICES');
+                Services.push(s);
+            }));
         }
 
         return await Promise.all(promises);
@@ -76,13 +78,13 @@ export default new class {
     }
 
 
-
     async #loadService(_serviceId) {
-        let FM = new FileManager("services/" + _serviceId + "/config.json");
+        let path = await getPathToService(_serviceId);
+        let FM = new FileManager(path + "/config.json", {isAbsolutePath: true});
         if (!(await FM.fileExists())) return Logger.log('Error: ' + _serviceId + '\'s config.json-file was not found.', null, 'SERVICES');
         let serviceConfig = await FM.getContent(true);
 
-        let FMJS = new FileManager("../services/" + _serviceId + "/server/service.js");
+        let FMJS = new FileManager(path + "/server/service.js", {isAbsolutePath: true});
         if (!(await FM.fileExists())) return Logger.log('Error: ' + _serviceId + '\'s service.js-file was not found.', null, 'SERVICES');
 		return new ServiceInterface(_serviceId, serviceConfig);
     }
@@ -134,6 +136,18 @@ export default new class {
 }
 
 
+export async function getPathToService(_id) {
+    return new Promise((resolve) => {
+        let defaultPath = __dirname + '/services/' + _id;
+        readlink(defaultPath, (a, _relLinkPath) => {
+            if (!_relLinkPath) return resolve(defaultPath);
+            let absolutePath = path.resolve(__dirname + '/services/', _relLinkPath);
+            resolve(absolutePath);
+        });
+    });
+}
+
+
 
 
 
@@ -176,6 +190,5 @@ class ServiceInterface {
 	}
 
 	onLoadRequiredServices(_services) {
-
 	}
 }
