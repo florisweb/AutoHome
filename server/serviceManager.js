@@ -1,115 +1,46 @@
-import child_process from 'child_process';
-import Logger from './logger.js';
+
+import { fork } from 'node:child_process';
 import { readdirSync } from 'fs'
-import fs from 'fs';
-import { FileManager, getCurDir } from './DBManager.js';
+import { getCurDir } from './polyfill.js';
+import { FileManager } from './DBManager.js';
+
 const __dirname = getCurDir();
+const Logger = console;
 
-let ConfigFileManager = new FileManager("../config.json");
+let ConfigFileManager = new FileManager("config.json");
 const Config = await ConfigFileManager.getContent(true);
+
+
 let Services = [];
-
-
 export default new class {
-    loadingPromise;
-
-    getService(_id) {
-        return Services.find((s) => s.id == _id);
-    }
-
-    getUIServices() {
-        return Services.filter(_service => _service.config.hasUI);
-    }
-
-
-    async setServiceEnableState(_serviceId, _enable) {
-        let installedServices = await this.#getInstalledServiceIdList();
-        if (!installedServices.includes(_serviceId) && _enable) return 'E_serviceNotInstalled';
-        if (!_enable)
-        {
-            let index = Config.server.enabledServices.findIndex((serviceId) => serviceId === _serviceId);
-            if (index === -1) return 'E_serviceAlreadyDisabled';
-            Config.server.enabledServices.splice(index, 1);
-        } else Config.server.enabledServices.push(_serviceId);
-        await ConfigFileManager.writeContent(Config);
-        this.restartServer();
-        return "Restarting";
-    }
-
-    restartServer() {
-        console.log("Restarting... PID: " + process.pid);
-        setTimeout(function () {
-            process.on("exit", function () {
-                child_process.spawn(process.argv.shift(), process.argv, {
-                    cwd: process.cwd(),
-                    detached: true,
-                    stdio: "inherit"
-                });
-            });
-            process.exit();
-        }, 5000);
-    }
-
-    async getServiceConditions() {
-        let enabledServiceIds = Config.server.enabledServices;
-        let installedServiceIds = await this.#getInstalledServiceIdList();
-        
-        let conditions = {};
-        for (let id of installedServiceIds)
-        {
-            conditions[id] = {state: 'Installed', error: false}
-            // Check for install-issues
-            // TODO: create a system that automatically rebuilds when the config has changed
-        }
-
-        for (let id of enabledServiceIds)
-        {
-            if (!conditions[id]) conditions[id] = {state: '', error: 'enabledServiceNotInstalled'}
-            conditions[id].state = 'EnabledInConfig';
-            conditions[id].enabled = true;
-        }
-
-        for (let service of Services)
-        {
-            conditions[service.id].state = 'NotLoaded';
-            if (service.enabled) conditions[service.id].state = "Loaded";
-            conditions[service.id].hasUI = service.config.hasUI;
-            conditions[service.id].isDeviceService = service.isDeviceService;
-            conditions[service.id].isSystemService = service.config.isSystemService;
-            if (service.condition.loadError) conditions[service.id].error = service.condition.loadError;
-            if (this.#outdatedServices.includes(service.id)) conditions[service.id].warning = "Files Outdated";
-        }
-
-        return conditions;
-    }
-
-    #outdatedServices = [];
-    #registerServiceChangeWatcher() {
-        fs.watch(`${__dirname}/services`, {recursive: true}, (eventType, filename) => {
-            let serviceId = filename.split('/')[0];
-            if (serviceId === '.DS_Store') return;
-            if (this.#outdatedServices.find(_serviceId => _serviceId === serviceId)) return;
-            this.#outdatedServices.push(serviceId);
-            this.getService('ServerManager')?.setOutDatedServices(this.#outdatedServices);
-        });
-    }
-
-
     async #getInstalledServiceIdList() {
         return readdirSync(__dirname + '/services', { withFileTypes: true })
             .filter(dirent => dirent.isDirectory())
             .map(dirent => dirent.name)
     }
 
-
-
-
-
+    getService(_id) {
+    	return Services.find(r => r.id === _id);
+    }
 
 
     async loadServices() {
+    	let installedServiceIds = await this.#getInstalledServiceIdList();
         let enabledServiceIds = Config.server.enabledServices;
-        let installedServiceIds = await this.#getInstalledServiceIdList();
+
+       	await this.#loadServices();
+        await this.#setupServices();
+        let success = await this.#enableServices();
+        
+        if (!success) return false;
+        Logger.log("Succesfully loaded " + Services.length + "/" + enabledServiceIds.length + " enabled services and " + Services.length + '/' + installedServiceIds.length + ' installed services.', null, 'SERVICES');
+        return true;
+    }
+
+    async #loadServices() {
+    	let installedServiceIds = await this.#getInstalledServiceIdList();
+        let enabledServiceIds = Config.server.enabledServices;
+
         Logger.log('Found ' + installedServiceIds.length + ' installed services.', null, 'SERVICES');
 
         let promises = [];
@@ -117,49 +48,51 @@ export default new class {
         {
             if (!installedServiceIds.includes(id))
             {
-                Logger.log('Error: Service ' + id + ' could not be found.', null, 'SERVICES');
+                Logger.log('Warning: Service ' + id + ' not installed: skipping.', null, 'SERVICES');
                 continue;
             }
 
-            promises.push(this.#loadService(id));
+            promises.push(this.#loadService(id).then(s => Services.push(s)));
         }
 
-        await Promise.all(promises);
-        
-        let setupPromises = []
-        for (let service of Services) setupPromises.push(service.setup());
-        await Promise.all(setupPromises);
+        return await Promise.all(promises);
+    }
+    async #setupServices() {
+    	return Promise.all(Services.map(s => s.setup()));
+    }
 
-
-        // Enable all services
-        for (let service of Services) await this.#enableService(service);
-        Logger.log("Succesfully loaded " + Services.length + "/" + enabledServiceIds.length + " enabled services and " + Services.length + '/' + installedServiceIds.length + ' installed services.', null, 'SERVICES');
+    async #enableServices() {
+    	for (let service of Services) {
+        	let success = await this.#enableService(service);
+        	if (!success)
+        	{
+        		Logger.log(`Error: Failed to load service ${service.id}, check the configuration. Stopping.`, null, 'SERVICES');
+        		return false;
+        	} else {
+        		Logger.log(`Succesfully enabled service ${service.id}`, null, 'SERVICES');
+        	}
+        }
+        return true;
     }
 
 
+
     async #loadService(_serviceId) {
-        let FM = new FileManager("../services/" + _serviceId + "/config.json");
+        let FM = new FileManager("services/" + _serviceId + "/config.json");
         if (!(await FM.fileExists())) return Logger.log('Error: ' + _serviceId + '\'s config.json-file was not found.', null, 'SERVICES');
         let serviceConfig = await FM.getContent(true);
 
         let FMJS = new FileManager("../services/" + _serviceId + "/server/service.js");
         if (!(await FM.fileExists())) return Logger.log('Error: ' + _serviceId + '\'s service.js-file was not found.', null, 'SERVICES');
-
-        await import('./services/' + _serviceId + '/server/service.js').then((mod) => {
-            Services.push(new mod.default({id: _serviceId, config: serviceConfig}));
-        });
+		return new ServiceInterface(_serviceId, serviceConfig);
     }
 
-
-
-
-  
 
     async #enableService(_service, _curDepth = 0) {
         if (_service.enabled) return;
         if (_curDepth > 100) return Logger.log('Error: Invalid require-order: stackoverflow', null, 'SERVICES');
 
-        for (let requiredServiceId of _service.requiredServices)
+        for (let requiredServiceId of _service.requiredServiceIds)
         {
             let curService = this.getService(requiredServiceId);
             if (!curService) {
@@ -167,12 +100,13 @@ export default new class {
                 return Logger.log(`Error: Required service not found (${requiredServiceId} on ${_service.id})`, null, 'SERVICES');
             }
             if (curService.enabled) continue;
-            await this.#enableService(curService, _curDepth + 1);
+            let success = await this.#enableService(curService, _curDepth + 1);
+            if (!success) return false;
         }
 
 
         let requiredServices = {};
-        for (let serviceId of _service.requiredServices)
+        for (let serviceId of _service.requiredServiceIds)
         {
             let service = this.getService(serviceId);
             if (!service.enabled) return;
@@ -183,26 +117,65 @@ export default new class {
         _service.onLoadRequiredServices(requiredServices);
         _service.enabled = true;
         
-        Logger.log("Enabled " + _service.id, null, 'SERVICES');
-        await _service.enable();
+        await _service.onEnable();
         this.#resolveOnWantedServiceLoad(_service);
+        return true;
     }
 
     async #resolveOnWantedServiceLoad(_service) {
         for (let service of Services)
         {
-            if (!service.wantedServices.includes(_service.id)) continue;
+            if (!service.wantedServicesIds.includes(_service.id)) continue;
             Logger.log("Loaded wanted service " + _service.id + " of " + service.id + ".", null, 'SERVICES');
             service.Services[_service.id] = _service;
             service.onWantedServiceLoad(_service);
         }
-    }
-
-    constructor() {
-        this.loadingPromise = this.loadServices();
-        this.#registerServiceChangeWatcher();;
-    }
+    } 
 }
 
 
 
+
+
+class ServiceInterface {
+	config;
+	id;
+	process;
+	enabled = false;
+	condition = {};
+
+	Services = {};
+
+	get requiredServiceIds() {
+		return this.config.needs || [];
+	}
+	get wantedServicesIds() {
+		return this.config.wants || [];
+	}
+
+	constructor(_id, _config) {
+		this.config = _config;
+		this.id = _id;
+
+		this.process = fork('serviceSpawner.js', [this.id]);
+
+		this.process.on('message', (message) => {
+		  console.log(`Message from child: ${message}`);
+		});
+
+		this.process.on('close', (code) => {
+			console.log(`child process exited with code ${code}`);
+		});
+	}
+
+	async setup() {
+
+	}
+	async onEnable() {
+
+	}
+
+	onLoadRequiredServices(_services) {
+
+	}
+}

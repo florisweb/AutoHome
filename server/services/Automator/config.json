@@ -1,5 +1,0 @@
-{
-    "hasUI": false,
-    "key": "",
-    "wants": ["LocTracker", "SceneManager", "PianoManager", "LEDStrip", "StateManager"]
-}

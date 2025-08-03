@@ -1,5 +1,6 @@
 {
     "hasUI": true,
     "key": "heyThereTest",
-    "wants": ["ShortCutAPI"]
+    "wants": ["ShortCutAPI"],
+    "needs": []
 }

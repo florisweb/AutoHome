@@ -1,8 +1,0 @@
-{
-    "name": "Good Night",
-    "state": [
-        ["CableLamp.lampOn", false],
-        ["CableLamp.sternIntensity", 0, {"setFunc": "animateSternIntensity"}],
-        ["LEDStrip.baseColor", [0, 0, 0], {"setFunc": "animateBaseColor"}]
-    ]
-}
