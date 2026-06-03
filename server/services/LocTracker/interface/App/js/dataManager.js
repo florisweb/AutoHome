@@ -4,7 +4,11 @@ const COLORS = [
   [0, 0, 255],
   [200, 200, 0],
   [255, 0, 255],
-  [0, 200, 200]
+  [0, 200, 200],
+  [255, 0, 200],
+  [255, 100, 0],
+  [0, 255, 150],
+  [0, 150, 255],
 ];
 
 const DataManager = new class {
@@ -44,8 +48,8 @@ const DataManager = new class {
 
   async setup() {
     await this.#fetchData();
-    this.#fetchCountryList().then(() => onChange());
-    this.#fetchTravelList().then(() => onChange());
+    this.#fetchCountryList().then(() => MapManager.onChange());
+    this.#fetchTravelList().then(() => MapManager.onChange());
     setInterval(() => this.#fetchData(), 1000 * 30);
   }
 
@@ -145,6 +149,7 @@ const DataManager = new class {
     TopBar.update();
     CountryPanel.update(this.countryList);
     TravelPanel.update(this.travelList);
+    MapManager.onDataLoad();
   }
 }
 
