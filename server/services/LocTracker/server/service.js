@@ -44,9 +44,10 @@ export default class extends Service {
 
     dataManager = new (function(_service) {
         let fm = new ServiceFileManager({path: "data.json", defaultValue: []}, _service);
-        this.addDataPoint = async function({lat, long}) {
+        this.addDataPoint = async function({lat, long, date}) {
             let data = await fm.getContent();
-            data.push({date: Date.now(), lat: lat, long: long});
+            if (!date || isNaN(date)) date = Date.now();
+            data.push({date: date, lat: lat, long: long});
             return fm.writeContent(data);
         }
         this.getData = function() {
@@ -124,6 +125,16 @@ export default class extends Service {
                         lat: parseFloat(_data.lat),
                         long: parseFloat(_data.long),
                     }
+
+                    let date = _data.date;
+                    if (date) 
+                    {
+                        const [datePart, timePart] = date.split(", ");
+                        const [day, month, year] = datePart.split("-");
+                        const [hour, minute] = timePart.split(":");
+                        data.date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
+                    }
+
                     if (isNaN(data.lat) || isNaN(data.long)) return _response.sendStatus(400);
                     this.dataManager.addDataPoint(data);
 
