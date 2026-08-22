@@ -37,7 +37,7 @@ const WebServer = new class {
                 return endpoint.onRequest(_request, _response);
             } catch (e) {
                 console.log(e)
-                return _response.send('An error accured while trying to handle your request to ' + _request.url + ' on ' + endpoint.url);
+                return _response.send('An error occurred while trying to handle your request to ' + _request.url + ' on ' + endpoint.url);
             }
         }
 
