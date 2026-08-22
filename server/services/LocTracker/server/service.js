@@ -46,8 +46,8 @@ export default class extends Service {
         let fm = new ServiceFileManager({path: "data.json", defaultValue: []}, _service);
         this.addDataPoint = async function({lat, long, date}) {
             let data = await fm.getContent();
-            if (!date || isNaN(date)) date = Date.now();
-            data.push({date: date, lat: lat, long: long});
+            if (!date || isNaN(date)) date = new Date();
+            data.push({date: date.getTime(), lat: lat, long: long});
             return fm.writeContent(data);
         }
         this.getData = function() {
@@ -246,26 +246,24 @@ export default class extends Service {
 
 
     async getTravelList() {
-        let dataPoints = await this.dataManager.getData();
+        const dataPoints = await this.dataManager.getData();
         if (dataPoints.length < 2) return [];
-        dataPoints.sort((a, b) => new Date(a.date).getTime() > new Date(b.date).getTime());
-        let countries = await this.getCountryList();
+        const sortedData = dataPoints.sort((a, b) => a.date - b.date);
+        const countries = await this.getCountryList();
 
         let sections = [];
-        let prevPoint = dataPoints[0];
+        let prevPoint = sortedData[0];
         let prevCountry = this.#getCountryFromPoint(prevPoint, countries);
-
-        for (let i = 1; i < dataPoints.length; i++)
+        for (let i = 1; i < sortedData.length; i++)
         {
-            let curCountry = this.#getCountryFromPoint(dataPoints[i], countries);
-            if (curCountry === prevCountry && i !== dataPoints.length - 1) continue;
-
+            let curCountry = this.#getCountryFromPoint(sortedData[i], countries);
+            if ((curCountry === prevCountry || curCountry === "Unknown") && i !== sortedData.length - 1) continue;
             sections.push({
                 country: prevCountry,
                 start: prevPoint.date,
-                end: dataPoints[i].date
+                end: sortedData[i].date
             });
-            prevPoint = dataPoints[i];
+            prevPoint = sortedData[i];
             prevCountry = curCountry;
         }
 
